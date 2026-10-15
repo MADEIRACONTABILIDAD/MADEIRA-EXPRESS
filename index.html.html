@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Facturación, Inventario y Sucursales</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col">
+
+  <!-- PANTALLA DE LOGIN -->
+  <div id="pantalla-login" class="fixed inset-0 bg-slate-900 bg-opacity-70 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
+      <div class="text-center mb-6">
+        <div class="inline-flex p-3 bg-indigo-100 text-indigo-600 rounded-full mb-2">
+          <i data-lucide="store" class="w-8 h-8"></i>
+        </div>
+        <h2 class="text-xl font-bold text-slate-800">Acceso al Sistema</h2>
+        <p class="text-xs text-slate-400">Ingresa tus credenciales autorizadas</p>
+      </div>
+      <form onsubmit="iniciarSesion(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Usuario</label>
+          <input type="text" id="login-user" required autocomplete="off" placeholder="Ingresa tu usuario" class="w-full text-sm p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Contraseña</label>
+          <input type="password" id="login-pass" required placeholder="Ingresa tu contraseña" class="w-full text-sm p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+        </div>
+        <button type="submit" id="btn-login" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-sm transition">
+          Ingresar
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- APLICACIÓN PRINCIPAL -->
+  <div id="app-contenido" class="hidden flex-1 flex flex-col">
+    <!-- ENCABEZADO -->
+    <header class="bg-indigo-700 text-white px-6 py-3 flex justify-between items-center shadow-md">
+      <div class="flex items-center space-x-3">
+        <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+        <div>
+          <h1 class="text-lg font-bold">POS & Inventario</h1>
+          <p id="badge-sucursal" class="text-xs text-indigo-200">Cargando...</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button onclick="cambiarVista('pos')" id="tab-pos" class="px-3 py-1.5 bg-indigo-800 rounded-md text-xs font-semibold flex items-center gap-1.5">
+          <i data-lucide="shopping-cart" class="w-4 h-4"></i> Vender
+        </button>
+        <button onclick="cambiarVista('inventario')" id="tab-inv" class="px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
+          <i data-lucide="package" class="w-4 h-4"></i> Inventario
+        </button>
+        <button onclick="cambiarVista('ventas')" id="tab-ventas" class="px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
+          <i data-lucide="receipt" class="w-4 h-4"></i> Reporte Ventas
+        </button>
+        <button onclick="cambiarVista('admin')" id="tab-admin" class="hidden px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
+          <i data-lucide="settings" class="w-4 h-4"></i> Sucursales y Personal
+        </button>
+        <button onclick="cerrarSesion()" class="ml-4 px-3 py-1.5 bg-red-600 hover:bg-red-700 rounded-md text-xs font-semibold flex items-center gap-1">
+          <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Salir
+        </button>
+      </div>
+    </header>
+
+    <main class="flex-1 p-6 max-w-7xl mx-auto w-full">
+
+      <!-- VISTA: VENDER (POS) -->
+      <div id="vista-pos" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-5">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="font-bold text-slate-800 flex items-center gap-2"><i data-lucide="grid" class="w-5 h-5 text-indigo-600"></i> Catálogo de Venta</h2>
+            <input type="text" id="buscar-pos" oninput="filtrarProductosPOS()" placeholder="Buscar producto o código..." class="text-sm p-2 border rounded-lg w-64">
+          </div>
+          <div id="grid-pos" class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[550px] overflow-y-auto"></div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-5 flex flex-col justify-between">
+          <div>
+            <div class="flex justify-between items-center pb-3 border-b mb-3">
+              <h2 class="font-bold text-slate-800 flex items-center gap-2"><i data-lucide="file-text" class="w-5 h-5 text-indigo-600"></i> Ticket Actual</h2>
+              <button onclick="limpiarCarrito()" class="text-xs text-red-500 hover:underline">Vaciar</button>
+            </div>
+            <div class="mb-3">
+              <label class="block text-xs font-bold text-slate-500 mb-1">Cédula / RUC</label>
+              <input type="text" id="pos-doc-cliente" value="9999999999" class="w-full text-xs p-2 border rounded">
+            </div>
+            <div id="carrito-items" class="space-y-2 max-h-[280px] overflow-y-auto"></div>
+          </div>
+          <div class="border-t pt-4">
+            <div class="flex justify-between text-xl font-bold mb-3">
+              <span>Total:</span>
+              <span id="pos-total-txt" class="text-indigo-600">$0.00</span>
+            </div>
+            <select id="pos-metodo" class="w-full text-sm p-2 border rounded mb-3">
+              <option value="EFECTIVO">Efectivo</option>
+              <option value="TRANSFERENCIA">Transferencia</option>
+              <option value="CREDITO">Crédito</option>
+            </select>
+            <button onclick="cobrarTicket()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg flex items-center justify-center gap-2">
+              <i data-lucide="check-circle" class="w-5 h-5"></i> Cobrar e Imprimir
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- VISTA: INVENTARIO -->
+      <div id="vista-inventario" class="hidden space-y-6">
+        <div class="bg-white p-5 rounded-xl border border-slate-200">
+          <h2 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="plus-circle" class="w-5 h-5 text-indigo-600"></i> Ingresar Producto al Inventario</h2>
+          <form onsubmit="crearProducto(event)" class="grid grid-cols-1 sm:grid-cols-5 gap-3">
+            <input type="text" id="inv-nombre" required placeholder="Nombre del producto" class="text-sm p-2 border rounded">
+            <input type="text" id="inv-codigo" placeholder="Código / IMEI" class="text-sm p-2 border rounded">
+            <input type="number" step="0.01" id="inv-costo" required placeholder="P. Costo ($)" class="text-sm p-2 border rounded">
+            <input type="number" step="0.01" id="inv-venta" required placeholder="P. Venta ($)" class="text-sm p-2 border rounded">
+            <div class="flex gap-2">
+              <input type="number" id="inv-stock" required placeholder="Stock" value="1" class="w-full text-sm p-2 border rounded">
+              <button type="submit" class="bg-indigo-600 text-white px-4 rounded font-bold text-sm">Guardar</button>
+            </div>
+          </form>
+        </div>
+        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+          <table class="w-full text-sm text-left">
+            <thead class="bg-slate-50 text-slate-500 uppercase text-xs border-b">
+              <tr>
+                <th class="p-3">Código</th>
+                <th class="p-3">Producto</th>
+                <th class="p-3 text-right">P. Costo</th>
+                <th class="p-3 text-right">P. Venta</th>
+                <th class="p-3 text-center">Stock</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-stock" class="divide-y"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- VISTA: REPORTE DE VENTAS -->
+      <div id="vista-ventas" class="hidden space-y-4">
+        <div class="bg-white p-5 rounded-xl border border-slate-200">
+          <h2 class="font-bold text-slate-800 mb-2 flex items-center gap-2"><i data-lucide="history" class="w-5 h-5 text-indigo-600"></i> Historial de Ventas</h2>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+              <thead class="bg-slate-50 text-slate-500 uppercase text-xs border-b">
+                <tr>
+                  <th class="p-3">Nº Comprobante</th>
+                  <th class="p-3">Fecha y Hora</th>
+                  <th class="p-3">Método</th>
+                  <th class="p-3 text-right">Total</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-ventas-body" class="divide-y"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- VISTA: ADMINISTRACIÓN (SUCURSALES Y TRABAJADORES) -->
+      <div id="vista-admin" class="hidden space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-white p-5 rounded-xl border border-slate-200">
+            <h2 class="font-bold mb-3 flex items-center gap-2"><i data-lucide="map-pin" class="w-5 h-5 text-indigo-600"></i> Crear Nueva Sucursal</h2>
+            <form onsubmit="crearSucursal(event)" class="space-y-3">
+              <input type="text" id="suc-nombre" required placeholder="Nombre de la sucursal" class="w-full text-sm p-2 border rounded">
+              <input type="text" id="suc-dir" placeholder="Dirección del local" class="w-full text-sm p-2 border rounded">
+              <button type="submit" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded text-sm">Registrar Sucursal</button>
+            </form>
+            <div class="mt-4">
+              <h3 class="text-xs font-bold text-slate-400 uppercase mb-2">Sucursales Activas:</h3>
+              <ul id="lista-sucursales" class="text-sm space-y-1"></ul>
+            </div>
+          </div>
+
+          <div class="bg-white p-5 rounded-xl border border-slate-200">
+            <h2 class="font-bold mb-3 flex items-center gap-2"><i data-lucide="users" class="w-5 h-5 text-indigo-600"></i> Crear Nuevo Trabajador</h2>
+            <form onsubmit="crearUsuario(event)" class="space-y-3">
+              <input type="text" id="user-nombre" required placeholder="Nombre completo" class="w-full text-sm p-2 border rounded">
+              <div class="grid grid-cols-2 gap-2">
+                <input type="text" id="user-alias" required placeholder="Usuario" class="text-sm p-2 border rounded">
+                <input type="password" id="user-clave" required placeholder="Contraseña" class="text-sm p-2 border rounded">
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <select id="user-rol" class="text-sm p-2 border rounded">
+                  <option value="VENDEDOR">Vendedor</option>
+                  <option value="ADMIN">Administrador</option>
+                </select>
+                <select id="user-sucursal" class="text-sm p-2 border rounded"></select>
+              </div>
+              <button type="submit" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded text-sm">Crear Cuenta</button>
+            </form>
+            <div class="mt-4">
+              <h3 class="text-xs font-bold text-slate-400 uppercase mb-2">Personal Registrado:</h3>
+              <ul id="lista-personal" class="text-sm space-y-1"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://pjpkcqyfocuwgxjxntan.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqcGtjcXlmb2N1d2d4anhudGFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMzMyMjcsImV4cCI6MjEwNzYwOTIyN30.a3pNRzsxjIK_xXFRBd8bP6JUENqBSf8JtsRXAI0sc3Y";
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let usuarioActual = null;
+    let sucursales = [];
+    let productos = [];
+    let carrito = [];
+
+    async function iniciarSesion(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-login');
+      btn.innerText = "Verificando...";
+      btn.disabled = true;
+
+      const u = document.getElementById('login-user').value.trim();
+      const p = document.getElementById('login-pass').value.trim();
+
+      try {
+        const { data, error } = await db.from('usuarios_sistema').select('*').eq('usuario', u).eq('clave', p);
+
+        if (error) {
+          alert("Error de conexión: " + error.message);
+          return;
+        }
+
+        if (!data || data.length === 0) {
+          alert("Usuario o contraseña incorrectos.");
+          return;
+        }
+
+        usuarioActual = data[0];
+        document.getElementById('pantalla-login').classList.add('hidden');
+        document.getElementById('app-contenido').classList.remove('hidden');
+
+        document.getElementById('badge-sucursal').innerText = `Usuario: ${usuarioActual.nombre_completo} (${usuarioActual.rol})`;
+
+        if (usuarioActual.rol === 'ADMIN') {
+          document.getElementById('tab-admin').classList.remove('hidden');
+        }
+
+        await cargarDatos();
+        lucide.createIcons();
+      } catch (err) {
+        alert("Ocurrió un error inesperado: " + err.message);
+      } finally {
+        btn.innerText = "Ingresar";
+        btn.disabled = false;
+      }
+    }
+
+    function cerrarSesion() {
+      usuarioActual = null;
+      document.getElementById('login-user').value = '';
+      document.getElementById('login-pass').value = '';
+      document.getElementById('pantalla-login').classList.remove('hidden');
+      document.getElementById('app-contenido').classList.add('hidden');
+    }
+
+    async function cargarDatos() {
+      await cargarSucursales();
+      await cargarProductos();
+      await cargarVentas();
+      if (usuarioActual && usuarioActual.rol === 'ADMIN') {
+        await cargarUsuariosLista();
+      }
+    }
+
+    async function cargarSucursales() {
+      const { data } = await db.from('sucursales').select('*');
+      sucursales = data || [];
+      const select = document.getElementById('user-sucursal');
+      if (select) select.innerHTML = '<option value="">Sin sede fija (Global)</option>';
+      const lista = document.getElementById('lista-sucursales');
+      if (lista) lista.innerHTML = '';
+
+      sucursales.forEach(s => {
+        if (select) select.innerHTML += `<option value="${s.id}">${s.nombre}</option>`;
+        if (lista) lista.innerHTML += `<li class="p-1.5 bg-slate-50 border rounded flex justify-between"><b>${s.nombre}</b> <span class="text-xs text-slate-400">${s.direccion || ''}</span></li>`;
+      });
+    }
+
+    async function cargarProductos() {
+      const { data } = await db.from('productos').select('*').order('id', { ascending: false });
+      productos = data || [];
+      renderizarPOS(productos);
+      renderizarInventario(productos);
+    }
+
+    async function cargarVentas() {
+      const { data } = await db.from('ventas').select('*').order('fecha', { ascending: false });
+      const t = document.getElementById('tabla-ventas-body');
+      t.innerHTML = '';
+      (data || []).forEach(v => {
+        t.innerHTML += `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3 font-mono font-bold">${v.numero_comprobante}</td>
+            <td class="p-3 text-slate-500">${new Date(v.fecha).toLocaleString()}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded text-xs bg-slate-100">${v.metodo_pago}</span></td>
+            <td class="p-3 text-right font-bold text-slate-800">$${parseFloat(v.total).toFixed(2)}</td>
+          </tr>
+        `;
+      });
+    }
+
+    async function cargarUsuariosLista() {
+      const { data } = await db.from('usuarios_sistema').select('*');
+      const l = document.getElementById('lista-personal');
+      if (!l) return;
+      l.innerHTML = '';
+      (data || []).forEach(u => {
+        l.innerHTML += `<li class="p-1.5 bg-slate-50 border rounded flex justify-between"><span><b>${u.nombre_completo}</b> (${u.usuario})</span> <span class="text-xs text-indigo-600 font-bold">${u.rol}</span></li>`;
+      });
+    }
+
+    async function crearSucursal(e) {
+      e.preventDefault();
+      const nombre = document.getElementById('suc-nombre').value;
+      const direccion = document.getElementById('suc-dir').value;
+      await db.from('sucursales').insert([{ nombre, direccion }]);
+      alert("Sucursal creada exitosamente.");
+      document.getElementById('suc-nombre').value = '';
+      document.getElementById('suc-dir').value = '';
+      cargarSucursales();
+    }
+
+    async function crearUsuario(e) {
+      e.preventDefault();
+      const nombre = document.getElementById('user-nombre').value;
+      const alias = document.getElementById('user-alias').value;
+      const clave = document.getElementById('user-clave').value;
+      const rol = document.getElementById('user-rol').value;
+      const sucursal_id = document.getElementById('user-sucursal').value || null;
+
+      const { error } = await db.from('usuarios_sistema').insert([{
+        nombre_completo: nombre,
+        usuario: alias,
+        clave: clave,
+        rol: rol,
+        sucursal_id: sucursal_id
+      }]);
+
+      if (error) {
+        alert("Error al crear usuario: " + error.message);
+        return;
+      }
+      alert("Trabajador registrado exitosamente.");
+      document.getElementById('user-nombre').value = '';
+      document.getElementById('user-alias').value = '';
+      document.getElementById('user-clave').value = '';
+      cargarUsuariosLista();
+    }
+
+    async function crearProducto(e) {
+      e.preventDefault();
+      const { error } = await db.from('productos').insert([{
+        nombre: document.getElementById('inv-nombre').value,
+        codigo_barras: document.getElementById('inv-codigo').value || null,
+        precio_costo: parseFloat(document.getElementById('inv-costo').value),
+        precio_venta: parseFloat(document.getElementById('inv-venta').value),
+        stock_actual: parseInt(document.getElementById('inv-stock').value)
+      }]);
+      if (error) alert(error.message);
+      else {
+        alert("Producto guardado.");
+        document.getElementById('inv-nombre').value = '';
+        document.getElementById('inv-codigo').value = '';
+        cargarProductos();
+      }
+    }
+
+    function renderizarPOS(lista) {
+      const c = document.getElementById('grid-pos');
+      c.innerHTML = '';
+      lista.forEach(p => {
+        c.innerHTML += `
+          <div onclick="agregarCarrito(${p.id})" class="border p-3 rounded-lg hover:border-indigo-500 cursor-pointer bg-white flex flex-col justify-between">
+            <div>
+              <p class="text-[11px] text-slate-400 font-mono">${p.codigo_barras || 'S/C'}</p>
+              <h4 class="font-bold text-xs text-slate-700">${p.nombre}</h4>
+            </div>
+            <div class="mt-2 flex justify-between items-center">
+              <span class="text-sm font-bold text-indigo-600">$${parseFloat(p.precio_venta).toFixed(2)}</span>
+              <span class="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded">Stock: ${p.stock_actual}</span>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function renderizarInventario(lista) {
+      const t = document.getElementById('tabla-stock');
+      t.innerHTML = '';
+      lista.forEach(p => {
+        t.innerHTML += `
+          <tr>
+            <td class="p-3 font-mono text-xs">${p.codigo_barras || '-'}</td>
+            <td class="p-3 font-semibold">${p.nombre}</td>
+            <td class="p-3 text-right font-mono">$${parseFloat(p.precio_costo).toFixed(2)}</td>
+            <td class="p-3 text-right font-mono font-bold">$${parseFloat(p.precio_venta).toFixed(2)}</td>
+            <td class="p-3 text-center font-bold">${p.stock_actual}</td>
+          </tr>
+        `;
+      });
+    }
+
+    function filtrarProductosPOS() {
+      const q = document.getElementById('buscar-pos').value.toLowerCase();
+      renderizarPOS(productos.filter(p => p.nombre.toLowerCase().includes(q) || (p.codigo_barras && p.codigo_barras.toLowerCase().includes(q))));
+    }
+
+    function agregarCarrito(id) {
+      const prod = productos.find(p => p.id === id);
+      const existe = carrito.find(c => c.id === id);
+      if (existe) existe.cantidad++;
+      else carrito.push({ ...prod, cantidad: 1 });
+      renderCarrito();
+    }
+
+    function renderCarrito() {
+      const c = document.getElementById('carrito-items');
+      c.innerHTML = '';
+      let total = 0;
+      carrito.forEach((item, idx) => {
+        const sub = item.cantidad * item.precio_venta;
+        total += sub;
+        c.innerHTML += `
+          <div class="flex justify-between items-center text-xs pb-1 border-b">
+            <div><b>${item.nombre}</b><p class="text-slate-400">$${item.precio_venta} c/u</p></div>
+            <div class="flex items-center gap-1">
+              <span class="font-bold">x${item.cantidad}</span>
+              <span class="font-bold w-12 text-right">$${sub.toFixed(2)}</span>
+              <button onclick="carrito.splice(${idx},1); renderCarrito();" class="text-red-500 font-bold ml-1">x</button>
+            </div>
+          </div>
+        `;
+      });
+      document.getElementById('pos-total-txt').innerText = `$${total.toFixed(2)}`;
+    }
+
+    function limpiarCarrito() {
+      carrito = [];
+      renderCarrito();
+    }
+
+    async function cobrarTicket() {
+      if (carrito.length === 0) return alert("Ticket vacío.");
+      const total = carrito.reduce((sum, i) => sum + (i.cantidad * i.precio_venta), 0);
+      const metodo = document.getElementById('pos-metodo').value;
+      const numComp = 'TKT-' + Math.floor(100000 + Math.random() * 900000);
+
+      let { data: cliente } = await db.from('clientes').select('id').eq('identificacion', '9999999999').single();
+      if (!cliente) {
+        const { data: nc } = await db.from('clientes').insert([{ identificacion: '9999999999', nombre_completo: 'CONSUMIDOR FINAL' }]).select().single();
+        cliente = nc;
+      }
+
+      const { data: venta, error } = await db.from('ventas').insert([{
+        numero_comprobante: numComp,
+        cliente_id: cliente.id,
+        total: total,
+        metodo_pago: metodo,
+        usuario_sistema_id: usuarioActual.id
+      }]).select().single();
+
+      if (error) return alert(error.message);
+
+      const items = carrito.map(i => ({
+        venta_id: venta.id,
+        producto_id: i.id,
+        cantidad: i.cantidad,
+        precio_unitario: i.precio_venta,
+        subtotal: i.cantidad * i.precio_venta
+      }));
+      await db.from('detalle_ventas').insert(items);
+
+      alert(`¡Venta realizada con éxito!\nTicket: ${numComp}\nTotal: $${total.toFixed(2)}`);
+      window.print();
+      limpiarCarrito();
+      cargarProductos();
+      cargarVentas();
+    }
+
+    function cambiarVista(v) {
+      ['pos', 'inventario', 'ventas', 'admin'].forEach(x => {
+        const el = document.getElementById('vista-' + x);
+        const tb = document.getElementById('tab-' + x);
+        if (el) el.classList.toggle('hidden', x !== v);
+        if (tb) {
+          tb.classList.toggle('bg-indigo-800', x === v);
+          tb.classList.toggle('hover:bg-indigo-600', x !== v);
+        }
+      });
+      lucide.createIcons();
+    }
+
+    window.onload = () => lucide.createIcons();
+  </script>
+</body>
+</html>
