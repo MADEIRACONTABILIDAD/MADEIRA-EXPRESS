@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistema de Facturación e Inventario</title>
+  <title>Sistema de Facturación, Inventario y Envíos USA</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -15,7 +15,7 @@
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
       <div class="text-center mb-6">
         <div class="inline-flex p-3 bg-indigo-100 text-indigo-600 rounded-full mb-2">
-          <i data-lucide="store" class="w-8 h-8"></i>
+          <i data-lucide="plane-takeoff" class="w-8 h-8"></i>
         </div>
         <h2 class="text-xl font-bold text-slate-800">Acceso al Sistema</h2>
         <p class="text-xs text-slate-400">Ingresa tus credenciales autorizadas</p>
@@ -38,27 +38,30 @@
 
   <!-- APLICACIÓN PRINCIPAL -->
   <div id="app-contenido" class="hidden flex-1 flex flex-col">
-    <!-- BARRA SUPERIOR -->
+    <!-- ENCABEZADO -->
     <header class="bg-indigo-700 text-white px-6 py-3 flex justify-between items-center shadow-md">
       <div class="flex items-center space-x-3">
-        <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+        <i data-lucide="package-check" class="w-7 h-7"></i>
         <div>
-          <h1 class="text-lg font-bold">Punto de Venta</h1>
+          <h1 class="text-lg font-bold">POS & Envíos Internacionales</h1>
           <p id="badge-sucursal" class="text-xs text-indigo-200">Cargando...</p>
         </div>
       </div>
       <div class="flex items-center space-x-2">
         <button onclick="cambiarVista('pos')" id="tab-pos" class="px-3 py-1.5 bg-indigo-800 rounded-md text-xs font-semibold flex items-center gap-1.5">
-          <i data-lucide="shopping-cart" class="w-4 h-4"></i> Vender
+          <i data-lucide="shopping-cart" class="w-4 h-4"></i> Ventas
         </button>
-        <!-- Pestaña de Inventario: Solo visible para ADMIN -->
+        <button onclick="cambiarVista('envios')" id="tab-envios" class="px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
+          <i data-lucide="send" class="w-4 h-4"></i> Envíos USA
+        </button>
+        <!-- Inventario: Solo visible para ADMIN -->
         <button onclick="cambiarVista('inventario')" id="tab-inv" class="hidden px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
           <i data-lucide="package" class="w-4 h-4"></i> Inventario
         </button>
         <button onclick="cambiarVista('ventas')" id="tab-ventas" class="px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
-          <i data-lucide="receipt" class="w-4 h-4"></i> Mis Ventas
+          <i data-lucide="receipt" class="w-4 h-4"></i> Historial Ventas
         </button>
-        <!-- Pestaña de Administración: Solo visible para ADMIN -->
+        <!-- Administración: Solo visible para ADMIN -->
         <button onclick="cambiarVista('admin')" id="tab-admin" class="hidden px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
           <i data-lucide="shield-check" class="w-4 h-4"></i> Sucursales y Usuarios
         </button>
@@ -70,12 +73,12 @@
 
     <main class="flex-1 p-6 max-w-7xl mx-auto w-full">
 
-      <!-- VISTA: VENDER (POS) -->
+      <!-- ==================== SECCIÓN 1: VENTAS (POS) ==================== -->
       <div id="vista-pos" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-5">
           <div class="flex justify-between items-center mb-4">
-            <h2 class="font-bold text-slate-800 flex items-center gap-2"><i data-lucide="grid" class="w-5 h-5 text-indigo-600"></i> Catálogo de Productos</h2>
-            <input type="text" id="buscar-pos" oninput="filtrarProductosPOS()" placeholder="Buscar por nombre o código..." class="text-sm p-2 border rounded-lg w-64 focus:ring-2 focus:ring-indigo-500 outline-none">
+            <h2 class="font-bold text-slate-800 flex items-center gap-2"><i data-lucide="grid" class="w-5 h-5 text-indigo-600"></i> Catálogo de Venta</h2>
+            <input type="text" id="buscar-pos" oninput="filtrarProductosPOS()" placeholder="Buscar producto o código..." class="text-sm p-2 border rounded-lg w-64 focus:ring-2 focus:ring-indigo-500 outline-none">
           </div>
           <div id="grid-pos" class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[550px] overflow-y-auto"></div>
         </div>
@@ -109,7 +112,166 @@
         </div>
       </div>
 
-      <!-- VISTA: INVENTARIO (SOLO ADMIN) -->
+      <!-- ==================== SECCIÓN 2: GESTIÓN DE ENVÍOS USA ==================== -->
+      <div id="vista-envios" class="hidden space-y-6">
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+          <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <i data-lucide="plane-takeoff" class="w-6 h-6 text-indigo-600"></i> Registro de Envío Internacional (USA)
+          </h2>
+          
+          <form onsubmit="registrarEnvio(event)" class="space-y-4">
+            <!-- Modalidad y Tracking -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Tipo de Envío</label>
+                <select id="env-tipo" class="w-full text-sm p-2.5 border rounded-lg bg-indigo-50 font-bold text-indigo-800 border-indigo-200">
+                  <option value="AEREO">✈️ Aéreo (Rápido)</option>
+                  <option value="MARITIMO">🚢 Marítimo (Carga / Cajas)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Código de Barras / Guía (Tracking)</label>
+                <div class="flex gap-2">
+                  <input type="text" id="env-tracking" placeholder="Escanear con pistola..." class="w-full text-sm p-2.5 border rounded-lg font-mono focus:ring-2 focus:ring-indigo-500">
+                  <button type="button" onclick="generarTracking()" class="px-3 bg-slate-200 hover:bg-slate-300 text-xs font-bold rounded-lg" title="Generar código automático">Auto</button>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Entrega en EE.UU.</label>
+                <select id="env-entrega" onchange="toggleDireccionUSA()" class="w-full text-sm p-2.5 border rounded-lg font-semibold">
+                  <option value="OFICINA">🏢 Retiro en Oficina (Pick-up)</option>
+                  <option value="DOMICILIO">🏠 Entrega a Domicilio</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Datos del Remitente y Destino -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Nombre del Cliente / Destinatario</label>
+                <input type="text" id="env-cliente" required placeholder="Ej: Juan Pérez" class="w-full text-sm p-2.5 border rounded-lg">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Teléfono de Contacto (WhatsApp)</label>
+                <input type="text" id="env-telefono" placeholder="+1 718-000-0000 o 099..." class="w-full text-sm p-2.5 border rounded-lg">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Ciudad de Destino en EE.UU.</label>
+                <input list="lista-ciudades-usa" id="env-ciudad" required placeholder="Escribe o selecciona ciudad..." class="w-full text-sm p-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500">
+                <datalist id="lista-ciudades-usa">
+                  <!-- Ciudades más habituales de envíos ecuatorianos -->
+                  <option value="New York, NY">
+                  <option value="Queens, NY">
+                  <option value="Brooklyn, NY">
+                  <option value="Bronx, NY">
+                  <option value="Newark, NJ">
+                  <option value="Jersey City, NJ">
+                  <option value="Miami, FL">
+                  <option value="Orlando, FL">
+                  <option value="Tampa, FL">
+                  <option value="Chicago, IL">
+                  <option value="Minneapolis, MN">
+                  <option value="Los Angeles, CA">
+                  <option value="Houston, TX">
+                  <option value="Dallas, TX">
+                  <option value="Atlanta, GA">
+                  <option value="Boston, MA">
+                  <option value="New Haven, CT">
+                  <option value="Danbury, CT">
+                  <option value="Philadelphia, PA">
+                  <option value="Washington, DC">
+                </datalist>
+              </div>
+            </div>
+
+            <!-- Dirección si es a Domicilio (Se oculta si es en oficina) -->
+            <div id="bloque-direccion-usa" class="hidden grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-3 rounded-lg border border-slate-200">
+              <div class="md:col-span-2">
+                <label class="block text-xs font-bold text-slate-600 mb-1">Dirección Exacta en EE.UU.</label>
+                <input type="text" id="env-direccion" placeholder="Ej: 123 5th Ave, Apt 4B" class="w-full text-sm p-2 border rounded-lg bg-white">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Código Postal (ZIP Code)</label>
+                <input type="text" id="env-zip" placeholder="Ej: 10001" class="w-full text-sm p-2 border rounded-lg bg-white font-mono">
+              </div>
+            </div>
+
+            <!-- Peso, Cobro y Foto -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Peso del Paquete / Caja</label>
+                <div class="flex gap-2">
+                  <input type="number" step="0.01" id="env-peso" required placeholder="0.00" class="w-full text-sm p-2.5 border rounded-lg font-bold text-slate-800">
+                  <select id="env-unidad-peso" class="text-sm p-2.5 border rounded-lg bg-slate-50 font-bold">
+                    <option value="LBS">Libras (lbs)</option>
+                    <option value="KG">Kilos (kg)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Valor Total del Envío ($)</label>
+                <input type="number" step="0.01" id="env-valor" required placeholder="0.00" class="w-full text-sm p-2.5 border rounded-lg font-bold text-indigo-600">
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Foto del Paquete / Caja</label>
+                <input type="file" id="env-foto-input" accept="image/*" onchange="previsualizarFoto(event)" class="text-xs w-full">
+              </div>
+            </div>
+
+            <!-- Previsualización de la foto seleccionada -->
+            <div id="preview-contenedor" class="hidden flex items-center gap-3 p-2 bg-slate-50 border rounded-lg w-max">
+              <img id="preview-img" src="" class="w-16 h-16 object-cover rounded border">
+              <div>
+                <p class="text-xs font-bold text-slate-700">Foto cargada</p>
+                <button type="button" onclick="quitarFoto()" class="text-xs text-red-500 hover:underline">Quitar foto</button>
+              </div>
+            </div>
+
+            <div class="pt-2">
+              <button type="submit" id="btn-guardar-envio" class="w-full md:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-sm flex items-center justify-center gap-2 shadow transition">
+                <i data-lucide="check-circle" class="w-4 h-4"></i> Guardar e Imprimir Etiqueta de Envío
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- TABLA DE ENVÍOS REALIZADOS -->
+        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+          <div class="p-4 border-b flex justify-between items-center">
+            <h3 class="font-bold text-slate-800 flex items-center gap-2">
+              <i data-lucide="archive" class="w-4 h-4 text-indigo-600"></i> Envíos Registrados
+            </h3>
+            <button onclick="cargarEnvios()" class="text-xs text-indigo-600 font-bold flex items-center gap-1 hover:underline">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Actualizar
+            </button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+              <thead class="bg-slate-50 text-slate-500 uppercase text-xs border-b">
+                <tr>
+                  <th class="p-3">Guía / Tracking</th>
+                  <th class="p-3">Tipo</th>
+                  <th class="p-3">Cliente</th>
+                  <th class="p-3">Destino USA</th>
+                  <th class="p-3">Peso</th>
+                  <th class="p-3 text-right">Valor</th>
+                  <th class="p-3 text-center">Foto</th>
+                  <th class="p-3 text-center">Estado</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-envios-body" class="divide-y"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== SECCIÓN 3: INVENTARIO (ADMIN) ==================== -->
       <div id="vista-inventario" class="hidden space-y-6">
         <div class="bg-white p-5 rounded-xl border border-slate-200">
           <h2 id="titulo-form-prod" class="font-bold mb-4 flex items-center gap-2">
@@ -146,7 +308,7 @@
         </div>
       </div>
 
-      <!-- VISTA: REPORTE DE VENTAS -->
+      <!-- ==================== SECCIÓN 4: HISTORIAL DE VENTAS ==================== -->
       <div id="vista-ventas" class="hidden space-y-4">
         <div class="bg-white p-5 rounded-xl border border-slate-200">
           <div class="flex justify-between items-center mb-3">
@@ -171,15 +333,13 @@
         </div>
       </div>
 
-      <!-- VISTA: ADMINISTRACIÓN (SOLO ADMIN: USUARIOS Y SUCURSALES) -->
+      <!-- ==================== SECCIÓN 5: ADMINISTRACIÓN (ADMIN) ==================== -->
       <div id="vista-admin" class="hidden space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
-          <!-- SUCURSALES -->
           <div class="bg-white p-5 rounded-xl border border-slate-200">
             <h2 class="font-bold mb-3 flex items-center gap-2"><i data-lucide="map-pin" class="w-5 h-5 text-indigo-600"></i> Gestión de Sucursales</h2>
             <form onsubmit="crearSucursal(event)" class="space-y-3">
-              <input type="text" id="suc-nombre" required placeholder="Nombre de la sucursal (ej: Isla Mall)" class="w-full text-sm p-2 border rounded">
+              <input type="text" id="suc-nombre" required placeholder="Nombre de la sucursal" class="w-full text-sm p-2 border rounded">
               <input type="text" id="suc-dir" placeholder="Dirección del local" class="w-full text-sm p-2 border rounded">
               <button type="submit" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded text-sm">Registrar Sucursal</button>
             </form>
@@ -189,21 +349,20 @@
             </div>
           </div>
 
-          <!-- USUARIOS (CREAR, EDITAR, ELIMINAR) -->
           <div class="bg-white p-5 rounded-xl border border-slate-200">
             <h2 class="font-bold mb-3 flex items-center gap-2">
               <i data-lucide="users" class="w-5 h-5 text-indigo-600"></i> <span id="txt-form-user">Crear Nuevo Trabajador</span>
             </h2>
             <form onsubmit="guardarUsuario(event)" class="space-y-3">
               <input type="hidden" id="edit-user-id">
-              <input type="text" id="user-nombre" required placeholder="Nombre completo del empleado" class="w-full text-sm p-2 border rounded">
+              <input type="text" id="user-nombre" required placeholder="Nombre completo" class="w-full text-sm p-2 border rounded">
               <div class="grid grid-cols-2 gap-2">
-                <input type="text" id="user-alias" required placeholder="Usuario de acceso" class="text-sm p-2 border rounded">
-                <input type="password" id="user-clave" placeholder="Contraseña (o nueva clave)" class="text-sm p-2 border rounded">
+                <input type="text" id="user-alias" required placeholder="Usuario" class="text-sm p-2 border rounded">
+                <input type="password" id="user-clave" placeholder="Contraseña" class="text-sm p-2 border rounded">
               </div>
               <div class="grid grid-cols-2 gap-2">
                 <select id="user-rol" class="text-sm p-2 border rounded">
-                  <option value="VENDEDOR">Vendedor (Solo Ventas)</option>
+                  <option value="VENDEDOR">Vendedor (Solo Ventas y Envíos)</option>
                   <option value="ADMIN">Administrador (Acceso Total)</option>
                 </select>
                 <select id="user-sucursal" class="text-sm p-2 border rounded"></select>
@@ -214,11 +373,10 @@
               </div>
             </form>
             <div class="mt-4">
-              <h3 class="text-xs font-bold text-slate-400 uppercase mb-2">Usuarios Registrados en el Sistema:</h3>
+              <h3 class="text-xs font-bold text-slate-400 uppercase mb-2">Personal Registrado:</h3>
               <div id="lista-personal" class="space-y-2 max-h-60 overflow-y-auto"></div>
             </div>
           </div>
-
         </div>
       </div>
 
@@ -234,9 +392,11 @@
     let sucursales = [];
     let productos = [];
     let usuariosLista = [];
+    let enviosLista = [];
     let carrito = [];
+    let fotoBase64 = null;
 
-    // AUTENTICACIÓN
+    // LOGIN
     async function iniciarSesion(e) {
       e.preventDefault();
       const btn = document.getElementById('btn-login');
@@ -248,7 +408,6 @@
 
       try {
         const { data, error } = await db.from('usuarios_sistema').select('*').eq('usuario', u).eq('clave', p);
-
         if (error) throw error;
         if (!data || data.length === 0) {
           alert("Usuario o contraseña incorrectos.");
@@ -261,7 +420,6 @@
 
         document.getElementById('badge-sucursal').innerText = `Usuario: ${usuarioActual.nombre_completo} [Rol: ${usuarioActual.rol}]`;
 
-        // REGLA DE PERMISOS: Solo el ADMIN ve Inventario y Administración
         if (usuarioActual.rol === 'ADMIN') {
           document.getElementById('tab-inv').classList.remove('hidden');
           document.getElementById('tab-admin').classList.remove('hidden');
@@ -274,7 +432,7 @@
         await cargarDatos();
         lucide.createIcons();
       } catch (err) {
-        alert("Error de inicio de sesión: " + err.message);
+        alert("Error de conexión: " + err.message);
       } finally {
         btn.innerText = "Ingresar";
         btn.disabled = false;
@@ -289,16 +447,146 @@
       document.getElementById('app-contenido').classList.add('hidden');
     }
 
-    // CARGA DE DATOS
     async function cargarDatos() {
       await cargarSucursales();
       await cargarProductos();
       await cargarVentas();
+      await cargarEnvios();
       if (usuarioActual && usuarioActual.rol === 'ADMIN') {
         await cargarUsuariosLista();
       }
     }
 
+    // ==================== MÓDULO ENVÍOS USA ====================
+    function toggleDireccionUSA() {
+      const tipo = document.getElementById('env-entrega').value;
+      const bloque = document.getElementById('bloque-direccion-usa');
+      bloque.classList.toggle('hidden', tipo === 'OFICINA');
+    }
+
+    function generarTracking() {
+      const prefijo = document.getElementById('env-tipo').value === 'AEREO' ? 'AIR' : 'SEA';
+      const num = Math.floor(10000000 + Math.random() * 90000000);
+      document.getElementById('env-tracking').value = `${prefijo}-${num}US`;
+    }
+
+    function previsualizarFoto(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        fotoBase64 = evt.target.result;
+        document.getElementById('preview-img').src = fotoBase64;
+        document.getElementById('preview-contenedor').classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function quitarFoto() {
+      fotoBase64 = null;
+      document.getElementById('env-foto-input').value = '';
+      document.getElementById('preview-contenedor').classList.add('hidden');
+    }
+
+    async function registrarEnvio(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-guardar-envio');
+      btn.innerText = "Guardando envío...";
+      btn.disabled = true;
+
+      let tracking = document.getElementById('env-tracking').value.trim();
+      if (!tracking) {
+        generarTracking();
+        tracking = document.getElementById('env-tracking').value;
+      }
+
+      const tipo = document.getElementById('env-tipo').value;
+      const entrega = document.getElementById('env-entrega').value;
+      const cliente = document.getElementById('env-cliente').value;
+      const telefono = document.getElementById('env-telefono').value;
+      const ciudad = document.getElementById('env-ciudad').value;
+      const direccion = entrega === 'DOMICILIO' ? document.getElementById('env-direccion').value : 'Retiro en Oficina USA';
+      const zip = entrega === 'DOMICILIO' ? document.getElementById('env-zip').value : null;
+      const peso = parseFloat(document.getElementById('env-peso').value);
+      const unidad = document.getElementById('env-unidad-peso').value;
+      const valor = parseFloat(document.getElementById('env-valor').value);
+
+      try {
+        const { error } = await db.from('envios_internacionales').insert([{
+          numero_guia: tracking,
+          tipo_transporte: tipo,
+          cliente_nombre: cliente,
+          cliente_telefono: telefono,
+          ciudad_destino: ciudad,
+          tipo_entrega: entrega,
+          direccion_destino: direccion,
+          zip_code: zip,
+          peso: peso,
+          unidad_peso: unidad,
+          valor_envio: valor,
+          foto_paquete_url: fotoBase64,
+          usuario_id: usuarioActual.id,
+          sucursal_id: usuarioActual.sucursal_id
+        }]);
+
+        if (error) throw error;
+
+        alert(`¡Envío registrado con éxito!\nGuía: ${tracking}\nDestino: ${ciudad} (${entrega})`);
+        
+        // Ventana para imprimir etiqueta
+        window.print();
+
+        // Limpiar formulario
+        e.target.reset();
+        quitarFoto();
+        toggleDireccionUSA();
+        cargarEnvios();
+      } catch (err) {
+        alert("Error al registrar envío: " + err.message);
+      } finally {
+        btn.innerText = "Guardar e Imprimir Etiqueta de Envío";
+        btn.disabled = false;
+      }
+    }
+
+    async function cargarEnvios() {
+      const { data, error } = await db.from('envios_internacionales').select('*').order('id', { ascending: false });
+      enviosLista = data || [];
+      const t = document.getElementById('tabla-envios-body');
+      t.innerHTML = '';
+
+      if (enviosLista.length === 0) {
+        t.innerHTML = `<tr><td colspan="8" class="text-center p-4 text-slate-400">No hay envíos registrados aún.</td></tr>`;
+        return;
+      }
+
+      enviosLista.forEach(env => {
+        t.innerHTML += `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3 font-mono font-bold text-indigo-700">${env.numero_guia}</td>
+            <td class="p-3">
+              <span class="px-2 py-0.5 rounded text-xs font-bold ${env.tipo_transporte === 'AEREO' ? 'bg-sky-100 text-sky-800' : 'bg-blue-100 text-blue-800'}">
+                ${env.tipo_transporte === 'AEREO' ? '✈️ Aéreo' : '🚢 Marítimo'}
+              </span>
+            </td>
+            <td class="p-3 font-semibold">${env.cliente_nombre}<br><span class="text-xs text-slate-400">${env.cliente_telefono || ''}</span></td>
+            <td class="p-3">${env.ciudad_destino}<br><span class="text-xs text-slate-400 font-bold">${env.tipo_entrega}</span></td>
+            <td class="p-3 font-bold">${env.peso} ${env.unidad_peso}</td>
+            <td class="p-3 text-right font-bold text-emerald-600">$${parseFloat(env.valor_envio).toFixed(2)}</td>
+            <td class="p-3 text-center">
+              ${env.foto_paquete_url ? `<img src="${env.foto_paquete_url}" onclick="window.open(this.src)" class="w-8 h-8 object-cover rounded cursor-pointer mx-auto border" title="Click para ver">` : '<span class="text-xs text-slate-400">Sin foto</span>'}
+            </td>
+            <td class="p-3 text-center">
+              <span class="px-2 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800">${env.estado}</span>
+            </td>
+          </tr>
+        `;
+      });
+      lucide.createIcons();
+    }
+
+    // ==================== RESTO DE FUNCIONES (POS, INVENTARIO, ADMIN) ====================
     async function cargarSucursales() {
       const { data } = await db.from('sucursales').select('*');
       sucursales = data || [];
@@ -324,7 +612,6 @@
 
     async function cargarVentas() {
       let query = db.from('ventas').select('*').order('fecha', { ascending: false });
-      // Si es vendedor, solo ve sus propias ventas
       if (usuarioActual.rol !== 'ADMIN') {
         query = query.eq('usuario_sistema_id', usuarioActual.id);
       }
@@ -343,14 +630,12 @@
       });
     }
 
-    // GESTIÓN DE USUARIOS (CREAR, EDITAR, ELIMINAR)
     async function cargarUsuariosLista() {
       const { data } = await db.from('usuarios_sistema').select('*');
       usuariosLista = data || [];
       const l = document.getElementById('lista-personal');
       if (!l) return;
       l.innerHTML = '';
-      
       usuariosLista.forEach(u => {
         l.innerHTML += `
           <div class="p-2 bg-slate-50 border rounded flex justify-between items-center text-xs">
@@ -377,23 +662,17 @@
       const sucursal_id = document.getElementById('user-sucursal').value || null;
 
       if (id) {
-        // MODIFICAR
         const payload = { nombre_completo: nombre, usuario: alias, rol: rol, sucursal_id: sucursal_id };
         if (clave.trim() !== '') payload.clave = clave;
-
         const { error } = await db.from('usuarios_sistema').update(payload).eq('id', id);
-        if (error) return alert("Error al modificar: " + error.message);
+        if (error) return alert(error.message);
         alert("Usuario actualizado.");
       } else {
-        // CREAR NUEVO
-        if (!clave) return alert("Debes asignarle una contraseña.");
-        const { error } = await db.from('usuarios_sistema').insert([{
-          nombre_completo: nombre, usuario: alias, clave: clave, rol: rol, sucursal_id: sucursal_id
-        }]);
-        if (error) return alert("Error al crear usuario: " + error.message);
-        alert("Usuario creado exitosamente.");
+        if (!clave) return alert("Debes asignar una contraseña.");
+        const { error } = await db.from('usuarios_sistema').insert([{ nombre_completo: nombre, usuario: alias, clave: clave, rol: rol, sucursal_id: sucursal_id }]);
+        if (error) return alert(error.message);
+        alert("Usuario registrado.");
       }
-
       cancelarEdicionUser();
       cargarUsuariosLista();
     }
@@ -405,12 +684,10 @@
       document.getElementById('user-nombre').value = u.nombre_completo;
       document.getElementById('user-alias').value = u.usuario;
       document.getElementById('user-clave').value = '';
-      document.getElementById('user-clave').placeholder = "Dejar en blanco para conservar clave";
       document.getElementById('user-rol').value = u.rol;
       document.getElementById('user-sucursal').value = u.sucursal_id || '';
-
       document.getElementById('txt-form-user').innerText = "Modificar Usuario";
-      document.getElementById('btn-save-user').innerText = "Actualizar Cambios";
+      document.getElementById('btn-save-user').innerText = "Actualizar";
       document.getElementById('btn-cancel-user').classList.remove('hidden');
     }
 
@@ -419,23 +696,18 @@
       document.getElementById('user-nombre').value = '';
       document.getElementById('user-alias').value = '';
       document.getElementById('user-clave').value = '';
-      document.getElementById('user-clave').placeholder = "Contraseña";
       document.getElementById('txt-form-user').innerText = "Crear Nuevo Trabajador";
       document.getElementById('btn-save-user').innerText = "Guardar Usuario";
       document.getElementById('btn-cancel-user').classList.add('hidden');
     }
 
     async function eliminarUsuario(id, alias) {
-      if (!confirm(`¿Estás seguro de eliminar al usuario @${alias}? Ya no podrá ingresar.`)) return;
+      if (!confirm(`¿Eliminar al usuario @${alias}?`)) return;
       const { error } = await db.from('usuarios_sistema').delete().eq('id', id);
-      if (error) alert("Error al eliminar: " + error.message);
-      else {
-        alert("Usuario eliminado.");
-        cargarUsuariosLista();
-      }
+      if (error) alert(error.message);
+      else { alert("Usuario eliminado."); cargarUsuariosLista(); }
     }
 
-    // GESTIÓN DE PRODUCTOS (SOLO ADMIN: CREAR, EDITAR, ELIMINAR)
     async function guardarProducto(e) {
       e.preventDefault();
       const id = document.getElementById('edit-prod-id').value;
@@ -446,21 +718,14 @@
       const stock = parseInt(document.getElementById('inv-stock').value);
 
       if (id) {
-        // MODIFICAR
-        const { error } = await db.from('productos').update({
-          nombre, codigo_barras: codigo, precio_costo: costo, precio_venta: venta, stock_actual: stock
-        }).eq('id', id);
-        if (error) return alert("Error al actualizar: " + error.message);
-        alert("Producto modificado correctamente.");
+        const { error } = await db.from('productos').update({ nombre, codigo_barras: codigo, precio_costo: costo, precio_venta: venta, stock_actual: stock }).eq('id', id);
+        if (error) return alert(error.message);
+        alert("Producto modificado.");
       } else {
-        // CREAR
-        const { error } = await db.from('productos').insert([{
-          nombre, codigo_barras: codigo, precio_costo: costo, precio_venta: venta, stock_actual: stock
-        }]);
-        if (error) return alert("Error al registrar: " + error.message);
-        alert("Producto registrado correctamente.");
+        const { error } = await db.from('productos').insert([{ nombre, codigo_barras: codigo, precio_costo: costo, precio_venta: venta, stock_actual: stock }]);
+        if (error) return alert(error.message);
+        alert("Producto guardado.");
       }
-
       cancelarEdicionProd();
       cargarProductos();
     }
@@ -474,7 +739,6 @@
       document.getElementById('inv-costo').value = p.precio_costo;
       document.getElementById('inv-venta').value = p.precio_venta;
       document.getElementById('inv-stock').value = p.stock_actual;
-
       document.getElementById('txt-form-prod').innerText = "Modificar Producto";
       document.getElementById('btn-save-prod').innerText = "Actualizar";
       document.getElementById('btn-cancel-prod').classList.remove('hidden');
@@ -493,13 +757,10 @@
     }
 
     async function eliminarProducto(id, nombre) {
-      if (!confirm(`¿Eliminar definitivamente "${nombre}" del catálogo?`)) return;
+      if (!confirm(`¿Eliminar permanentemente "${nombre}"?`)) return;
       const { error } = await db.from('productos').delete().eq('id', id);
-      if (error) alert("Error al eliminar producto: " + error.message);
-      else {
-        alert("Producto eliminado.");
-        cargarProductos();
-      }
+      if (error) alert(error.message);
+      else { alert("Producto eliminado."); cargarProductos(); }
     }
 
     function renderizarInventario(lista) {
@@ -522,7 +783,6 @@
       });
     }
 
-    // POS & VENTAS
     function renderizarPOS(lista) {
       const c = document.getElementById('grid-pos');
       c.innerHTML = '';
@@ -586,7 +846,7 @@
     }
 
     async function cobrarTicket() {
-      if (carrito.length === 0) return alert("El ticket está vacío.");
+      if (carrito.length === 0) return alert("Ticket vacío.");
       const total = carrito.reduce((sum, i) => sum + (i.cantidad * i.precio_venta), 0);
       const metodo = document.getElementById('pos-metodo').value;
       const numComp = 'TKT-' + Math.floor(100000 + Math.random() * 900000);
@@ -605,7 +865,7 @@
         usuario_sistema_id: usuarioActual.id
       }]).select().single();
 
-      if (error) return alert("Error al registrar venta: " + error.message);
+      if (error) return alert("Error al cobrar: " + error.message);
 
       const items = carrito.map(i => ({
         venta_id: venta.id,
@@ -635,7 +895,7 @@
     }
 
     function cambiarVista(v) {
-      ['pos', 'inventario', 'ventas', 'admin'].forEach(x => {
+      ['pos', 'envios', 'inventario', 'ventas', 'admin'].forEach(x => {
         const el = document.getElementById('vista-' + x);
         const tb = document.getElementById('tab-' + x);
         if (el) el.classList.toggle('hidden', x !== v);
