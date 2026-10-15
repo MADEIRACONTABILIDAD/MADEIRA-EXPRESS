@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistema de Facturación, Inventario y Envíos USA</title>
+  <title>Sistema POS, Inventario & Courier Internacional</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -52,7 +52,7 @@
           <i data-lucide="shopping-cart" class="w-4 h-4"></i> Ventas
         </button>
         <button onclick="cambiarVista('envios')" id="tab-envios" class="px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
-          <i data-lucide="send" class="w-4 h-4"></i> Envíos USA
+          <i data-lucide="send" class="w-4 h-4"></i> Envíos
         </button>
         <button onclick="cambiarVista('inventario')" id="tab-inv" class="hidden px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
           <i data-lucide="package" class="w-4 h-4"></i> Inventario
@@ -110,22 +110,33 @@
         </div>
       </div>
 
-      <!-- ==================== SECCIÓN 2: GESTIÓN DE ENVÍOS USA ==================== -->
+      <!-- ==================== SECCIÓN 2: GESTIÓN DE ENVÍOS (USA & NICARAGUA) ==================== -->
       <div id="vista-envios" class="hidden space-y-6">
         <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-          <div class="border-b pb-3 mb-5 flex justify-between items-center">
+          
+          <div class="border-b pb-4 mb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
-                <i data-lucide="plane-takeoff" class="w-6 h-6 text-indigo-600"></i> Registro de Envío a Estados Unidos
+                <i data-lucide="plane-takeoff" class="w-6 h-6 text-indigo-600"></i> Guía de Envío Internacional
               </h2>
-              <p class="text-xs text-slate-400">Guía internacional con datos de remitente, destinatario y control aduanero</p>
+              <p class="text-xs text-slate-400">Selecciona la ruta de transporte y completa los datos aduaneros</p>
             </div>
+
+            <!-- SELECTOR DE RUTA -->
+            <div class="flex items-center gap-2">
+              <label class="text-xs font-bold text-slate-600">Ruta de Envío:</label>
+              <select id="env-ruta" onchange="cambiarRutaEnvio()" class="text-xs font-bold py-2 px-3 border-2 border-indigo-500 rounded-lg bg-indigo-50 text-indigo-800">
+                <option value="USA">✈️ Hacia Estados Unidos (USA)</option>
+                <option value="USA_NICARAGUA">🇳🇮 Estados Unidos ➔ Nicaragua</option>
+              </select>
+            </div>
+
             <!-- Escáner Barcode Principal -->
             <div class="flex items-center gap-2 bg-indigo-50 border border-indigo-200 px-3 py-1.5 rounded-lg">
               <i data-lucide="scan-barcode" class="w-5 h-5 text-indigo-600"></i>
               <div>
-                <span class="block text-[10px] uppercase font-bold text-indigo-700">Código de Guía (Tracking)</span>
-                <input type="text" id="env-tracking" placeholder="Escanear pistola..." class="text-xs font-mono font-bold bg-transparent outline-none w-36 text-indigo-900">
+                <span class="block text-[10px] uppercase font-bold text-indigo-700">Guía / Tracking</span>
+                <input type="text" id="env-tracking" placeholder="Escanear lector..." class="text-xs font-mono font-bold bg-transparent outline-none w-32 text-indigo-900">
               </div>
               <button type="button" onclick="generarTracking()" class="px-2 py-1 bg-white hover:bg-indigo-100 border border-indigo-300 text-[11px] font-bold rounded text-indigo-700">Auto</button>
             </div>
@@ -138,23 +149,24 @@
               <div>
                 <label class="block text-xs font-bold text-slate-700 mb-1">Modalidad de Transporte</label>
                 <select id="env-tipo" onchange="actualizarTarifaSugerida()" class="w-full text-sm p-2 border rounded-lg bg-white font-bold text-indigo-800">
-                  <option value="AEREO">✈️ Aéreo (Rápido)</option>
+                  <option value="AEREO">✈️ Aéreo (Express)</option>
                   <option value="MARITIMO">🚢 Marítimo (Cajas / Carga)</option>
                 </select>
               </div>
 
               <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Forma de Entrega en EE.UU.</label>
-                <select id="env-entrega" onchange="toggleDireccionUSA()" class="w-full text-sm p-2 border rounded-lg bg-white font-semibold">
-                  <option value="OFICINA">🏢 Retiro en Oficina (Pick-up)</option>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Forma de Entrega en Destino</label>
+                <select id="env-entrega" onchange="toggleDireccionDestino()" class="w-full text-sm p-2 border rounded-lg bg-white font-semibold">
+                  <option value="OFICINA">🏢 Retiro en Sucursal / Oficina</option>
                   <option value="DOMICILIO">🏠 Entrega a Domicilio (Delivery)</option>
                 </select>
               </div>
 
               <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Ciudad Destino en EE.UU.</label>
-                <input list="lista-ciudades-usa" id="env-ciudad" required placeholder="Escribe ciudad o estado..." class="w-full text-sm p-2 border rounded-lg bg-white focus:ring-2 focus:ring-indigo-500">
-                <datalist id="lista-ciudades-usa">
+                <label id="lbl-ciudad-destino" class="block text-xs font-bold text-slate-700 mb-1">Ciudad Destino en EE.UU.</label>
+                <input list="lista-ciudades-destino" id="env-ciudad" required placeholder="Escribe o selecciona ciudad..." class="w-full text-sm p-2 border rounded-lg bg-white focus:ring-2 focus:ring-indigo-500">
+                <datalist id="lista-ciudades-destino">
+                  <!-- Ciudades EE.UU. por defecto -->
                   <option value="New York, NY">
                   <option value="Queens, NY">
                   <option value="Brooklyn, NY">
@@ -165,16 +177,11 @@
                   <option value="Orlando, FL">
                   <option value="Tampa, FL">
                   <option value="Chicago, IL">
-                  <option value="Minneapolis, MN">
                   <option value="Los Angeles, CA">
                   <option value="Houston, TX">
                   <option value="Dallas, TX">
                   <option value="Atlanta, GA">
-                  <option value="Boston, MA">
                   <option value="New Haven, CT">
-                  <option value="Danbury, CT">
-                  <option value="Philadelphia, PA">
-                  <option value="Washington, DC">
                 </datalist>
               </div>
             </div>
@@ -184,7 +191,7 @@
               
               <!-- Tarjeta Remitente (Quien Envía) -->
               <div class="p-4 border rounded-xl bg-white space-y-3">
-                <h3 class="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1.5 pb-2 border-b">
+                <h3 id="titulo-remitente" class="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1.5 pb-2 border-b">
                   <i data-lucide="user" class="w-4 h-4"></i> Datos de Quien Envía (Remitente)
                 </h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -193,52 +200,51 @@
                     <input type="text" id="rem-nombre" required placeholder="Nombres y Apellidos" class="w-full text-xs p-2 border rounded-lg">
                   </div>
                   <div>
-                    <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Cédula / Pasaporte</label>
-                    <input type="text" id="rem-cedula" required placeholder="Número de identidad" class="w-full text-xs p-2 border rounded-lg font-mono">
+                    <label id="lbl-rem-cedula" class="block text-[11px] font-bold text-slate-600 mb-0.5">Cédula / Identificación</label>
+                    <input type="text" id="rem-cedula" required placeholder="Nº de identidad" class="w-full text-xs p-2 border rounded-lg font-mono">
                   </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
-                    <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Teléfono / Celular</label>
-                    <input type="text" id="rem-telefono" required placeholder="099..." class="w-full text-xs p-2 border rounded-lg">
+                    <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Teléfono / WhatsApp</label>
+                    <input type="text" id="rem-telefono" required placeholder="Teléfono con código" class="w-full text-xs p-2 border rounded-lg">
                   </div>
                   <div>
-                    <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Dirección Completa (Ciudad, Barrio, Calles)</label>
-                    <input type="text" id="rem-direccion" required placeholder="Ej: Santo Domingo, Coop. 30 de Julio..." class="w-full text-xs p-2 border rounded-lg">
+                    <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Dirección de Origen (Ciudad, Calles)</label>
+                    <input type="text" id="rem-direccion" required placeholder="Dirección del remitente" class="w-full text-xs p-2 border rounded-lg">
                   </div>
                 </div>
               </div>
 
-              <!-- Tarjeta Destinatario (Quien Recibe en USA) -->
+              <!-- Tarjeta Destinatario (Quien Recibe) -->
               <div class="p-4 border rounded-xl bg-white space-y-3">
-                <h3 class="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1.5 pb-2 border-b">
+                <h3 id="titulo-destinatario" class="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1.5 pb-2 border-b">
                   <i data-lucide="map-pin" class="w-4 h-4"></i> Datos de Quien Recibe en EE.UU. (Destinatario)
                 </h3>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   <div>
                     <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Nombre y Apellidos</label>
-                    <input type="text" id="dest-nombre" required placeholder="Nombre en USA" class="w-full text-xs p-2 border rounded-lg">
-                  </div>
-                  <!-- CASILLA AGREGADA: Documento / ID de quien recibe -->
-                  <div>
-                    <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Nº Documento (ID / Pasaporte)</label>
-                    <input type="text" id="dest-doc" required placeholder="ID / Social / Pass" class="w-full text-xs p-2 border rounded-lg font-mono">
+                    <input type="text" id="dest-nombre" required placeholder="Nombre del receptor" class="w-full text-xs p-2 border rounded-lg">
                   </div>
                   <div>
-                    <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Teléfono (WhatsApp)</label>
-                    <input type="text" id="dest-telefono" required placeholder="+1 (___) ___-____" class="w-full text-xs p-2 border rounded-lg">
+                    <label id="lbl-dest-doc" class="block text-[11px] font-bold text-slate-600 mb-0.5">Nº Documento (ID/Pasaporte)</label>
+                    <input type="text" id="dest-doc" required placeholder="Documento de identidad" class="w-full text-xs p-2 border rounded-lg font-mono">
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Teléfono en Destino</label>
+                    <input type="text" id="dest-telefono" required placeholder="Teléfono de contacto" class="w-full text-xs p-2 border rounded-lg">
                   </div>
                 </div>
 
-                <!-- Dirección en USA (si eligió domicilio) -->
-                <div id="bloque-direccion-usa" class="hidden space-y-2 bg-indigo-50/40 p-2.5 rounded-lg border border-indigo-100">
+                <!-- Dirección en Destino si es a Domicilio -->
+                <div id="bloque-direccion-destino" class="hidden space-y-2 bg-indigo-50/40 p-2.5 rounded-lg border border-indigo-100">
                   <div>
-                    <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Dirección exacta en EE.UU. (Calle, Número, Apto)</label>
-                    <input type="text" id="dest-direccion" placeholder="Ej: 104-12 Roosevelt Ave, Apt 3B" class="w-full text-xs p-2 border rounded-lg bg-white">
+                    <label id="lbl-dest-dir" class="block text-[11px] font-bold text-slate-600 mb-0.5">Dirección Exacta en Destino</label>
+                    <input type="text" id="dest-direccion" placeholder="Calle, número, departamento o referencias..." class="w-full text-xs p-2 border rounded-lg bg-white">
                   </div>
-                  <div>
+                  <div id="bloque-zip-code">
                     <label class="block text-[11px] font-bold text-slate-600 mb-0.5">Código Postal (ZIP Code)</label>
-                    <input type="text" id="dest-zip" placeholder="Ej: 11368" class="w-full text-xs p-2 border rounded-lg bg-white font-mono">
+                    <input type="text" id="dest-zip" placeholder="Ej: 11368 o N/A" class="w-full text-xs p-2 border rounded-lg bg-white font-mono">
                   </div>
                 </div>
               </div>
@@ -249,9 +255,9 @@
             <div class="p-4 border rounded-xl bg-white grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
               <div class="md:col-span-2">
                 <label class="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
-                  <i data-lucide="file-text" class="w-3.5 h-3.5 text-indigo-600"></i> ¿Qué contiene el paquete o caja? (Declaración de Aduana)
+                  <i data-lucide="file-text" class="w-3.5 h-3.5 text-indigo-600"></i> ¿Qué contiene el paquete o caja? (Declaración Aduanera)
                 </label>
-                <textarea id="env-contenido" rows="2" required placeholder="Detalla los artículos: ropa, dulces típicos, medicinas, zapatos, etc." class="w-full text-xs p-2.5 border rounded-lg"></textarea>
+                <textarea id="env-contenido" rows="2" required placeholder="Detalla los artículos: ropa, zapatos, alimentos empacados, artículos de uso personal..." class="w-full text-xs p-2.5 border rounded-lg"></textarea>
               </div>
 
               <div>
@@ -329,8 +335,9 @@
               <thead class="bg-slate-50 text-slate-500 uppercase text-xs border-b">
                 <tr>
                   <th class="p-3">Guía / Tracking</th>
+                  <th class="p-3">Ruta</th>
                   <th class="p-3">Remitente</th>
-                  <th class="p-3">Destinatario (USA)</th>
+                  <th class="p-3">Destinatario</th>
                   <th class="p-3">Contenido</th>
                   <th class="p-3">Peso</th>
                   <th class="p-3 text-right">Valor</th>
@@ -470,6 +477,20 @@
     let carrito = [];
     let fotoBase64 = null;
 
+    // LISTAS DE CIUDADES POR RUTA
+    const CIUDADES_USA = [
+      "New York, NY", "Queens, NY", "Brooklyn, NY", "Bronx, NY", "Newark, NJ", 
+      "Jersey City, NJ", "Miami, FL", "Orlando, FL", "Tampa, FL", "Chicago, IL", 
+      "Houston, TX", "Dallas, TX", "Los Angeles, CA", "Atlanta, GA", "New Haven, CT"
+    ];
+
+    const CIUDADES_NICARAGUA = [
+      "Managua (Capital)", "Matagalpa", "Estelí", "León", "Chinandega", 
+      "Masaya", "Granada", "Jinotega", "Juigalpa (Chontales)", "Rivas", 
+      "Ocotal (Nueva Segovia)", "Somoto (Madriz)", "Boaco", "San Carlos (Río San Juan)", 
+      "Bluefields (RACCS)", "Puerto Cabezas / Bilwi (RACCN)", "Tipitapa", "Ciudad Sandino"
+    ];
+
     // LOGIN
     async function iniciarSesion(e) {
       e.preventDefault();
@@ -531,7 +552,46 @@
       }
     }
 
-    // ==================== CÁLCULOS Y GESTIÓN DE ENVÍOS USA ====================
+    // ==================== CÁLCULOS Y GESTIÓN DE ENVÍOS (USA & NICARAGUA) ====================
+    function cambiarRutaEnvio() {
+      const ruta = document.getElementById('env-ruta').value;
+      const datalist = document.getElementById('lista-ciudades-destino');
+      const inputCiudad = document.getElementById('env-ciudad');
+      const lblCiudad = document.getElementById('lbl-ciudad-destino');
+      const tituloRem = document.getElementById('titulo-remitente');
+      const tituloDest = document.getElementById('titulo-destinatario');
+      const lblDestDoc = document.getElementById('lbl-dest-doc');
+      const bloqueZip = document.getElementById('bloque-zip-code');
+
+      datalist.innerHTML = '';
+      inputCiudad.value = '';
+
+      if (ruta === 'USA_NICARAGUA') {
+        lblCiudad.innerText = "Departamento / Ciudad en Nicaragua";
+        tituloRem.innerHTML = '<i data-lucide="user" class="w-4 h-4"></i> Remitente en EE.UU. (Quien Envía)';
+        tituloDest.innerHTML = '<i data-lucide="map-pin" class="w-4 h-4"></i> Destinatario en Nicaragua (Quien Recibe)';
+        lblDestDoc.innerText = "Cédula de Nicaragua";
+        if (bloqueZip) bloqueZip.classList.add('hidden'); // En Nicaragua no se usa comúnmente ZIP Code
+
+        CIUDADES_NICARAGUA.forEach(c => {
+          datalist.innerHTML += `<option value="${c}">`;
+        });
+      } else {
+        lblCiudad.innerText = "Ciudad Destino en EE.UU.";
+        tituloRem.innerHTML = '<i data-lucide="user" class="w-4 h-4"></i> Remitente (Quien Envía)';
+        tituloDest.innerHTML = '<i data-lucide="map-pin" class="w-4 h-4"></i> Destinatario en EE.UU. (Quien Recibe)';
+        lblDestDoc.innerText = "Nº Documento (ID/Pasaporte)";
+        if (bloqueZip) bloqueZip.classList.remove('hidden');
+
+        CIUDADES_USA.forEach(c => {
+          datalist.innerHTML += `<option value="${c}">`;
+        });
+      }
+
+      actualizarTarifaSugerida();
+      lucide.createIcons();
+    }
+
     function cambiarUnidadPeso() {
       const unidad = document.getElementById('env-unidad-peso').value;
       const lbl = document.getElementById('lbl-tarifa');
@@ -541,8 +601,16 @@
 
     function actualizarTarifaSugerida() {
       const tipo = document.getElementById('env-tipo').value;
+      const ruta = document.getElementById('env-ruta').value;
       const inputTarifa = document.getElementById('env-tarifa-unidad');
-      inputTarifa.value = tipo === 'AEREO' ? "4.50" : "2.00";
+
+      if (ruta === 'USA_NICARAGUA') {
+        // Tarifas sugeridas USA -> Nicaragua
+        inputTarifa.value = tipo === 'AEREO' ? "5.50" : "2.25";
+      } else {
+        // Tarifas sugeridas hacia USA
+        inputTarifa.value = tipo === 'AEREO' ? "4.50" : "2.00";
+      }
       calcularTotalEnvio();
     }
 
@@ -556,16 +624,19 @@
       document.getElementById('env-valor-final').value = total.toFixed(2);
     }
 
-    function toggleDireccionUSA() {
+    function toggleDireccionDestino() {
       const tipo = document.getElementById('env-entrega').value;
-      const bloque = document.getElementById('bloque-direccion-usa');
+      const bloque = document.getElementById('bloque-direccion-destino');
       bloque.classList.toggle('hidden', tipo === 'OFICINA');
     }
 
     function generarTracking() {
-      const prefijo = document.getElementById('env-tipo').value === 'AEREO' ? 'AIR' : 'SEA';
+      const ruta = document.getElementById('env-ruta').value;
+      const tipo = document.getElementById('env-tipo').value;
+      const prefijoTipo = tipo === 'AEREO' ? 'AIR' : 'SEA';
+      const sufijoPais = ruta === 'USA_NICARAGUA' ? 'NI' : 'US';
       const num = Math.floor(10000000 + Math.random() * 90000000);
-      document.getElementById('env-tracking').value = `${prefijo}-${num}US`;
+      document.getElementById('env-tracking').value = `${prefijoTipo}-${num}${sufijoPais}`;
     }
 
     function previsualizarFoto(e) {
@@ -599,6 +670,7 @@
         tracking = document.getElementById('env-tracking').value;
       }
 
+      const ruta = document.getElementById('env-ruta').value;
       const tipo = document.getElementById('env-tipo').value;
       const entrega = document.getElementById('env-entrega').value;
       const ciudad = document.getElementById('env-ciudad').value;
@@ -609,12 +681,12 @@
       const remTelefono = document.getElementById('rem-telefono').value;
       const remDireccion = document.getElementById('rem-direccion').value;
 
-      // Destinatario (Con su documento)
+      // Destinatario
       const destNombre = document.getElementById('dest-nombre').value;
       const destDoc = document.getElementById('dest-doc').value;
       const destTelefono = document.getElementById('dest-telefono').value;
-      const destDireccion = entrega === 'DOMICILIO' ? document.getElementById('dest-direccion').value : 'Retiro en Oficina USA';
-      const destZip = entrega === 'DOMICILIO' ? document.getElementById('dest-zip').value : null;
+      const destDireccion = entrega === 'DOMICILIO' ? document.getElementById('dest-direccion').value : 'Retiro en Sucursal/Oficina';
+      const destZip = (entrega === 'DOMICILIO' && ruta === 'USA') ? document.getElementById('dest-zip').value : null;
 
       // Paquete
       const contenido = document.getElementById('env-contenido').value;
@@ -626,6 +698,7 @@
       try {
         const { error } = await db.from('envios_internacionales').insert([{
           numero_guia: tracking,
+          ruta_envio: ruta,
           tipo_transporte: tipo,
           cliente_nombre: destNombre,
           cliente_telefono: destTelefono,
@@ -635,7 +708,7 @@
           direccion_destino: destDireccion,
           zip_code: destZip,
           remitente_cedula: remCedula,
-          remitente_direccion: `${remNombre} (CI: ${remCedula}) - Tel: ${remTelefono} - Dir: ${remDireccion}`,
+          remitente_direccion: `${remNombre} (ID: ${remCedula}) - Tel: ${remTelefono} - Origen: ${remDireccion}`,
           contenido_paquete: contenido,
           peso: peso,
           unidad_peso: unidad,
@@ -648,13 +721,14 @@
 
         if (error) throw error;
 
-        alert(`¡Envío Registrado!\nGuía: ${tracking}\nDestinatario: ${destNombre} [ID: ${destDoc}]\nTotal: $${valor.toFixed(2)} (${estadoPago})`);
+        const paisDest = ruta === 'USA_NICARAGUA' ? 'Nicaragua 🇳🇮' : 'EE.UU. 🇺🇸';
+        alert(`¡Envío Registrado con Éxito!\nGuía: ${tracking}\nRuta: ${paisDest}\nDestinatario: ${destNombre}\nTotal: $${valor.toFixed(2)} (${estadoPago})`);
         window.print();
 
         e.target.reset();
         quitarFoto();
         actualizarTarifaSugerida();
-        toggleDireccionUSA();
+        toggleDireccionDestino();
         cargarEnvios();
 
         setTimeout(() => document.getElementById('env-tracking').focus(), 400);
@@ -674,15 +748,21 @@
       t.innerHTML = '';
 
       if (enviosLista.length === 0) {
-        t.innerHTML = `<tr><td colspan="9" class="text-center p-4 text-slate-400">No hay envíos registrados aún.</td></tr>`;
+        t.innerHTML = `<tr><td colspan="10" class="text-center p-4 text-slate-400">No hay envíos registrados aún.</td></tr>`;
         return;
       }
 
       enviosLista.forEach(env => {
+        const esNica = env.ruta_envio === 'USA_NICARAGUA';
         t.innerHTML += `
           <tr class="hover:bg-slate-50 text-xs">
             <td class="p-3 font-mono font-bold text-indigo-700">${env.numero_guia}<br>
               <span class="text-[10px] font-semibold px-1.5 py-0.5 rounded ${env.tipo_transporte === 'AEREO' ? 'bg-sky-100 text-sky-800' : 'bg-blue-100 text-blue-800'}">${env.tipo_transporte}</span>
+            </td>
+            <td class="p-3">
+              <span class="px-2 py-1 rounded text-[10px] font-bold ${esNica ? 'bg-indigo-100 text-indigo-800' : 'bg-slate-100 text-slate-800'}">
+                ${esNica ? '🇺🇸 ➔ 🇳🇮 Nic' : '➔ 🇺🇸 USA'}
+              </span>
             </td>
             <td class="p-3">
               <span class="font-bold text-slate-700">${env.remitente_direccion ? env.remitente_direccion.split('-')[0] : 'S/D'}</span>
