@@ -166,7 +166,6 @@
                 <label id="lbl-ciudad-destino" class="block text-xs font-bold text-slate-700 mb-1">Ciudad Destino en EE.UU.</label>
                 <input list="lista-ciudades-destino" id="env-ciudad" required placeholder="Escribe o selecciona ciudad..." class="w-full text-sm p-2 border rounded-lg bg-white focus:ring-2 focus:ring-indigo-500">
                 <datalist id="lista-ciudades-destino">
-                  <!-- Ciudades EE.UU. por defecto -->
                   <option value="New York, NY">
                   <option value="Queens, NY">
                   <option value="Brooklyn, NY">
@@ -177,9 +176,9 @@
                   <option value="Orlando, FL">
                   <option value="Tampa, FL">
                   <option value="Chicago, IL">
-                  <option value="Los Angeles, CA">
                   <option value="Houston, TX">
                   <option value="Dallas, TX">
+                  <option value="Los Angeles, CA">
                   <option value="Atlanta, GA">
                   <option value="New Haven, CT">
                 </datalist>
@@ -189,7 +188,7 @@
             <!-- BLOQUE 2: REMITENTE VS DESTINATARIO -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
               
-              <!-- Tarjeta Remitente (Quien Envía) -->
+              <!-- Remitente -->
               <div class="p-4 border rounded-xl bg-white space-y-3">
                 <h3 id="titulo-remitente" class="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1.5 pb-2 border-b">
                   <i data-lucide="user" class="w-4 h-4"></i> Datos de Quien Envía (Remitente)
@@ -216,7 +215,7 @@
                 </div>
               </div>
 
-              <!-- Tarjeta Destinatario (Quien Recibe) -->
+              <!-- Destinatario -->
               <div class="p-4 border rounded-xl bg-white space-y-3">
                 <h3 id="titulo-destinatario" class="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1.5 pb-2 border-b">
                   <i data-lucide="map-pin" class="w-4 h-4"></i> Datos de Quien Recibe en EE.UU. (Destinatario)
@@ -236,7 +235,6 @@
                   </div>
                 </div>
 
-                <!-- Dirección en Destino si es a Domicilio -->
                 <div id="bloque-direccion-destino" class="hidden space-y-2 bg-indigo-50/40 p-2.5 rounded-lg border border-indigo-100">
                   <div>
                     <label id="lbl-dest-dir" class="block text-[11px] font-bold text-slate-600 mb-0.5">Dirección Exacta en Destino</label>
@@ -311,7 +309,6 @@
               </div>
             </div>
 
-            <!-- BOTÓN GUARDAR -->
             <div class="pt-2 flex justify-end">
               <button type="submit" id="btn-guardar-envio" class="w-full md:w-auto px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm flex items-center justify-center gap-2 shadow-lg transition">
                 <i data-lucide="printer" class="w-5 h-5"></i> Guardar e Imprimir Guía Internacional
@@ -477,7 +474,6 @@
     let carrito = [];
     let fotoBase64 = null;
 
-    // LISTAS DE CIUDADES POR RUTA
     const CIUDADES_USA = [
       "New York, NY", "Queens, NY", "Brooklyn, NY", "Bronx, NY", "Newark, NJ", 
       "Jersey City, NJ", "Miami, FL", "Orlando, FL", "Tampa, FL", "Chicago, IL", 
@@ -491,7 +487,26 @@
       "Bluefields (RACCS)", "Puerto Cabezas / Bilwi (RACCN)", "Tipitapa", "Ciudad Sandino"
     ];
 
-    // LOGIN
+    // ==================== SESIÓN PERSISTENTE (LOCALSTORAGE) ====================
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      verificarSesionGuardada();
+    });
+
+    function verificarSesionGuardada() {
+      const guardado = localStorage.getItem('sesion_pos_usuario');
+      if (guardado) {
+        try {
+          usuarioActual = JSON.parse(guardado);
+          aplicarSesionUsuario();
+          const ultimaVista = localStorage.getItem('sesion_pos_vista') || 'pos';
+          cambiarVista(ultimaVista);
+        } catch(e) {
+          localStorage.removeItem('sesion_pos_usuario');
+        }
+      }
+    }
+
     async function iniciarSesion(e) {
       e.preventDefault();
       const btn = document.getElementById('btn-login');
@@ -510,22 +525,11 @@
         }
 
         usuarioActual = data[0];
-        document.getElementById('pantalla-login').classList.add('hidden');
-        document.getElementById('app-contenido').classList.remove('hidden');
+        // Guardar sesión en el almacenamiento local para que no se cierre con F5
+        localStorage.setItem('sesion_pos_usuario', JSON.stringify(usuarioActual));
 
-        document.getElementById('badge-sucursal').innerText = `Usuario: ${usuarioActual.nombre_completo} [Rol: ${usuarioActual.rol}]`;
-
-        if (usuarioActual.rol === 'ADMIN') {
-          document.getElementById('tab-inv').classList.remove('hidden');
-          document.getElementById('tab-admin').classList.remove('hidden');
-        } else {
-          document.getElementById('tab-inv').classList.add('hidden');
-          document.getElementById('tab-admin').classList.add('hidden');
-        }
-
+        aplicarSesionUsuario();
         cambiarVista('pos');
-        await cargarDatos();
-        lucide.createIcons();
       } catch (err) {
         alert("Error de conexión: " + err.message);
       } finally {
@@ -534,7 +538,28 @@
       }
     }
 
+    async function aplicarSesionUsuario() {
+      document.getElementById('pantalla-login').classList.add('hidden');
+      document.getElementById('app-contenido').classList.remove('hidden');
+
+      document.getElementById('badge-sucursal').innerText = `Usuario: ${usuarioActual.nombre_completo} [Rol: ${usuarioActual.rol}]`;
+
+      if (usuarioActual.rol === 'ADMIN') {
+        document.getElementById('tab-inv').classList.remove('hidden');
+        document.getElementById('tab-admin').classList.remove('hidden');
+      } else {
+        document.getElementById('tab-inv').classList.add('hidden');
+        document.getElementById('tab-admin').classList.add('hidden');
+      }
+
+      await cargarDatos();
+      lucide.createIcons();
+    }
+
     function cerrarSesion() {
+      // Eliminar de memoria local
+      localStorage.removeItem('sesion_pos_usuario');
+      localStorage.removeItem('sesion_pos_vista');
       usuarioActual = null;
       document.getElementById('login-user').value = '';
       document.getElementById('login-pass').value = '';
@@ -552,7 +577,7 @@
       }
     }
 
-    // ==================== CÁLCULOS Y GESTIÓN DE ENVÍOS (USA & NICARAGUA) ====================
+    // ==================== CÁLCULOS Y GESTIÓN DE ENVÍOS ====================
     function cambiarRutaEnvio() {
       const ruta = document.getElementById('env-ruta').value;
       const datalist = document.getElementById('lista-ciudades-destino');
@@ -571,7 +596,7 @@
         tituloRem.innerHTML = '<i data-lucide="user" class="w-4 h-4"></i> Remitente en EE.UU. (Quien Envía)';
         tituloDest.innerHTML = '<i data-lucide="map-pin" class="w-4 h-4"></i> Destinatario en Nicaragua (Quien Recibe)';
         lblDestDoc.innerText = "Cédula de Nicaragua";
-        if (bloqueZip) bloqueZip.classList.add('hidden'); // En Nicaragua no se usa comúnmente ZIP Code
+        if (bloqueZip) bloqueZip.classList.add('hidden');
 
         CIUDADES_NICARAGUA.forEach(c => {
           datalist.innerHTML += `<option value="${c}">`;
@@ -605,10 +630,8 @@
       const inputTarifa = document.getElementById('env-tarifa-unidad');
 
       if (ruta === 'USA_NICARAGUA') {
-        // Tarifas sugeridas USA -> Nicaragua
         inputTarifa.value = tipo === 'AEREO' ? "5.50" : "2.25";
       } else {
-        // Tarifas sugeridas hacia USA
         inputTarifa.value = tipo === 'AEREO' ? "4.50" : "2.00";
       }
       calcularTotalEnvio();
@@ -675,20 +698,17 @@
       const entrega = document.getElementById('env-entrega').value;
       const ciudad = document.getElementById('env-ciudad').value;
 
-      // Remitente
       const remNombre = document.getElementById('rem-nombre').value;
       const remCedula = document.getElementById('rem-cedula').value;
       const remTelefono = document.getElementById('rem-telefono').value;
       const remDireccion = document.getElementById('rem-direccion').value;
 
-      // Destinatario
       const destNombre = document.getElementById('dest-nombre').value;
       const destDoc = document.getElementById('dest-doc').value;
       const destTelefono = document.getElementById('dest-telefono').value;
       const destDireccion = entrega === 'DOMICILIO' ? document.getElementById('dest-direccion').value : 'Retiro en Sucursal/Oficina';
       const destZip = (entrega === 'DOMICILIO' && ruta === 'USA') ? document.getElementById('dest-zip').value : null;
 
-      // Paquete
       const contenido = document.getElementById('env-contenido').value;
       const peso = parseFloat(document.getElementById('env-peso').value);
       const unidad = document.getElementById('env-unidad-peso').value;
@@ -1112,6 +1132,9 @@
         }
       });
 
+      // Guardar también en qué vista estabas para no perderla al recargar
+      localStorage.setItem('sesion_pos_vista', v);
+
       if (v === 'envios') {
         setTimeout(() => {
           const input = document.getElementById('env-tracking');
@@ -1121,8 +1144,6 @@
 
       lucide.createIcons();
     }
-
-    window.onload = () => lucide.createIcons();
   </script>
 </body>
 </html>
