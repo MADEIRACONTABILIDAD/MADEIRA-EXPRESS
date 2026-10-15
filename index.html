@@ -54,14 +54,12 @@
         <button onclick="cambiarVista('envios')" id="tab-envios" class="px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
           <i data-lucide="send" class="w-4 h-4"></i> Envíos USA
         </button>
-        <!-- Inventario: Solo visible para ADMIN -->
         <button onclick="cambiarVista('inventario')" id="tab-inv" class="hidden px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
           <i data-lucide="package" class="w-4 h-4"></i> Inventario
         </button>
         <button onclick="cambiarVista('ventas')" id="tab-ventas" class="px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
           <i data-lucide="receipt" class="w-4 h-4"></i> Historial Ventas
         </button>
-        <!-- Administración: Solo visible para ADMIN -->
         <button onclick="cambiarVista('admin')" id="tab-admin" class="hidden px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
           <i data-lucide="shield-check" class="w-4 h-4"></i> Sucursales y Usuarios
         </button>
@@ -120,21 +118,29 @@
           </h2>
           
           <form onsubmit="registrarEnvio(event)" class="space-y-4">
-            <!-- Modalidad y Tracking -->
+            
+            <!-- Fila 1: Modalidad, Escáner de Código y Modo de Entrega -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label class="block text-xs font-bold text-slate-600 mb-1">Tipo de Envío</label>
-                <select id="env-tipo" class="w-full text-sm p-2.5 border rounded-lg bg-indigo-50 font-bold text-indigo-800 border-indigo-200">
+                <label class="block text-xs font-bold text-slate-600 mb-1">Tipo de Transporte</label>
+                <select id="env-tipo" onchange="actualizarTarifaSugerida()" class="w-full text-sm p-2.5 border rounded-lg bg-indigo-50 font-bold text-indigo-800 border-indigo-200">
                   <option value="AEREO">✈️ Aéreo (Rápido)</option>
                   <option value="MARITIMO">🚢 Marítimo (Carga / Cajas)</option>
                 </select>
               </div>
 
+              <!-- Casilla para escanear con la pistola -->
               <div>
-                <label class="block text-xs font-bold text-slate-600 mb-1">Código de Barras / Guía (Tracking)</label>
+                <label class="block text-xs font-bold text-slate-600 mb-1 flex items-center justify-between">
+                  <span>Código de Barras / Guía (Tracking)</span>
+                  <span class="text-[10px] text-emerald-600 font-semibold">Listo para lector</span>
+                </label>
                 <div class="flex gap-2">
-                  <input type="text" id="env-tracking" placeholder="Escanear con pistola..." class="w-full text-sm p-2.5 border rounded-lg font-mono focus:ring-2 focus:ring-indigo-500">
-                  <button type="button" onclick="generarTracking()" class="px-3 bg-slate-200 hover:bg-slate-300 text-xs font-bold rounded-lg" title="Generar código automático">Auto</button>
+                  <div class="relative flex-1">
+                    <input type="text" id="env-tracking" placeholder="Dispara el lector aquí..." class="w-full text-sm pl-8 pr-2 py-2 border-2 border-indigo-300 rounded-lg font-mono focus:border-indigo-600 outline-none bg-indigo-50/20">
+                    <i data-lucide="scan-barcode" class="w-4 h-4 absolute left-2.5 top-2.5 text-indigo-500"></i>
+                  </div>
+                  <button type="button" onclick="generarTracking()" class="px-3 bg-slate-100 hover:bg-slate-200 border text-xs font-bold rounded-lg" title="Generar código automático">Auto</button>
                 </div>
               </div>
 
@@ -147,15 +153,15 @@
               </div>
             </div>
 
-            <!-- Datos del Remitente y Destino -->
+            <!-- Fila 2: Datos del Destinatario y Ciudad -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label class="block text-xs font-bold text-slate-600 mb-1">Nombre del Cliente / Destinatario</label>
-                <input type="text" id="env-cliente" required placeholder="Ej: Juan Pérez" class="w-full text-sm p-2.5 border rounded-lg">
+                <label class="block text-xs font-bold text-slate-600 mb-1">Destinatario / Remitente</label>
+                <input type="text" id="env-cliente" required placeholder="Nombre y Apellido" class="w-full text-sm p-2.5 border rounded-lg">
               </div>
 
               <div>
-                <label class="block text-xs font-bold text-slate-600 mb-1">Teléfono de Contacto (WhatsApp)</label>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Teléfono / WhatsApp</label>
                 <input type="text" id="env-telefono" placeholder="+1 718-000-0000 o 099..." class="w-full text-sm p-2.5 border rounded-lg">
               </div>
 
@@ -163,7 +169,6 @@
                 <label class="block text-xs font-bold text-slate-600 mb-1">Ciudad de Destino en EE.UU.</label>
                 <input list="lista-ciudades-usa" id="env-ciudad" required placeholder="Escribe o selecciona ciudad..." class="w-full text-sm p-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500">
                 <datalist id="lista-ciudades-usa">
-                  <!-- Ciudades más habituales de envíos ecuatorianos -->
                   <option value="New York, NY">
                   <option value="Queens, NY">
                   <option value="Brooklyn, NY">
@@ -188,25 +193,25 @@
               </div>
             </div>
 
-            <!-- Dirección si es a Domicilio (Se oculta si es en oficina) -->
+            <!-- Fila Condicional: Si es Domicilio -->
             <div id="bloque-direccion-usa" class="hidden grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-3 rounded-lg border border-slate-200">
               <div class="md:col-span-2">
                 <label class="block text-xs font-bold text-slate-600 mb-1">Dirección Exacta en EE.UU.</label>
-                <input type="text" id="env-direccion" placeholder="Ej: 123 5th Ave, Apt 4B" class="w-full text-sm p-2 border rounded-lg bg-white">
+                <input type="text" id="env-direccion" placeholder="Ej: 104-12 Roosevelt Ave, Apt 2" class="w-full text-sm p-2 border rounded-lg bg-white">
               </div>
               <div>
                 <label class="block text-xs font-bold text-slate-600 mb-1">Código Postal (ZIP Code)</label>
-                <input type="text" id="env-zip" placeholder="Ej: 10001" class="w-full text-sm p-2 border rounded-lg bg-white font-mono">
+                <input type="text" id="env-zip" placeholder="Ej: 11368" class="w-full text-sm p-2 border rounded-lg bg-white font-mono">
               </div>
             </div>
 
-            <!-- Peso, Cobro y Foto -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+            <!-- Fila 3: Cálculo Dinámico (Peso × Precio Libra/Kg = Total a Pagar) -->
+            <div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
               <div>
-                <label class="block text-xs font-bold text-slate-600 mb-1">Peso del Paquete / Caja</label>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Peso del Paquete</label>
                 <div class="flex gap-2">
-                  <input type="number" step="0.01" id="env-peso" required placeholder="0.00" class="w-full text-sm p-2.5 border rounded-lg font-bold text-slate-800">
-                  <select id="env-unidad-peso" class="text-sm p-2.5 border rounded-lg bg-slate-50 font-bold">
+                  <input type="number" step="0.01" id="env-peso" required oninput="calcularTotalEnvio()" placeholder="0.00" class="w-full text-base font-bold p-2 border rounded-lg bg-white">
+                  <select id="env-unidad-peso" onchange="cambiarUnidadPeso()" class="text-xs p-2 border rounded-lg font-bold bg-white">
                     <option value="LBS">Libras (lbs)</option>
                     <option value="KG">Kilos (kg)</option>
                   </select>
@@ -214,22 +219,43 @@
               </div>
 
               <div>
-                <label class="block text-xs font-bold text-slate-600 mb-1">Valor Total del Envío ($)</label>
-                <input type="number" step="0.01" id="env-valor" required placeholder="0.00" class="w-full text-sm p-2.5 border rounded-lg font-bold text-indigo-600">
+                <label id="lbl-tarifa" class="block text-xs font-bold text-slate-700 mb-1">Precio por Libra ($)</label>
+                <div class="relative">
+                  <span class="absolute left-3 top-2 text-slate-400 font-bold">$</span>
+                  <input type="number" step="0.01" id="env-tarifa-unidad" value="4.50" oninput="calcularTotalEnvio()" class="w-full text-base font-bold pl-7 pr-2 py-2 border rounded-lg bg-white">
+                </div>
               </div>
 
               <div>
-                <label class="block text-xs font-bold text-slate-600 mb-1">Foto del Paquete / Caja</label>
-                <input type="file" id="env-foto-input" accept="image/*" onchange="previsualizarFoto(event)" class="text-xs w-full">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Cargos Extra / Seguro ($)</label>
+                <div class="relative">
+                  <span class="absolute left-3 top-2 text-slate-400 font-bold">$</span>
+                  <input type="number" step="0.01" id="env-cargos-extra" value="0.00" oninput="calcularTotalEnvio()" class="w-full text-base font-bold pl-7 pr-2 py-2 border rounded-lg bg-white">
+                </div>
+              </div>
+
+              <!-- Total a Pagar Calculado Automáticamente -->
+              <div class="bg-indigo-600 text-white p-3 rounded-lg flex flex-col justify-between shadow-sm">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-200">Total a Cobrar</span>
+                <span id="txt-total-envio" class="text-2xl font-black">$0.00</span>
+                <input type="hidden" id="env-valor-final" value="0.00">
               </div>
             </div>
 
-            <!-- Previsualización de la foto seleccionada -->
-            <div id="preview-contenedor" class="hidden flex items-center gap-3 p-2 bg-slate-50 border rounded-lg w-max">
-              <img id="preview-img" src="" class="w-16 h-16 object-cover rounded border">
+            <!-- Fila 4: Foto de Paquete y Envío -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
               <div>
-                <p class="text-xs font-bold text-slate-700">Foto cargada</p>
-                <button type="button" onclick="quitarFoto()" class="text-xs text-red-500 hover:underline">Quitar foto</button>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Foto del Paquete / Caja</label>
+                <input type="file" id="env-foto-input" accept="image/*" onchange="previsualizarFoto(event)" class="text-xs w-full file:mr-2 file:py-2 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+              </div>
+
+              <!-- Previsualización -->
+              <div id="preview-contenedor" class="hidden flex items-center gap-3 p-2 bg-slate-50 border rounded-lg">
+                <img id="preview-img" src="" class="w-14 h-14 object-cover rounded border">
+                <div>
+                  <p class="text-xs font-bold text-slate-700">Foto cargada</p>
+                  <button type="button" onclick="quitarFoto()" class="text-xs text-red-500 hover:underline">Quitar foto</button>
+                </div>
               </div>
             </div>
 
@@ -260,7 +286,7 @@
                   <th class="p-3">Cliente</th>
                   <th class="p-3">Destino USA</th>
                   <th class="p-3">Peso</th>
-                  <th class="p-3 text-right">Valor</th>
+                  <th class="p-3 text-right">Valor Cobrado</th>
                   <th class="p-3 text-center">Foto</th>
                   <th class="p-3 text-center">Estado</th>
                 </tr>
@@ -457,7 +483,35 @@
       }
     }
 
-    // ==================== MÓDULO ENVÍOS USA ====================
+    // ==================== CÁLCULOS Y GESTIÓN DE ENVÍOS ====================
+    function cambiarUnidadPeso() {
+      const unidad = document.getElementById('env-unidad-peso').value;
+      const lbl = document.getElementById('lbl-tarifa');
+      lbl.innerText = unidad === 'LBS' ? 'Precio por Libra ($)' : 'Precio por Kilo ($)';
+      calcularTotalEnvio();
+    }
+
+    function actualizarTarifaSugerida() {
+      const tipo = document.getElementById('env-tipo').value;
+      const inputTarifa = document.getElementById('env-tarifa-unidad');
+      if (tipo === 'AEREO') {
+        inputTarifa.value = "4.50"; // Tarifa sugerida aéreo
+      } else {
+        inputTarifa.value = "2.00"; // Tarifa sugerida marítimo
+      }
+      calcularTotalEnvio();
+    }
+
+    function calcularTotalEnvio() {
+      const peso = parseFloat(document.getElementById('env-peso').value) || 0;
+      const tarifa = parseFloat(document.getElementById('env-tarifa-unidad').value) || 0;
+      const extra = parseFloat(document.getElementById('env-cargos-extra').value) || 0;
+
+      const total = (peso * tarifa) + extra;
+      document.getElementById('txt-total-envio').innerText = `$${total.toFixed(2)}`;
+      document.getElementById('env-valor-final').value = total.toFixed(2);
+    }
+
     function toggleDireccionUSA() {
       const tipo = document.getElementById('env-entrega').value;
       const bloque = document.getElementById('bloque-direccion-usa');
@@ -510,7 +564,7 @@
       const zip = entrega === 'DOMICILIO' ? document.getElementById('env-zip').value : null;
       const peso = parseFloat(document.getElementById('env-peso').value);
       const unidad = document.getElementById('env-unidad-peso').value;
-      const valor = parseFloat(document.getElementById('env-valor').value);
+      const valor = parseFloat(document.getElementById('env-valor-final').value);
 
       try {
         const { error } = await db.from('envios_internacionales').insert([{
@@ -532,16 +586,19 @@
 
         if (error) throw error;
 
-        alert(`¡Envío registrado con éxito!\nGuía: ${tracking}\nDestino: ${ciudad} (${entrega})`);
+        alert(`¡Envío registrado con éxito!\nGuía: ${tracking}\nTotal Cobrado: $${valor.toFixed(2)}`);
         
-        // Ventana para imprimir etiqueta
         window.print();
 
-        // Limpiar formulario
         e.target.reset();
         quitarFoto();
+        actualizarTarifaSugerida();
         toggleDireccionUSA();
         cargarEnvios();
+
+        // Dejar el cursor listo para el próximo escaneo con pistola
+        setTimeout(() => document.getElementById('env-tracking').focus(), 500);
+
       } catch (err) {
         alert("Error al registrar envío: " + err.message);
       } finally {
@@ -586,7 +643,7 @@
       lucide.createIcons();
     }
 
-    // ==================== RESTO DE FUNCIONES (POS, INVENTARIO, ADMIN) ====================
+    // ==================== FUNCIONES POS, INVENTARIO Y ADMIN ====================
     async function cargarSucursales() {
       const { data } = await db.from('sucursales').select('*');
       sucursales = data || [];
@@ -904,6 +961,15 @@
           tb.classList.toggle('hover:bg-indigo-600', x !== v);
         }
       });
+
+      // Si cambia a la pestaña de envíos, enfocar automáticamente la casilla para disparar el lector
+      if (v === 'envios') {
+        setTimeout(() => {
+          const input = document.getElementById('env-tracking');
+          if (input) input.focus();
+        }, 300);
+      }
+
       lucide.createIcons();
     }
 
