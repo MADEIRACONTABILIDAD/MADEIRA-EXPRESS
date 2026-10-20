@@ -812,4 +812,209 @@
       const nuevoSaldo = saldoActual - monto;
 
       // Inserción inmutable: Cada abono se inserta en abonos_plan sin sobreescribir el anterior
-      const { error: err
+      const { error: errAbono } = await db.from('abonos_plan').insert([{
+        plan_id: planId,
+        monto: monto,
+        metodo_pago: 'EFECTIVO',
+        saldo_anterior: saldoActual,
+        nuevo_saldo: nuevoSaldo,
+        usuario_nombre: usuarioActual.nombre_completo,
+        usuario_id: usuarioActual.id
+      }]);
+
+      if (errAbono) return alert("Error al registrar abono: " + errAbono.message);
+
+      await db.from('planes_acumulativos').update({
+        saldo_pendiente: nuevoSaldo,
+        fecha_proximo_abono: proxFecha || null,
+        estado: nuevoSaldo <= 0 ? 'LIQUIDADO' : 'ACTIVO'
+      }).eq('id', planId);
+
+      alert(`¡Abono de $${monto.toFixed(2)} registrado!\nSaldo pendiente restante: $${nuevoSaldo.toFixed(2)}`);
+      cargarPlanesAcumulativos();
+    }
+
+    async function verHistorialAbonosModal(planId) {
+      const plan = planesLista.find(p => p.id === planId);
+      if (!plan) return;
+
+      const { data: abonos, error } = await db.from('abonos_plan').select('*').eq('plan_id', planId).order('id', { ascending: true });
+      if (error) return alert("Error al cargar historial: " + error.message);
+
+      document.getElementById('modal-subtitulo-plan').innerText = `${plan.codigo_plan} - ${plan.cliente_nombre}`;
+      document.getElementById('modal-plan-total').innerText = `$${parseFloat(plan.total).toFixed(2)}`;
+      
+      const totalAbonado = (abonos || []).reduce((acc, a) => acc + parseFloat(a.monto), 0);
+      document.getElementById('modal-plan-abonado').innerText = `$${totalAbonado.toFixed(2)}`;
+      document.getElementById('modal-plan-saldo').innerText = `$${parseFloat(plan.saldo_pendiente).toFixed(2)}`;
+
+      const tbody = document.getElementById('modal-tabla-abonos-body');
+      tbody.innerHTML = '';
+
+      if (!abonos || abonos.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center p-3 text-slate-400">Sin abonos registrados.</td></tr>`;
+      } else {
+        abonos.forEach((ab, i) => {
+          tbody.innerHTML += `
+            <tr class="hover:bg-slate-50">
+              <td class="p-2 font-bold text-slate-500">${i + 1}</td>
+              <td class="p-2 text-slate-600">${new Date(ab.fecha).toLocaleString()}</td>
+              <td class="p-2 text-right font-bold text-emerald-600">+$${parseFloat(ab.monto).toFixed(2)}</td>
+              <td class="p-2 text-right font-bold text-slate-700">$${parseFloat(ab.nuevo_saldo).toFixed(2)}</td>
+              <td class="p-2 text-slate-500">${ab.usuario_nombre || 'Cajero'}</td>
+            </tr>
+          `;
+        });
+      }
+
+      document.getElementById('modal-historial-abonos').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function cerrarModalHistorial() {
+      document.getElementById('modal-historial-abonos').classList.add('hidden');
+    }
+
+    // ==================== GENERACIÓN DE PDF Y TICKETS ====================
+    function generarDocumentoPDF(datos, descargar) {
+      document.getElementById('pdf-titulo-doc').innerText = datos.titulo;
+      document.getElementById('pdf-folio').innerText = `Nº: ${datos.folio}`;
+      document.getElementById('pdf-cliente-nom').innerText = datos.cliente;
+      document.getElementById('pdf-cliente-doc').innerText = datos.doc;
+      document.getElementById('pdf-cliente-tel').innerText = datos.tel;
+      document.getElementById('pdf-fecha').innerText = datos.fecha;
+      document.getElementById('pdf-total').innerText = datos.total;
+
+      const tbody = document.getElementById('pdf-items');
+      tbody.innerHTML = '';
+      datos.items.forEach(it => {
+        tbody.innerHTML += `
+          <tr class="text-xs">
+            <td class="p-2">${it.cantidad}</td>
+            <td class="p-2">${it.nombre}</td>
+            <td class="p-2 text-right">$${parseFloat(it.precio_venta).toFixed(2)}</td>
+            <td class="p-2 text-right font-bold">$${(it.cantidad * it.precio_venta).toFixed(2)}</td>
+          </tr>
+        `;
+      });
+
+      const elemento = document.getElementById('pdf-plantilla');
+      elemento.classList.remove('hidden');
+
+      const opt = {
+        margin: 10, filename: `${datos.folio}.pdf`, image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      if (descargar) {
+        html2pdf().set(opt).from(elemento).save().then(() => elemento.classList.add('hidden'));
+      } else {
+        html2pdf().set(opt).from(elemento).toPdf().get('pdf').then((pdf) => {
+          pdf.autoPrint();
+          window.open(pdf.output('bloburl'), '_blank');
+          elemento.classList.add('hidden');
+        });
+      }
+    }
+
+    function imprimirTicketTermicoRaw(datos) {
+      document.getElementById('tkt-numero').innerText = datos.numero;
+      document.getElementById('tkt-fecha').innerText = datos.fecha;
+      document.getElementById('tkt-cliente').innerText = datos.cliente;
+      document.getElementById('tkt-cajero').innerText = datos.cajero;
+      document.getElementById('tkt-total').innerText = datos.total;
+      document.getElementById('tkt-metodo').innerText = datos.metodo;
+
+      const tb = document.getElementById('tkt-items');
+      tb.innerHTML = '';
+      datos.items.forEach(it => {
+        tb.innerHTML += `
+          <tr>
+            <td>${it.cantidad}x ${it.nombre}</td>
+            <td class="text-right font-bold">$${(it.cantidad * it.precio_venta).toFixed(2)}</td>
+          </tr>
+        `;
+      });
+      window.print();
+    }
+
+    async function reimprimirVentaDual(ventaId, modo) {
+      const { data: venta } = await db.from('ventas').select('*, clientes(*)').eq('id', ventaId).single();
+      const { data: det } = await db.from('detalle_ventas').select('*, productos(nombre)').eq('venta_id', ventaId);
+
+      const items = (det || []).map(d => ({
+        cantidad: d.cantidad, nombre: d.productos ? d.productos.nombre : 'Articulo', precio_venta: d.precio_unitario
+      }));
+
+      const nombreCli = venta.clientes ? (venta.clientes.nombre_completo || venta.clientes.identificacion) : 'CONSUMIDOR FINAL';
+      const docCli = venta.clientes ? venta.clientes.identificacion : '9999999999';
+
+      if (modo === 'TICKET') {
+        imprimirTicketTermicoRaw({
+          numero: venta.numero_comprobante, fecha: new Date(venta.fecha).toLocaleString(),
+          cliente: nombreCli, cajero: 'Cajero', items: items, total: `$${parseFloat(venta.total).toFixed(2)}`,
+          metodo: venta.metodo_pago
+        });
+      } else {
+        generarDocumentoPDF({
+          titulo: "FACTURA DE VENTA", folio: venta.numero_comprobante, cliente: nombreCli,
+          doc: docCli, tel: '-', fecha: new Date(venta.fecha).toLocaleDateString(),
+          items: items, total: `$${parseFloat(venta.total).toFixed(2)}`
+        }, true);
+      }
+    }
+
+    // ==================== HISTORIAL DE VENTAS ====================
+    async function cargarVentas() {
+      let q = db.from('ventas').select('*').order('fecha', { ascending: false });
+      const fi = document.getElementById('filtro-fecha-inicio').value;
+      const ff = document.getElementById('filtro-fecha-fin').value;
+      if (fi) q = q.gte('fecha', `${fi}T00:00:00.000Z`);
+      if (ff) q = q.lte('fecha', `${ff}T23:59:59.999Z`);
+
+      const { data } = await q;
+      const tb = document.getElementById('tabla-ventas-body');
+      if (!tb) return;
+      tb.innerHTML = '';
+      (data || []).forEach(v => {
+        tb.innerHTML += `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3 font-mono font-bold text-indigo-700">${v.numero_comprobante}</td>
+            <td class="p-3 text-slate-500">${new Date(v.fecha).toLocaleDateString()}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded text-xs bg-slate-100 font-bold">${v.metodo_pago}</span></td>
+            <td class="p-3 text-right font-bold text-slate-800">$${parseFloat(v.total).toFixed(2)}</td>
+            <td class="p-3 text-center space-x-1">
+              <button onclick="reimprimirVentaDual(${v.id}, 'TICKET')" class="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-xs font-bold" title="Ticket"><i data-lucide="printer" class="w-3.5 h-3.5"></i></button>
+              <button onclick="reimprimirVentaDual(${v.id}, 'PDF')" class="p-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded text-xs font-bold" title="Descargar PDF"><i data-lucide="download" class="w-3.5 h-3.5"></i></button>
+            </td>
+          </tr>
+        `;
+      });
+      lucide.createIcons();
+    }
+
+    function cambiarVista(v) {
+      ['pos', 'cotizacion', 'plan', 'envios', 'inventario', 'ventas', 'admin'].forEach(x => {
+        const el = document.getElementById('vista-' + x);
+        const tb = document.getElementById('tab-' + x);
+        if (el) el.classList.toggle('hidden', x !== v);
+        if (tb) {
+          tb.classList.toggle('bg-indigo-800', x === v);
+          tb.classList.toggle('hover:bg-indigo-600', x !== v);
+        }
+      });
+      localStorage.setItem('sesion_pos_vista', v);
+      lucide.createIcons();
+    }
+
+    function filtrarProductosPOS() {
+      const q = document.getElementById('buscar-pos').value.toLowerCase();
+      renderizarPOS(productos.filter(p => p.nombre.toLowerCase().includes(q) || (p.codigo_barras && p.codigo_barras.toLowerCase().includes(q))));
+    }
+
+    function cambiarRutaEnvio() {}
+    function registrarEnvio(e) { e.preventDefault(); }
+    function guardarProducto(e) { e.preventDefault(); }
+  </script>
+</body>
+</html>
