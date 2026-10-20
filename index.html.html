@@ -20,31 +20,40 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col">
 
-  <!-- ==================== MODAL DE SELECCIÓN DE TURNO / CAJERO ==================== -->
+  <!-- ==================== MODAL DE CAMBIO DE CAJERO / TURNO ==================== -->
   <div id="pantalla-login" class="hidden fixed inset-0 bg-slate-900 bg-opacity-75 flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 text-center">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center relative">
+      <!-- Botón de Cerrar (X) -->
+      <button onclick="cerrarModalLogin()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 font-bold text-xl leading-none" title="Cancelar">
+        &times;
+      </button>
+
       <div class="inline-flex p-3 bg-indigo-100 text-indigo-600 rounded-full mb-3">
         <i data-lucide="user-check" class="w-8 h-8"></i>
       </div>
-      <h2 class="text-lg font-bold text-slate-800">Control de Turno y Caja</h2>
-      <p class="text-xs text-slate-400 mb-4">Selecciona el usuario que está atendiendo</p>
+      <h2 class="text-lg font-bold text-slate-800">Cambio de Turno y Cajero</h2>
+      <p class="text-xs text-slate-400 mb-4">Selecciona el usuario que atenderá el punto de venta</p>
 
       <div class="space-y-3 text-left">
         <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">Empleado / Cajero</label>
-          <select id="select-usuario-login" class="w-full text-xs font-semibold p-2.5 border rounded-lg bg-white">
-            <option value="3">PINA IBARRA (ADMIN)</option>
-          </select>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Cajero / Trabajador</label>
+          <select id="select-usuario-login" class="w-full text-xs font-semibold p-2.5 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-indigo-500"></select>
         </div>
 
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Contraseña o PIN</label>
-          <input type="password" id="input-clave-login" placeholder="Ingresa contraseña" class="w-full text-xs p-2.5 border rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+          <input type="password" id="input-clave-login" placeholder="Ingresa clave (o admin123)" class="w-full text-xs p-2.5 border rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
+          <p class="text-[10px] text-slate-400 mt-1">Como administrador puedes usar <b>admin123</b> para autorizar a cualquier cajero.</p>
         </div>
 
-        <button onclick="confirmarAccesoCajero()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs transition flex items-center justify-center gap-1.5 shadow-sm">
-          <i data-lucide="log-in" class="w-4 h-4"></i> Abrir Turno / Entrar
-        </button>
+        <div class="pt-2 flex gap-2">
+          <button type="button" onclick="cerrarModalLogin()" class="flex-1 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-lg text-xs transition">
+            Cancelar
+          </button>
+          <button type="button" onclick="confirmarAccesoCajero()" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs transition flex items-center justify-center gap-1 shadow-sm">
+            <i data-lucide="check" class="w-4 h-4"></i> Activar Turno
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -82,8 +91,8 @@
         <button onclick="cambiarVista('admin')" id="tab-admin" class="hidden px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
           <i data-lucide="shield-check" class="w-4 h-4"></i> Personal / Sedes
         </button>
-        <button onclick="mostrarModalLogin()" class="ml-3 px-3 py-1.5 bg-indigo-900 hover:bg-indigo-800 rounded-md text-xs font-semibold flex items-center gap-1" title="Cambiar de cajero">
-          <i data-lucide="users" class="w-3.5 h-3.5"></i> Cambiar Cajero
+        <button onclick="mostrarModalLogin()" class="ml-3 px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-900 rounded-md text-xs font-bold flex items-center gap-1.5 shadow" title="Cambiar de cajero">
+          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Cambiar Cajero
         </button>
       </div>
     </header>
@@ -198,7 +207,7 @@
             <div class="border-t pt-3">
               <div class="flex justify-between text-lg font-bold mb-3">
                 <span>Total Cotizado:</span>
-                <span id="cot-total" class="text-indigo-600">$0.00</span>
+                <span id="cot-total" class="text-indigo-600 font-mono">$0.00</span>
               </div>
               <div class="grid grid-cols-2 gap-2">
                 <button onclick="guardarYDescargarCotizacion(false)" class="py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1.5">
@@ -343,7 +352,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   <input type="text" id="dest-nombre" required placeholder="Nombre receptor" class="w-full text-xs p-2 border rounded-lg">
                   <input type="text" id="dest-doc" required placeholder="Nº Documento" class="w-full text-xs p-2 border rounded-lg font-mono">
-                  <input type="text" id="dest-telefono" required placeholder="Teléfono" class="w-full text-xs p-2 border rounded-lg">
+                  <input type="text" id="dest-telefono" required placeholder="Teléfono" class="text-xs p-2 border rounded-lg">
                 </div>
                 <div id="bloque-direccion-destino" class="hidden space-y-2 bg-indigo-50/40 p-2.5 rounded-lg border border-indigo-100">
                   <input type="text" id="dest-direccion" placeholder="Dirección exacta..." class="w-full text-xs p-2 border rounded-lg bg-white">
@@ -441,8 +450,6 @@
 
       <!-- ==================== SECCIÓN 5: INVENTARIO CON PLANTILLAS Y ATRIBUTOS ==================== -->
       <div id="vista-inventario" class="hidden space-y-6">
-        
-        <!-- BARRA SUPERIOR DE INVENTARIO: SELECCIÓN Y GESTIÓN DE PLANTILLAS -->
         <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b">
             <div>
@@ -461,11 +468,9 @@
             </div>
           </div>
 
-          <!-- FORMULARIO DE PRODUCTO -->
           <form onsubmit="guardarProducto(event)" class="space-y-4">
             <input type="hidden" id="edit-prod-id">
             
-            <!-- DATOS BÁSICOS -->
             <div class="grid grid-cols-1 sm:grid-cols-6 gap-3">
               <div class="sm:col-span-2">
                 <label class="block text-[11px] font-bold text-slate-600 mb-1">Nombre del Producto</label>
@@ -489,7 +494,6 @@
               </div>
             </div>
 
-            <!-- CONTENEDOR DINÁMICO DE ATRIBUTOS SEGÚN LA PLANTILLA -->
             <div id="contenedor-campos-plantilla" class="bg-indigo-50/40 p-3.5 rounded-xl border border-indigo-100">
               <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-800 block mb-2" id="txt-nombre-plantilla-activa">
                 Atributos de la Plantilla
@@ -506,7 +510,6 @@
           </form>
         </div>
 
-        <!-- TABLA DE PRODUCTOS CON VISUALIZACIÓN DE ATRIBUTOS -->
         <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
           <div class="p-4 border-b flex justify-between items-center">
             <h3 class="font-bold text-slate-800 flex items-center gap-2"><i data-lucide="package" class="w-4 h-4 text-indigo-600"></i> Existencias en Bodega</h3>
@@ -550,7 +553,7 @@
           </div>
 
           <div class="py-2 flex justify-between items-center text-xs text-slate-500">
-            <span>Total vendido en el periodo: <b id="txt-total-periodo" class="text-sm font-bold text-indigo-700">$0.00</b></span>
+            <span>Total vendido en el periodo: <b id="txt-total-periodo" class="text-sm font-bold text-indigo-700 font-mono">$0.00</b></span>
           </div>
 
           <div class="overflow-x-auto mt-2">
@@ -620,7 +623,7 @@
     </main>
   </div>
 
-  <!-- MODAL: CREAR NUEVA PLANTILLA DE INVENTARIO -->
+  <!-- MODAL: CREAR NUEVA PLANTILLA -->
   <div id="modal-nueva-plantilla" class="hidden fixed inset-0 bg-slate-900 bg-opacity-60 flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4">
       <div class="flex justify-between items-center border-b pb-3">
@@ -664,9 +667,9 @@
       </div>
 
       <div class="bg-slate-50 p-3 rounded-lg border grid grid-cols-3 gap-2 text-center text-xs">
-        <div><span class="text-slate-400 block text-[10px]">TOTAL:</span><b id="modal-plan-total" class="text-slate-700 font-bold">$0.00</b></div>
-        <div><span class="text-slate-400 block text-[10px]">ABONADO:</span><b id="modal-plan-abonado" class="text-emerald-600 font-bold">$0.00</b></div>
-        <div><span class="text-slate-400 block text-[10px]">PENDIENTE:</span><b id="modal-plan-saldo" class="text-red-600 font-bold">$0.00</b></div>
+        <div><span class="text-slate-400 block text-[10px]">TOTAL:</span><b id="modal-plan-total" class="text-slate-700 font-bold font-mono">$0.00</b></div>
+        <div><span class="text-slate-400 block text-[10px]">ABONADO:</span><b id="modal-plan-abonado" class="text-emerald-600 font-bold font-mono">$0.00</b></div>
+        <div><span class="text-slate-400 block text-[10px]">PENDIENTE:</span><b id="modal-plan-saldo" class="text-red-600 font-bold font-mono">$0.00</b></div>
       </div>
 
       <div class="overflow-y-auto max-h-60 border rounded-lg">
@@ -795,13 +798,181 @@
       lucide.createIcons();
     });
 
-    // ==================== GESTIÓN DE PLANTILLAS DINÁMICAS ====================
+    // ==================== GESTIÓN DE TURNOS Y ROLES ====================
+    function mostrarModalLogin() {
+      document.getElementById('input-clave-login').value = '';
+      document.getElementById('pantalla-login').classList.remove('hidden');
+      setTimeout(() => {
+        const input = document.getElementById('input-clave-login');
+        if (input) input.focus();
+      }, 100);
+    }
+
+    function cerrarModalLogin() {
+      document.getElementById('pantalla-login').classList.add('hidden');
+    }
+
+    async function confirmarAccesoCajero() {
+      const select = document.getElementById('select-usuario-login');
+      const userId = select.value;
+      const clave = document.getElementById('input-clave-login').value.trim();
+
+      // Comparación flexible (==) para aceptar ID numérico o string
+      const user = usuariosLista.find(u => u.id == userId);
+      if (!user) return alert("Por favor selecciona un usuario válido.");
+
+      // Validación con clave maestra admin123
+      if (clave === 'admin123') {
+        // Clave maestra autorizada
+      } else if (user.rol === 'ADMIN') {
+        if (clave !== user.clave) {
+          return alert("Contraseña incorrecta para Administrador.");
+        }
+      } else {
+        if (user.clave && user.clave !== clave) {
+          return alert("Contraseña incorrecta para " + user.nombre_completo);
+        }
+      }
+
+      usuarioActual = user;
+      cerrarModalLogin();
+      aplicarPermisosRol();
+      alert(`¡Turno activado!\nCajero actual: ${usuarioActual.nombre_completo}\nRol: ${usuarioActual.rol}`);
+    }
+
+    function aplicarPermisosRol() {
+      document.getElementById('badge-sucursal').innerText = `${usuarioActual.nombre_completo} [${usuarioActual.rol}]`;
+      const tabInv = document.getElementById('tab-inv');
+      const tabAdmin = document.getElementById('tab-admin');
+
+      if (usuarioActual.rol === 'ADMIN') {
+        tabInv.classList.remove('hidden');
+        tabAdmin.classList.remove('hidden');
+      } else {
+        tabInv.classList.add('hidden');
+        tabAdmin.classList.add('hidden');
+        cambiarVista('pos');
+      }
+    }
+
+    async function cargarUsuariosLista() {
+      const { data } = await db.from('usuarios_sistema').select('*');
+      usuariosLista = data || [];
+      if (!usuariosLista.some(u => u.usuario === 'admin')) {
+        usuariosLista.unshift(usuarioActual);
+      }
+
+      const selectLogin = document.getElementById('select-usuario-login');
+      if (selectLogin) {
+        selectLogin.innerHTML = '';
+        usuariosLista.forEach(u => {
+          selectLogin.innerHTML += `<option value="${u.id}">${u.nombre_completo} (${u.rol})</option>`;
+        });
+      }
+
+      const l = document.getElementById('lista-personal');
+      if (!l) return;
+      l.innerHTML = '';
+      usuariosLista.forEach(u => {
+        l.innerHTML += `
+          <div class="p-2 bg-slate-50 border rounded flex justify-between items-center text-xs">
+            <div>
+              <p class="font-bold text-slate-800">${u.nombre_completo} <span class="text-indigo-600 font-normal">(@${u.usuario})</span></p>
+              <p class="text-slate-400">Rol: <b>${u.rol}</b></p>
+            </div>
+            <div class="flex gap-1">
+              <button onclick="prepararEdicionUser(${u.id})" class="px-2 py-1 bg-amber-500 text-white rounded font-bold">Editar</button>
+              ${u.usuario !== 'admin' ? `<button onclick="eliminarUsuario(${u.id}, '${u.usuario}')" class="px-2 py-1 bg-red-500 text-white rounded font-bold">Eliminar</button>` : ''}
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    async function guardarUsuario(e) {
+      e.preventDefault();
+      const id = document.getElementById('edit-user-id').value;
+      const nombre = document.getElementById('user-nombre').value;
+      const alias = document.getElementById('user-alias').value;
+      const clave = document.getElementById('user-clave').value;
+      const rol = document.getElementById('user-rol').value;
+      const sucursal_id = document.getElementById('user-sucursal').value || null;
+
+      if (id) {
+        const payload = { nombre_completo: nombre, usuario: alias, rol: rol, sucursal_id: sucursal_id };
+        if (clave.trim() !== '') payload.clave = clave;
+        await db.from('usuarios_sistema').update(payload).eq('id', id);
+        alert("Usuario actualizado.");
+      } else {
+        if (!clave) return alert("Asigne una contraseña.");
+        await db.from('usuarios_sistema').insert([{ nombre_completo: nombre, usuario: alias, clave: clave, rol: rol, sucursal_id: sucursal_id }]);
+        alert("Trabajador registrado.");
+      }
+      cancelarEdicionUser();
+      await cargarUsuariosLista();
+    }
+
+    function prepararEdicionUser(id) {
+      const u = usuariosLista.find(x => x.id == id);
+      if (!u) return;
+      document.getElementById('edit-user-id').value = u.id;
+      document.getElementById('user-nombre').value = u.nombre_completo;
+      document.getElementById('user-alias').value = u.usuario;
+      document.getElementById('user-clave').value = '';
+      document.getElementById('user-rol').value = u.rol;
+      document.getElementById('user-sucursal').value = u.sucursal_id || '';
+      document.getElementById('txt-form-user').innerText = "Modificar Trabajador";
+      document.getElementById('btn-save-user').innerText = "Actualizar";
+      document.getElementById('btn-cancel-user').classList.remove('hidden');
+    }
+
+    function cancelarEdicionUser() {
+      document.getElementById('edit-user-id').value = '';
+      document.getElementById('user-nombre').value = '';
+      document.getElementById('user-alias').value = '';
+      document.getElementById('user-clave').value = '';
+      document.getElementById('txt-form-user').innerText = "Crear Nuevo Trabajador";
+      document.getElementById('btn-save-user').innerText = "Guardar Empleado";
+      document.getElementById('btn-cancel-user').classList.add('hidden');
+    }
+
+    async function eliminarUsuario(id, alias) {
+      if (!confirm(`¿Eliminar al empleado @${alias}?`)) return;
+      await db.from('usuarios_sistema').delete().eq('id', id);
+      cargarUsuariosLista();
+    }
+
+    async function cargarSucursales() {
+      const { data } = await db.from('sucursales').select('*');
+      sucursales = data || [];
+      const selectUser = document.getElementById('user-sucursal');
+      const lista = document.getElementById('lista-sucursales');
+      if (selectUser) selectUser.innerHTML = '<option value="">Sin sede fija (Global)</option>';
+      if (lista) lista.innerHTML = '';
+
+      sucursales.forEach(s => {
+        if (selectUser) selectUser.innerHTML += `<option value="${s.id}">${s.nombre}</option>`;
+        if (lista) lista.innerHTML += `<li class="p-2 bg-slate-50 border rounded flex justify-between"><b>${s.nombre}</b> <span class="text-xs text-slate-400">${s.direccion || ''}</span></li>`;
+      });
+    }
+
+    async function crearSucursal(e) {
+      e.preventDefault();
+      const nombre = document.getElementById('suc-nombre').value.trim();
+      const direccion = document.getElementById('suc-dir').value.trim();
+      await db.from('sucursales').insert([{ nombre, direccion }]);
+      alert("Sucursal creada.");
+      document.getElementById('suc-nombre').value = '';
+      document.getElementById('suc-dir').value = '';
+      cargarSucursales();
+    }
+
+    // ==================== PLANTILLAS DINÁMICAS ====================
     async function cargarPlantillas() {
-      const { data, error } = await db.from('plantillas_inventario').select('*').order('id', { ascending: true });
-      if (!error && data && data.length > 0) {
+      const { data } = await db.from('plantillas_inventario').select('*').order('id', { ascending: true });
+      if (data && data.length > 0) {
         plantillas = data;
       } else {
-        // Fallback local por defecto si la tabla está vacía
         plantillas = [
           { id: 1, nombre: 'Celulares / Móviles', campos: ['IMEI', 'Color', 'Capacidad (GB)', 'RAM (GB)'] },
           { id: 2, nombre: 'Ropa / Calzado', campos: ['Talla / Tamaño', 'Color', 'Material'] },
@@ -858,21 +1029,20 @@
       const camposTexto = document.getElementById('tpl-nuevos-campos').value.trim();
 
       if (!nombre || !camposTexto) {
-        return alert("Por favor escribe el nombre de la plantilla y al menos un campo.");
+        return alert("Por favor escribe el nombre de la plantilla y sus campos.");
       }
 
-      // Convertir lista separada por comas en Array limpio
       const camposArray = camposTexto.split(',').map(c => c.trim()).filter(c => c.length > 0);
 
-      const { data, error } = await db.from('plantillas_inventario').insert([{
+      const { error } = await db.from('plantillas_inventario').insert([{
         nombre: nombre,
         campos: camposArray
-      }]).select();
+      }]);
 
       if (error) {
-        alert("Error al guardar la plantilla: " + error.message);
+        alert("Error al guardar: " + error.message);
       } else {
-        alert(`¡Plantilla "${nombre}" creada con éxito!`);
+        alert(`¡Plantilla "${nombre}" guardada!`);
         cerrarModalNuevaPlantilla();
         await cargarPlantillas();
         document.getElementById('select-plantilla-activa').value = nombre;
@@ -880,7 +1050,7 @@
       }
     }
 
-    // ==================== INVENTARIO (CON ATRIBUTOS DINÁMICOS) ====================
+    // ==================== INVENTARIO (CON ATRIBUTOS) ====================
     async function guardarProducto(e) {
       e.preventDefault();
       const id = document.getElementById('edit-prod-id').value;
@@ -891,7 +1061,6 @@
       const stock = parseInt(document.getElementById('inv-stock').value);
       const plantillaNombre = document.getElementById('select-plantilla-activa').value;
 
-      // Recolectar atributos dinámicos
       const atributos = {};
       const inputs = document.querySelectorAll('.input-atributo-dinamico');
       inputs.forEach(inp => {
@@ -912,12 +1081,12 @@
 
       if (id) {
         const { error } = await db.from('productos').update(payload).eq('id', id);
-        if (error) return alert("Error al modificar producto: " + error.message);
+        if (error) return alert("Error al modificar: " + error.message);
         alert("Producto modificado correctamente.");
       } else {
         const { error } = await db.from('productos').insert([payload]);
-        if (error) return alert("Error al registrar producto: " + error.message);
-        alert("Producto guardado correctamente en el inventario.");
+        if (error) return alert("Error al guardar: " + error.message);
+        alert("Producto registrado correctamente.");
       }
       cancelarEdicionProd();
       await cargarProductos();
@@ -936,7 +1105,6 @@
       }
 
       lista.forEach(p => {
-        // Formatear etiquetas de atributos visuales
         let atributosBadge = '';
         if (p.atributos && typeof p.atributos === 'object' && Object.keys(p.atributos).length > 0) {
           atributosBadge = '<div class="flex flex-wrap gap-1 mt-1">';
@@ -967,7 +1135,7 @@
     }
 
     function prepararEdicionProd(id) {
-      const p = productos.find(x => x.id === id);
+      const p = productos.find(x => x.id == id);
       if (!p) return;
       document.getElementById('edit-prod-id').value = p.id;
       document.getElementById('inv-nombre').value = p.nombre;
@@ -981,7 +1149,6 @@
       }
       cambiarPlantillaFormulario();
 
-      // Cargar los valores de atributos guardados en los inputs dinámicos
       if (p.atributos && typeof p.atributos === 'object') {
         const inputs = document.querySelectorAll('.input-atributo-dinamico');
         inputs.forEach(inp => {
@@ -1076,10 +1243,10 @@
     }
 
     function agregarCarrito(id) {
-      const prod = productos.find(p => p.id === id);
+      const prod = productos.find(p => p.id == id);
       if (!prod || prod.stock_actual <= 0) return alert("Producto agotado.");
 
-      const itemEnCarrito = carrito.find(c => c.id === id);
+      const itemEnCarrito = carrito.find(c => c.id == id);
       if (itemEnCarrito) {
         if (itemEnCarrito.cantidad >= prod.stock_actual) {
           return alert(`Stock insuficiente. Solo quedan ${prod.stock_actual} unidades.`);
@@ -1093,7 +1260,7 @@
 
     function cambiarCantidadCarrito(idx, delta) {
       const item = carrito[idx];
-      const prod = productos.find(p => p.id === item.id);
+      const prod = productos.find(p => p.id == item.id);
       const nuevaCantidad = item.cantidad + delta;
 
       if (nuevaCantidad <= 0) {
@@ -1189,7 +1356,7 @@
       if (carrito.length === 0) return alert("Ticket vacío.");
 
       for (const item of carrito) {
-        const prod = productos.find(p => p.id === item.id);
+        const prod = productos.find(p => p.id == item.id);
         if (!prod || prod.stock_actual < item.cantidad) {
           return alert(`Stock insuficiente para "${item.nombre}". Disponible: ${prod ? prod.stock_actual : 0}`);
         }
@@ -1264,7 +1431,7 @@
       await actualizarProximoNumeroTicketVisual();
     }
 
-    // ==================== RESTO DE MÓDULOS (COTIZACIÓN, PLAN, ENVÍOS, HISTORIAL) ====================
+    // ==================== RESTO DE MÓDULOS ====================
     function renderizarCotizarGrid(lista) {
       const g = document.getElementById('grid-cotizar');
       if (!g) return;
@@ -1280,8 +1447,8 @@
     }
 
     function agregarCotizacion(id) {
-      const prod = productos.find(p => p.id === id);
-      const existe = carritoCotizacion.find(c => c.id === id);
+      const prod = productos.find(p => p.id == id);
+      const existe = carritoCotizacion.find(c => c.id == id);
       if (existe) existe.cantidad++;
       else carritoCotizacion.push({ ...prod, cantidad: 1 });
       renderCotizacion();
@@ -1422,7 +1589,7 @@
     }
 
     async function verHistorialAbonosModal(planId) {
-      const plan = planesLista.find(p => p.id === planId);
+      const plan = planesLista.find(p => p.id == planId);
       if (!plan) return;
 
       const { data: abonos } = await db.from('abonos_plan').select('*').eq('plan_id', planId).order('id', { ascending: true });
@@ -1705,7 +1872,7 @@
           <tr class="text-xs">
             <td class="p-2">${it.cantidad}</td>
             <td class="p-2">${it.nombre}</td>
-            <td class="p-2 text-right">$${parseFloat(it.precio_venta).toFixed(2)}</td>
+            <td class="p-2 text-right font-mono">$${parseFloat(it.precio_venta).toFixed(2)}</td>
             <td class="p-2 text-right font-bold font-mono">$${(it.cantidad * it.precio_venta).toFixed(2)}</td>
           </tr>
         `;
@@ -1751,7 +1918,7 @@
       window.print();
     }
 
-    // ==================== NAVEGACIÓN ====================
+    // ==================== NAVEGACIÓN ENTRE PESTAÑAS ====================
     function cambiarVista(v) {
       ['pos', 'cotizacion', 'plan', 'envios', 'inventario', 'ventas', 'admin'].forEach(x => {
         const el = document.getElementById('vista-' + x);
