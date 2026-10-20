@@ -24,7 +24,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col">
 
-  <!-- ==================== MODAL DE BÚSQUEDA RÁPIDA (F2) ==================== -->
+  <!-- MODAL BUSCADOR GLOBAL (LUPA / F2) -->
   <div id="modal-buscador-global" class="hidden fixed inset-0 bg-slate-900 bg-opacity-75 flex items-start justify-center pt-16 p-4 z-50">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden border border-slate-200">
       <div class="p-4 bg-slate-50 border-b flex items-center gap-3">
@@ -32,20 +32,20 @@
           <i data-lucide="search" class="w-5 h-5"></i>
         </div>
         <div class="flex-1">
-          <input type="text" id="input-buscador-global" oninput="ejecutarBusquedaGlobal(this.value)" placeholder="Escribe nombre, código, IMEI o atributo..." class="w-full bg-transparent text-sm font-semibold text-slate-800 placeholder-slate-400 outline-none">
+          <input type="text" id="input-buscador-global" oninput="ejecutarBusquedaGlobal(this.value)" placeholder="Escribe nombre, código alfanumérico, IMEI o atributo..." class="w-full bg-transparent text-sm font-semibold text-slate-800 placeholder-slate-400 outline-none">
         </div>
         <span class="text-[10px] font-mono bg-slate-200 text-slate-600 px-2 py-1 rounded-md font-bold">ESC</span>
         <button onclick="cerrarBuscadorGlobal()" class="text-slate-400 hover:text-slate-700 font-bold text-xl leading-none">&times;</button>
       </div>
       <div class="px-4 py-2 bg-indigo-50/50 border-b flex justify-between items-center text-[11px] text-slate-500">
-        <span>Resultados (<span id="txt-contador-busqueda" class="font-bold text-indigo-700">0</span> encontrados)</span>
-        <span class="text-slate-400">Clic para seleccionar</span>
+        <span>Resultados (<span id="txt-contador-busqueda" class="font-bold text-indigo-700">0</span>)</span>
+        <span class="text-slate-400">Clic en cualquier artículo para seleccionarlo</span>
       </div>
       <div id="lista-resultados-global" class="max-h-[380px] overflow-y-auto divide-y divide-slate-100 p-2"></div>
     </div>
   </div>
 
-  <!-- ==================== MODAL DE CAMBIO DE CAJERO ==================== -->
+  <!-- MODAL DE CAMBIO DE CAJERO -->
   <div id="pantalla-login" class="hidden fixed inset-0 bg-slate-900 bg-opacity-75 flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center relative">
       <button onclick="cerrarModalLogin()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 font-bold text-xl leading-none">&times;</button>
@@ -53,8 +53,7 @@
         <i data-lucide="user-check" class="w-8 h-8"></i>
       </div>
       <h2 class="text-lg font-bold text-slate-800">Cambio de Turno y Cajero</h2>
-      <p class="text-xs text-slate-400 mb-4">Selecciona el usuario que atenderá</p>
-
+      <p class="text-xs text-slate-400 mb-4">Selecciona el usuario que atenderá el punto de venta</p>
       <div class="space-y-3 text-left">
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Cajero / Trabajador</label>
@@ -65,8 +64,8 @@
           <input type="password" id="input-clave-login" placeholder="••••••••" class="w-full text-xs p-2.5 border rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
         </div>
         <div class="pt-2 flex gap-2">
-          <button type="button" onclick="cerrarModalLogin()" class="flex-1 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-lg text-xs transition">Cancelar</button>
-          <button type="button" onclick="confirmarAccesoCajero()" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs transition flex items-center justify-center gap-1 shadow-sm">
+          <button type="button" onclick="cerrarModalLogin()" class="flex-1 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-lg text-xs">Cancelar</button>
+          <button type="button" onclick="confirmarAccesoCajero()" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1 shadow-sm">
             <i data-lucide="check" class="w-4 h-4"></i> Activar Turno
           </button>
         </div>
@@ -74,9 +73,8 @@
     </div>
   </div>
 
-  <!-- ==================== APLICACIÓN PRINCIPAL ==================== -->
+  <!-- APLICACIÓN PRINCIPAL -->
   <div id="app-contenido" class="flex-1 flex flex-col">
-    <!-- BARRA SUPERIOR -->
     <header class="bg-indigo-700 text-white px-6 py-3 flex justify-between items-center shadow-md">
       <div class="flex items-center space-x-3">
         <i data-lucide="package-check" class="w-7 h-7"></i>
@@ -85,16 +83,12 @@
           <p id="badge-sucursal" class="text-xs text-indigo-200">Cargando...</p>
         </div>
       </div>
-
       <div class="flex items-center gap-2">
-        <div onclick="abrirBuscadorGlobal()" class="flex items-center gap-2 bg-indigo-800 hover:bg-indigo-900 border border-indigo-500 px-3 py-1.5 rounded-xl cursor-pointer shadow-inner transition text-xs text-indigo-100">
+        <div onclick="abrirBuscadorGlobal()" class="flex items-center gap-2 bg-indigo-800 hover:bg-indigo-900 border border-indigo-500 px-3 py-1.5 rounded-xl cursor-pointer shadow-inner text-xs text-indigo-100">
           <i data-lucide="search" class="w-4 h-4 text-indigo-300"></i>
-          <span class="hidden sm:inline font-medium">Buscar producto...</span>
+          <span class="hidden sm:inline font-medium">Buscar...</span>
           <span class="bg-indigo-600 text-[10px] px-1.5 py-0.5 rounded font-mono font-bold text-white">F2</span>
         </div>
-      </div>
-
-      <div class="flex items-center space-x-2">
         <button onclick="cambiarVista('pos')" id="tab-pos" class="px-3 py-1.5 bg-indigo-800 rounded-md text-xs font-semibold flex items-center gap-1.5">
           <i data-lucide="shopping-cart" class="w-4 h-4"></i> Ventas
         </button>
@@ -102,7 +96,7 @@
           <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Cotización
         </button>
         <button onclick="cambiarVista('plan')" id="tab-plan" class="px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
-          <i data-lucide="calendar-clock" class="w-4 h-4"></i> Plan Acumulativo
+          <i data-lucide="calendar-clock" class="w-4 h-4"></i> Plan
         </button>
         <button onclick="cambiarVista('envios')" id="tab-envios" class="px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
           <i data-lucide="send" class="w-4 h-4"></i> Envíos
@@ -114,17 +108,16 @@
           <i data-lucide="receipt" class="w-4 h-4"></i> Historial
         </button>
         <button onclick="cambiarVista('admin')" id="tab-admin" class="hidden px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
-          <i data-lucide="shield-check" class="w-4 h-4"></i> Personal / Sedes
+          <i data-lucide="shield-check" class="w-4 h-4"></i> Personal
         </button>
-        <button onclick="mostrarModalLogin()" class="ml-3 px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-900 rounded-md text-xs font-bold flex items-center gap-1.5 shadow" title="Cambiar de cajero">
+        <button onclick="mostrarModalLogin()" class="ml-2 px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-900 rounded-md text-xs font-bold flex items-center gap-1.5">
           <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Cambiar Cajero
         </button>
       </div>
     </header>
 
     <main class="flex-1 p-6 max-w-7xl mx-auto w-full">
-
-      <!-- ==================== SECCIÓN 1: VENTAS (TPV / POS) ==================== -->
+      <!-- VISTA POS -->
       <div id="vista-pos" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
           <div class="flex justify-between items-center mb-4">
@@ -132,13 +125,7 @@
               <i data-lucide="grid" class="w-5 h-5 text-indigo-600"></i> Catálogo de Productos
             </h2>
             <div class="relative w-72 flex items-center gap-1.5">
-              <div class="relative flex-1">
-                <input type="text" id="buscar-pos" onkeydown="verificarEnterEscaneo(event)" oninput="filtrarProductosPOS()" placeholder="Escanear o buscar..." class="text-sm p-2 pl-8 border rounded-lg w-full focus:ring-2 focus:ring-indigo-500 outline-none">
-                <i data-lucide="scan-barcode" class="w-4 h-4 text-slate-400 absolute left-2.5 top-3"></i>
-              </div>
-              <button onclick="abrirBuscadorGlobal()" class="p-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg">
-                <i data-lucide="search" class="w-4 h-4"></i>
-              </button>
+              <input type="text" id="buscar-pos" onkeydown="verificarEnterEscaneo(event)" oninput="filtrarProductosPOS()" placeholder="Escanear o buscar..." class="text-sm p-2 border rounded-lg w-full outline-none focus:ring-2 focus:ring-indigo-500">
             </div>
           </div>
           <div id="grid-pos" class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[550px] overflow-y-auto"></div>
@@ -157,7 +144,6 @@
             </div>
             
             <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 mb-3 space-y-2">
-              <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Datos del Cliente</span>
               <div class="grid grid-cols-2 gap-2">
                 <input type="text" id="pos-doc-cliente" value="9999999999" placeholder="Cédula / RUC" class="text-xs p-1.5 border rounded bg-white font-mono">
                 <input type="text" id="pos-tel-cliente" placeholder="Teléfono" class="text-xs p-1.5 border rounded bg-white">
@@ -166,467 +152,110 @@
                 <input type="text" id="pos-nom-cliente" placeholder="Nombres" class="text-xs p-1.5 border rounded bg-white">
                 <input type="text" id="pos-ape-cliente" placeholder="Apellidos" class="text-xs p-1.5 border rounded bg-white">
               </div>
-              <input type="email" id="pos-mail-cliente" placeholder="Correo electrónico" class="w-full text-xs p-1.5 border rounded bg-white">
             </div>
 
-            <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200 mb-3 space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-slate-700">Moneda de Cobro:</span>
-                <select id="pos-moneda" onchange="actualizarMonedaPOS()" class="text-xs font-bold p-1 border rounded bg-white text-indigo-700">
-                  <option value="USD">Dólares (USD $)</option>
-                  <option value="NIO">Córdobas (NIO C$)</option>
-                </select>
-              </div>
-              <div id="bloque-tasa-cambio" class="hidden flex items-center justify-between text-xs pt-1 border-t border-slate-200">
-                <span class="text-slate-500 font-semibold">Tasa (1 USD =):</span>
-                <div class="flex items-center gap-1">
-                  <input type="number" step="0.01" id="pos-tasa-cambio" value="36.80" oninput="renderCarrito()" class="w-16 p-1 text-right font-bold border rounded bg-white">
-                  <span class="text-slate-600 font-bold">C$</span>
-                </div>
-              </div>
+            <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200 mb-3 flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-700">Moneda:</span>
+              <select id="pos-moneda" class="text-xs font-bold p-1 border rounded bg-white text-indigo-700">
+                <option value="USD">Dólares (USD $)</option>
+              </select>
             </div>
 
-            <div id="carrito-items" class="space-y-1.5 max-h-[160px] overflow-y-auto"></div>
+            <div id="carrito-items" class="space-y-1.5 max-h-[180px] overflow-y-auto"></div>
           </div>
 
           <div class="border-t pt-3">
-            <div class="flex justify-between text-base font-bold mb-1">
+            <div class="flex justify-between text-base font-bold mb-2">
               <span>Total USD:</span>
-              <span id="pos-total-usd" class="text-slate-700 font-mono">$0.00</span>
-            </div>
-            <div id="fila-total-moneda" class="hidden flex justify-between text-lg font-black mb-2 text-indigo-600">
-              <span>Total a Pagar:</span>
-              <span id="pos-total-moneda" class="font-mono">C$ 0.00</span>
+              <span id="pos-total-usd" class="text-slate-800 font-mono text-lg">$0.00</span>
             </div>
             <select id="pos-metodo" class="w-full text-xs p-2 border rounded mb-2 font-semibold">
               <option value="EFECTIVO">Efectivo</option>
               <option value="TRANSFERENCIA">Transferencia</option>
               <option value="CREDITO">Crédito</option>
             </select>
-            <button onclick="cobrarTicket()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition text-sm shadow">
+            <button onclick="cobrarTicket()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 text-sm shadow">
               <i data-lucide="check-circle" class="w-4 h-4"></i> Procesar Venta
             </button>
           </div>
         </div>
       </div>
 
-      <!-- ==================== SECCIÓN 2: COTIZACIÓN ==================== -->
-      <div id="vista-cotizacion" class="hidden space-y-6">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
-            <div class="flex justify-between items-center mb-3">
-              <h2 class="font-bold text-slate-800 flex items-center gap-2">
-                <i data-lucide="file-spreadsheet" class="w-5 h-5 text-indigo-600"></i> Catálogo para Cotizar
-              </h2>
-              <button onclick="abrirBuscadorGlobal()" class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-bold flex items-center gap-1 shadow-xs">
-                <i data-lucide="search" class="w-3.5 h-3.5"></i> Buscar Producto (F2)
-              </button>
-            </div>
-            <div id="grid-cotizar" class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[500px] overflow-y-auto"></div>
-          </div>
-
-          <div class="bg-white rounded-xl border border-slate-200 p-5 flex flex-col justify-between shadow-sm">
-            <div>
-              <div class="flex justify-between items-center pb-2 border-b mb-3">
-                <h3 class="font-bold text-slate-800 text-sm">Detalle de Cotización</h3>
-                <button onclick="carritoCotizacion = []; renderCotizacion();" class="text-xs text-red-500 hover:underline">Vaciar</button>
-              </div>
-              <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 mb-3 space-y-2">
-                <input type="text" id="cot-doc" placeholder="Cédula / RUC" class="w-full text-xs p-1.5 border rounded bg-white font-mono">
-                <input type="text" id="cot-nom" placeholder="Nombres y Apellidos" class="w-full text-xs p-1.5 border rounded bg-white">
-                <div class="grid grid-cols-2 gap-2">
-                  <input type="text" id="cot-tel" placeholder="Teléfono" class="text-xs p-1.5 border rounded bg-white">
-                  <input type="email" id="cot-mail" placeholder="Correo" class="text-xs p-1.5 border rounded bg-white">
-                </div>
-              </div>
-              <div id="items-cotizacion" class="space-y-1.5 max-h-[180px] overflow-y-auto"></div>
-            </div>
-
-            <div class="border-t pt-3">
-              <div class="flex justify-between text-lg font-bold mb-3">
-                <span>Total Cotizado:</span>
-                <span id="cot-total" class="text-indigo-600 font-mono">$0.00</span>
-              </div>
-              <div class="grid grid-cols-2 gap-2">
-                <button onclick="guardarYDescargarCotizacion(false)" class="py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1.5">
-                  <i data-lucide="printer" class="w-4 h-4"></i> Imprimir
-                </button>
-                <button onclick="guardarYDescargarCotizacion(true)" class="py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1.5">
-                  <i data-lucide="download" class="w-4 h-4"></i> Descargar PDF
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ==================== SECCIÓN 3: PLAN ACUMULATIVO ==================== -->
-      <div id="vista-plan" class="hidden space-y-6">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div class="lg:col-span-1 bg-white p-5 rounded-xl border border-slate-200 space-y-4 shadow-sm">
-            <h2 class="font-bold text-slate-800 flex items-center gap-2">
-              <i data-lucide="calendar-clock" class="w-5 h-5 text-indigo-600"></i> Apertura de Plan Acumulativo
-            </h2>
-            <form onsubmit="crearPlanAcumulativo(event)" class="space-y-3">
-              <input type="text" id="plan-doc" required placeholder="Cédula / Identificación" class="w-full text-xs p-2 border rounded font-mono">
-              <input type="text" id="plan-nom" required placeholder="Nombre completo del cliente" class="w-full text-xs p-2 border rounded">
-              <div class="grid grid-cols-2 gap-2">
-                <input type="text" id="plan-tel" required placeholder="Teléfono" class="text-xs p-2 border rounded">
-                <input type="email" id="plan-mail" placeholder="Email" class="text-xs p-2 border rounded">
-              </div>
-              <div>
-                <div class="flex justify-between items-center mb-1">
-                  <label class="block text-[11px] font-bold text-slate-600">Producto a Reservar</label>
-                  <button type="button" onclick="abrirBuscadorGlobal()" class="text-[10px] text-indigo-600 font-bold hover:underline">Buscar con Lupa</button>
-                </div>
-                <select id="plan-producto-select" class="w-full text-xs p-2 border rounded font-semibold"></select>
-              </div>
-              <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label class="block text-[11px] font-bold text-slate-600 mb-1">Abono Inicial ($)</label>
-                  <input type="number" step="0.01" id="plan-abono-inicial" required placeholder="0.00" class="w-full text-xs p-2 border rounded font-bold text-emerald-600 font-mono">
-                </div>
-                <div>
-                  <label class="block text-[11px] font-bold text-slate-600 mb-1">Próximo Abono</label>
-                  <input type="date" id="plan-proxima-fecha" required class="w-full text-xs p-2 border rounded">
-                </div>
-              </div>
-              <button type="submit" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs">Aperturar Plan Acumulativo</button>
-            </form>
-          </div>
-
-          <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
-            <div class="p-4 border-b flex justify-between items-center">
-              <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
-                <i data-lucide="list" class="w-4 h-4 text-indigo-600"></i> Planes Activos y Control de Abonos
-              </h3>
-              <button onclick="cargarPlanesAcumulativos()" class="text-xs text-indigo-600 font-bold flex items-center gap-1 hover:underline">
-                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Actualizar
-              </button>
-            </div>
-            <div class="overflow-x-auto">
-              <table class="w-full text-xs text-left">
-                <thead class="bg-slate-50 text-slate-500 uppercase border-b">
-                  <tr>
-                    <th class="p-3">Código</th>
-                    <th class="p-3">Cliente</th>
-                    <th class="p-3">Total</th>
-                    <th class="p-3 text-red-600 font-bold">Saldo</th>
-                    <th class="p-3">Próx. Abono</th>
-                    <th class="p-3">Estado</th>
-                    <th class="p-3 text-center">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody id="tabla-planes-body" class="divide-y"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ==================== SECCIÓN 4: ENVÍOS (COURIER) ==================== -->
-      <div id="vista-envios" class="hidden space-y-6">
-        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-          <div class="border-b pb-4 mb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
-                <i data-lucide="plane-takeoff" class="w-6 h-6 text-indigo-600"></i> Guía de Envío Internacional
-              </h2>
-            </div>
-            <div class="flex items-center gap-2">
-              <label class="text-xs font-bold text-slate-600">Ruta:</label>
-              <select id="env-ruta" onchange="cambiarRutaEnvio()" class="text-xs font-bold py-2 px-3 border-2 border-indigo-500 rounded-lg bg-indigo-50 text-indigo-800">
-                <option value="USA">✈️ Hacia Estados Unidos (USA)</option>
-                <option value="USA_NICARAGUA">🇳🇮 Estados Unidos ➔ Nicaragua</option>
-              </select>
-            </div>
-            <div class="flex items-center gap-2 bg-indigo-50 border border-indigo-200 px-3 py-1.5 rounded-lg">
-              <i data-lucide="scan-barcode" class="w-5 h-5 text-indigo-600"></i>
-              <div>
-                <span class="block text-[10px] uppercase font-bold text-indigo-700">Guía / Tracking</span>
-                <input type="text" id="env-tracking" placeholder="Escanear..." class="text-xs font-mono font-bold bg-transparent outline-none w-32 text-indigo-900">
-              </div>
-              <button type="button" onclick="generarTracking()" class="px-2 py-1 bg-white hover:bg-indigo-100 border border-indigo-300 text-[11px] font-bold rounded text-indigo-700">Auto</button>
-            </div>
-          </div>
-          
-          <form onsubmit="registrarEnvio(event)" class="space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Transporte</label>
-                <select id="env-tipo" onchange="actualizarTarifaSugerida()" class="w-full text-sm p-2 border rounded-lg bg-white font-bold text-indigo-800">
-                  <option value="AEREO">✈️ Aéreo (Express)</option>
-                  <option value="MARITIMO">🚢 Marítimo (Cajas)</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Entrega</label>
-                <select id="env-entrega" onchange="toggleDireccionDestino()" class="w-full text-sm p-2 border rounded-lg bg-white font-semibold">
-                  <option value="OFICINA">🏢 Retiro en Sucursal</option>
-                  <option value="DOMICILIO">🏠 Entrega a Domicilio</option>
-                </select>
-              </div>
-              <div>
-                <label id="lbl-ciudad-destino" class="block text-xs font-bold text-slate-700 mb-1">Ciudad Destino</label>
-                <input list="lista-ciudades-destino" id="env-ciudad" required placeholder="Ciudad..." class="w-full text-sm p-2 border rounded-lg bg-white">
-                <datalist id="lista-ciudades-destino"></datalist>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div class="p-4 border rounded-xl bg-white space-y-3">
-                <h3 id="titulo-remitente" class="text-xs font-bold text-indigo-600 uppercase pb-2 border-b">Datos del Remitente</h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <input type="text" id="rem-nombre" required placeholder="Nombres" class="w-full text-xs p-2 border rounded-lg">
-                  <input type="text" id="rem-cedula" required placeholder="Cédula / ID" class="w-full text-xs p-2 border rounded-lg font-mono">
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <input type="text" id="rem-telefono" required placeholder="Teléfono" class="text-xs p-2 border rounded-lg">
-                  <input type="text" id="rem-direccion" required placeholder="Dirección Origen" class="text-xs p-2 border rounded-lg">
-                </div>
-              </div>
-
-              <div class="p-4 border rounded-xl bg-white space-y-3">
-                <h3 id="titulo-destinatario" class="text-xs font-bold text-indigo-600 uppercase pb-2 border-b">Datos del Destinatario</h3>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  <input type="text" id="dest-nombre" required placeholder="Nombre receptor" class="w-full text-xs p-2 border rounded-lg">
-                  <input type="text" id="dest-doc" required placeholder="Nº Documento" class="w-full text-xs p-2 border rounded-lg font-mono">
-                  <input type="text" id="dest-telefono" required placeholder="Teléfono" class="text-xs p-2 border rounded-lg">
-                </div>
-                <div id="bloque-direccion-destino" class="hidden space-y-2 bg-indigo-50/40 p-2.5 rounded-lg border border-indigo-100">
-                  <input type="text" id="dest-direccion" placeholder="Dirección exacta..." class="w-full text-xs p-2 border rounded-lg bg-white">
-                  <div id="bloque-zip-code">
-                    <input type="text" id="dest-zip" placeholder="ZIP Code" class="w-full text-xs p-2 border rounded-lg bg-white font-mono">
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="p-4 border rounded-xl bg-white grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-              <div class="md:col-span-2">
-                <label class="block text-xs font-bold text-slate-700 mb-1">Contenido Aduanero</label>
-                <textarea id="env-contenido" rows="2" required placeholder="Artículos contenidos..." class="w-full text-xs p-2.5 border rounded-lg"></textarea>
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Foto del Paquete</label>
-                <input type="file" id="env-foto-input" accept="image/*" onchange="previsualizarFoto(event)" class="text-xs w-full">
-                <div id="preview-contenedor" class="hidden flex items-center gap-2 mt-2 p-1.5 bg-slate-50 border rounded-lg">
-                  <img id="preview-img" src="" class="w-10 h-10 object-cover rounded border">
-                  <button type="button" onclick="quitarFoto()" class="text-[11px] text-red-500 hover:underline ml-auto">Quitar</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="bg-indigo-50/70 p-4 rounded-xl border border-indigo-100 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Peso</label>
-                <div class="flex gap-1.5">
-                  <input type="number" step="0.01" id="env-peso" required oninput="calcularTotalEnvio()" placeholder="0.00" class="w-full text-base font-bold p-2 border rounded-lg bg-white font-mono">
-                  <select id="env-unidad-peso" onchange="cambiarUnidadPeso()" class="text-xs p-2 border rounded-lg font-bold bg-white">
-                    <option value="LBS">lbs</option>
-                    <option value="KG">kg</option>
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label id="lbl-tarifa" class="block text-xs font-bold text-slate-700 mb-1">Precio x Libra ($)</label>
-                <input type="number" step="0.01" id="env-tarifa-unidad" value="4.50" oninput="calcularTotalEnvio()" class="w-full text-base font-bold p-2 border rounded-lg bg-white font-mono">
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Extras ($)</label>
-                <input type="number" step="0.01" id="env-cargos-extra" value="0.00" oninput="calcularTotalEnvio()" class="w-full text-base font-bold p-2 border rounded-lg bg-white font-mono">
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Condición Pago</label>
-                <select id="env-estado-pago" class="w-full text-xs font-bold p-2.5 border rounded-lg bg-white">
-                  <option value="PAGADO">✅ PAGADO</option>
-                  <option value="POR COBRAR">⏳ POR COBRAR</option>
-                </select>
-              </div>
-              <div class="bg-indigo-600 text-white p-2.5 rounded-lg flex flex-col justify-between shadow-sm">
-                <span class="text-[10px] font-bold uppercase text-indigo-200">Total Envíos</span>
-                <span id="txt-total-envio" class="text-xl font-black font-mono">$0.00</span>
-                <input type="hidden" id="env-valor-final" value="0.00">
-              </div>
-            </div>
-
-            <div class="pt-2 flex justify-end">
-              <button type="submit" id="btn-guardar-envio" class="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm flex items-center gap-2">
-                <i data-lucide="printer" class="w-5 h-5"></i> Guardar e Imprimir Guía
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
-          <div class="p-4 border-b flex justify-between items-center">
-            <h3 class="font-bold text-slate-800 flex items-center gap-2"><i data-lucide="archive" class="w-4 h-4 text-indigo-600"></i> Registro de Envíos</h3>
-            <button onclick="cargarEnvios()" class="text-xs text-indigo-600 font-bold flex items-center gap-1 hover:underline">
-              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Actualizar
-            </button>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm text-left">
-              <thead class="bg-slate-50 text-slate-500 uppercase text-xs border-b">
-                <tr>
-                  <th class="p-3">Guía</th>
-                  <th class="p-3">Ruta</th>
-                  <th class="p-3">Remitente</th>
-                  <th class="p-3">Destinatario</th>
-                  <th class="p-3">Contenido</th>
-                  <th class="p-3">Peso</th>
-                  <th class="p-3 text-right">Valor</th>
-                  <th class="p-3 text-center">Pago</th>
-                  <th class="p-3 text-center">Foto</th>
-                  <th class="p-3 text-center">Estado</th>
-                </tr>
-              </thead>
-              <tbody id="tabla-envios-body" class="divide-y"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- ==================== SECCIÓN 5: INVENTARIO MODULAR ==================== -->
+      <!-- VISTA INVENTARIO MODULAR -->
       <div id="vista-inventario" class="hidden">
         <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-
-          <!-- BARRA LATERAL ESTILO ERP / MENÚ DE INVENTARIO -->
-          <div class="md:col-span-3 bg-[#0d1b2a] text-white rounded-2xl p-4 shadow-lg flex flex-col justify-between">
-            <div class="space-y-4">
-              <div class="flex items-center gap-3 px-3 py-2 bg-[#1b263b] rounded-xl border border-slate-700">
-                <i data-lucide="archive" class="w-6 h-6 text-indigo-400"></i>
-                <div class="flex-1">
-                  <h3 class="font-bold text-sm tracking-wide">Inventario</h3>
-                  <p class="text-[10px] text-slate-400 font-medium">Gestión y Movimientos</p>
-                </div>
+          <div class="md:col-span-3 bg-[#0d1b2a] text-white rounded-2xl p-4 shadow-lg space-y-4">
+            <div class="flex items-center gap-3 px-3 py-2 bg-[#1b263b] rounded-xl border border-slate-700">
+              <i data-lucide="archive" class="w-6 h-6 text-indigo-400"></i>
+              <div>
+                <h3 class="font-bold text-sm tracking-wide">Inventario</h3>
+                <p class="text-[10px] text-slate-400">Módulos</p>
               </div>
-
-              <nav class="space-y-1 text-xs font-semibold">
-                <button onclick="cambiarSubMenuInv('crear')" id="subtab-crear" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition text-slate-300 hover:bg-[#1b263b]">
-                  <i data-lucide="shopping-bag" class="w-4 h-4"></i> Crear producto
-                </button>
-                <button onclick="cambiarSubMenuInv('mantenimiento')" id="subtab-mantenimiento" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition bg-[#65a30d] text-white font-bold shadow-md">
-                  <i data-lucide="wrench" class="w-4 h-4"></i> Mantenimiento Producto
-                </button>
-                <button onclick="cambiarSubMenuInv('masivo')" id="subtab-masivo" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition text-slate-300 hover:bg-[#1b263b]">
-                  <i data-lucide="sliders" class="w-4 h-4"></i> Mantenimiento Masivo
-                </button>
-                <button onclick="cambiarSubMenuInv('catalogo')" id="subtab-catalogo" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition text-slate-300 hover:bg-[#1b263b]">
-                  <i data-lucide="book-open" class="w-4 h-4"></i> Catálogo
-                </button>
-                <button onclick="cambiarSubMenuInv('entradas')" id="subtab-entradas" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition text-slate-300 hover:bg-[#1b263b]">
-                  <i data-lucide="truck" class="w-4 h-4"></i> Entrada Inventario
-                </button>
-                <button onclick="cambiarSubMenuInv('salidas')" id="subtab-salidas" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition text-slate-300 hover:bg-[#1b263b]">
-                  <i data-lucide="package-minus" class="w-4 h-4"></i> Salida Inventario
-                </button>
-                <button onclick="cambiarSubMenuInv('transferencias')" id="subtab-transferencias" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition text-slate-300 hover:bg-[#1b263b]">
-                  <i data-lucide="arrow-left-right" class="w-4 h-4"></i> Transferencias
-                </button>
-              </nav>
             </div>
-
-            <div class="mt-6 pt-4 border-t border-slate-800 text-[11px] text-slate-400">
-              <p>Productos registrados: <b id="txt-sidebar-count-prod" class="text-white">0</b></p>
-              <p>Total valorizado: <b id="txt-sidebar-valor-prod" class="text-emerald-400 font-mono">$0.00</b></p>
-            </div>
+            <nav class="space-y-1 text-xs font-semibold">
+              <button onclick="cambiarSubMenuInv('crear')" id="subtab-crear" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:bg-[#1b263b]">
+                <i data-lucide="shopping-bag" class="w-4 h-4"></i> Crear producto
+              </button>
+              <button onclick="cambiarSubMenuInv('mantenimiento')" id="subtab-mantenimiento" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-[#65a30d] text-white font-bold">
+                <i data-lucide="wrench" class="w-4 h-4"></i> Mantenimiento Producto
+              </button>
+              <button onclick="cambiarSubMenuInv('catalogo')" id="subtab-catalogo" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:bg-[#1b263b]">
+                <i data-lucide="book-open" class="w-4 h-4"></i> Catálogo
+              </button>
+              <button onclick="cambiarSubMenuInv('entradas')" id="subtab-entradas" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:bg-[#1b263b]">
+                <i data-lucide="truck" class="w-4 h-4"></i> Entrada Inventario
+              </button>
+              <button onclick="cambiarSubMenuInv('salidas')" id="subtab-salidas" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:bg-[#1b263b]">
+                <i data-lucide="package-minus" class="w-4 h-4"></i> Salida Inventario
+              </button>
+            </nav>
           </div>
 
-          <!-- ÁREA PRINCIPAL DINÁMICA DE SUBPESTAÑAS -->
           <div class="md:col-span-9 space-y-6">
-
-            <!-- SUB-PÁGINA 1: CREAR PRODUCTO -->
+            <!-- CREAR PRODUCTO -->
             <div id="subvista-crear" class="hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-              <div class="flex justify-between items-center pb-3 border-b">
-                <div>
-                  <h3 class="font-bold text-base text-slate-800 flex items-center gap-2">
-                    <i data-lucide="plus-circle" class="w-5 h-5 text-indigo-600"></i> Alta de Nuevo Producto
-                  </h3>
-                  <p class="text-xs text-slate-400">Aplica atributos de la plantilla seleccionada</p>
-                </div>
-                <div class="flex items-center gap-2">
-                  <label class="text-xs font-bold text-slate-600">Plantilla:</label>
-                  <select id="select-plantilla-activa" onchange="cambiarPlantillaFormulario()" class="text-xs font-bold p-2 border rounded-lg bg-indigo-50 text-indigo-800"></select>
-                  <button type="button" onclick="abrirModalNuevaPlantilla()" class="px-2.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-sm">
-                    + Plantilla
-                  </button>
-                </div>
-              </div>
-
+              <h3 class="font-bold text-base text-slate-800">Alta de Nuevo Producto</h3>
               <form onsubmit="guardarProducto(event)" class="space-y-4">
                 <input type="hidden" id="edit-prod-id">
-                <div class="grid grid-cols-1 sm:grid-cols-6 gap-3">
-                  <div class="sm:col-span-3">
-                    <label class="block text-[11px] font-bold text-slate-600 mb-1">Nombre Comercial</label>
-                    <input type="text" id="inv-nombre" required placeholder="Ej: Smartphone Tecno Spark 20" class="w-full text-xs p-2.5 border rounded-lg">
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                  <div class="sm:col-span-2">
+                    <label class="block text-[11px] font-bold text-slate-600 mb-1">Nombre</label>
+                    <input type="text" id="inv-nombre" required class="w-full text-xs p-2.5 border rounded-lg">
                   </div>
-                  <div class="sm:col-span-3">
-                    <div class="flex justify-between items-center mb-1">
-                      <label class="block text-[11px] font-bold text-slate-600">Código de Barras / IMEI</label>
-                      <button type="button" onclick="generarCodigoAleatorio()" class="text-[10px] text-indigo-600 font-bold hover:underline">Generar Aleatorio</button>
-                    </div>
-                    <input type="text" id="inv-codigo" oninput="actualizarCodigoBarrasEnVivo(this.value)" placeholder="Código alfanumérico o escaneo" class="w-full text-xs p-2.5 border rounded-lg font-mono">
+                  <div class="sm:col-span-2">
+                    <label class="block text-[11px] font-bold text-slate-600 mb-1">Código / Barras</label>
+                    <input type="text" id="inv-codigo" class="w-full text-xs p-2.5 border rounded-lg font-mono">
                   </div>
                   <div>
-                    <label class="block text-[11px] font-bold text-slate-600 mb-1">P. Costo ($)</label>
-                    <input type="number" step="0.01" id="inv-costo" required placeholder="0.00" class="w-full text-xs p-2.5 border rounded-lg font-mono">
+                    <label class="block text-[11px] font-bold text-slate-600 mb-1">Costo ($)</label>
+                    <input type="number" step="0.01" id="inv-costo" required class="w-full text-xs p-2.5 border rounded-lg font-mono">
                   </div>
                   <div>
-                    <label class="block text-[11px] font-bold text-slate-600 mb-1">P. Venta ($)</label>
-                    <input type="number" step="0.01" id="inv-venta" required placeholder="0.00" class="w-full text-xs p-2.5 border rounded-lg font-bold text-indigo-700 font-mono">
+                    <label class="block text-[11px] font-bold text-slate-600 mb-1">Venta ($)</label>
+                    <input type="number" step="0.01" id="inv-venta" required class="w-full text-xs p-2.5 border rounded-lg font-bold font-mono">
                   </div>
                   <div>
-                    <label class="block text-[11px] font-bold text-slate-600 mb-1">Stock Inicial</label>
-                    <input type="number" id="inv-stock" required value="1" min="0" class="w-full text-xs p-2.5 border rounded-lg font-bold text-center">
+                    <label class="block text-[11px] font-bold text-slate-600 mb-1">Stock</label>
+                    <input type="number" id="inv-stock" required value="1" class="w-full text-xs p-2.5 border rounded-lg font-bold">
                   </div>
-                  <div class="sm:col-span-3 bg-slate-50 border p-2 rounded-xl flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                      <svg id="svg-codigo-barra-preview" class="max-h-[35px] max-w-[130px]"></svg>
-                      <span id="txt-sin-codigo-preview" class="text-[10px] text-slate-400">Sin código</span>
-                    </div>
-                    <button type="button" onclick="imprimirEtiquetaActual()" class="px-2.5 py-1 bg-slate-800 text-white rounded text-[11px] font-bold">Imprimir Etiqueta</button>
+                  <div class="flex items-end">
+                    <button type="submit" class="w-full py-2.5 bg-emerald-600 text-white font-bold rounded-lg text-xs">Guardar</button>
                   </div>
-                </div>
-
-                <div id="contenedor-campos-plantilla" class="bg-indigo-50/50 p-3.5 rounded-xl border border-indigo-100">
-                  <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-800 block mb-2" id="txt-nombre-plantilla-activa">Atributos de la Plantilla</span>
-                  <div id="grid-campos-dinamicos" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5"></div>
-                </div>
-
-                <div class="flex justify-end pt-2">
-                  <button type="submit" id="btn-save-prod" class="px-7 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow">
-                    <i data-lucide="check-circle" class="w-4 h-4"></i> Guardar Producto en Catálogo
-                  </button>
                 </div>
               </form>
             </div>
 
-            <!-- SUB-PÁGINA 2: MANTENIMIENTO PRODUCTO -->
+            <!-- MANTENIMIENTO -->
             <div id="subvista-mantenimiento" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b">
-                <div>
-                  <h3 class="font-bold text-base text-slate-800 flex items-center gap-2">
-                    <i data-lucide="wrench" class="w-5 h-5 text-lime-600"></i> Mantenimiento de Productos y Precios
-                  </h3>
-                  <p class="text-xs text-slate-400">Modifica precios de costo, venta, códigos de barra y detalles específicos</p>
-                </div>
-                <div class="flex items-center gap-2">
-                  <input type="text" id="filtro-mantenimiento" oninput="filtrarTablaMantenimiento()" placeholder="Buscar producto..." class="text-xs p-2 border rounded-lg w-64 outline-none focus:ring-2 focus:ring-indigo-500">
-                  <button onclick="abrirBuscadorGlobal()" title="Buscar con Lupa" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg border">
-                    <i data-lucide="search" class="w-4 h-4"></i>
-                  </button>
-                </div>
-              </div>
-
+              <h3 class="font-bold text-base text-slate-800">Mantenimiento de Existencias</h3>
               <div class="overflow-x-auto">
                 <table class="w-full text-xs text-left">
                   <thead class="bg-slate-50 text-slate-500 uppercase border-b">
                     <tr>
                       <th class="p-3">Código</th>
-                      <th class="p-3">Producto & Atributos</th>
-                      <th class="p-3 text-right">Costo ($)</th>
-                      <th class="p-3 text-right">Venta ($)</th>
+                      <th class="p-3">Producto</th>
+                      <th class="p-3 text-right">Costo</th>
+                      <th class="p-3 text-right">Venta</th>
                       <th class="p-3 text-center">Stock</th>
                       <th class="p-3 text-center">Acciones</th>
                     </tr>
@@ -636,534 +265,142 @@
               </div>
             </div>
 
-            <!-- SUB-PÁGINA 3: MANTENIMIENTO MASIVO -->
-            <div id="subvista-masivo" class="hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
-              <div class="pb-3 border-b">
-                <h3 class="font-bold text-base text-slate-800 flex items-center gap-2">
-                  <i data-lucide="sliders" class="w-5 h-5 text-indigo-600"></i> Actualización Masiva de Precios
-                </h3>
-                <p class="text-xs text-slate-400">Ajusta los precios de venta en porcentaje o monto fijo</p>
-              </div>
-
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border">
-                <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1">Filtrar por Plantilla</label>
-                  <select id="masivo-plantilla" class="w-full text-xs p-2 border rounded bg-white">
-                    <option value="TODAS">Todas las categorías/plantillas</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1">Tipo de Ajuste</label>
-                  <select id="masivo-tipo" class="w-full text-xs p-2 border rounded bg-white font-semibold">
-                    <option value="PORCENTAJE_AUMENTO">Incrementar porcentaje (+%)</option>
-                    <option value="PORCENTAJE_DESCUENTO">Descontar porcentaje (-%)</option>
-                    <option value="MONTO_FIJO">Añadir monto fijo (+$)</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1">Valor a Aplicar</label>
-                  <div class="flex gap-2">
-                    <input type="number" step="0.01" id="masivo-valor" placeholder="Ej: 5" class="w-full text-xs p-2 border rounded font-bold font-mono">
-                    <button onclick="ejecutarAjusteMasivo()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-xs font-bold shadow">Aplicar</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- SUB-PÁGINA 4: CATÁLOGO VISUAL -->
-            <div id="subvista-catalogo" class="hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-              <div class="flex justify-between items-center pb-3 border-b">
-                <div>
-                  <h3 class="font-bold text-base text-slate-800 flex items-center gap-2">
-                    <i data-lucide="book-open" class="w-5 h-5 text-indigo-600"></i> Catálogo General de Artículos
-                  </h3>
-                  <p class="text-xs text-slate-400">Consulta de artículos sin riesgo de modificación</p>
-                </div>
-                <div class="flex items-center gap-2">
-                  <input type="text" id="filtro-catalogo" oninput="filtrarCatalogoVisual()" placeholder="Buscar en catálogo..." class="text-xs p-2 border rounded-lg w-60 outline-none">
-                  <button onclick="abrirBuscadorGlobal()" title="Buscar con Lupa" class="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg border">
-                    <i data-lucide="search" class="w-4 h-4"></i>
-                  </button>
-                </div>
-              </div>
-              <div id="grid-catalogo-visual" class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-h-[500px] overflow-y-auto"></div>
-            </div>
-
-            <!-- SUB-PÁGINA 5: ENTRADA DE INVENTARIO -->
+            <!-- ENTRADAS -->
             <div id="subvista-entradas" class="hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-              <div class="pb-3 border-b flex justify-between items-center">
-                <div>
-                  <h3 class="font-bold text-base text-slate-800 flex items-center gap-2">
-                    <i data-lucide="truck" class="w-5 h-5 text-emerald-600"></i> Entrada de Inventario (Compras)
-                  </h3>
-                  <p class="text-xs text-slate-400">Suma existencias al stock actual</p>
-                </div>
-                <button type="button" onclick="abrirBuscadorGlobal()" class="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg text-xs font-bold flex items-center gap-1 shadow-xs">
-                  <i data-lucide="search" class="w-3.5 h-3.5"></i> Seleccionar por Lupa
-                </button>
-              </div>
-
+              <h3 class="font-bold text-base text-slate-800">Entrada de Mercancía (Compras)</h3>
               <form onsubmit="registrarEntradaInventario(event)" class="space-y-4">
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">Producto</label>
-                    <select id="ent-producto-id" required class="w-full text-xs p-2.5 border rounded-lg font-semibold bg-white"></select>
+                    <select id="ent-producto-id" required class="w-full text-xs p-2.5 border rounded-lg bg-white"></select>
                   </div>
                   <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Cantidad que Ingresa (+)</label>
-                    <input type="number" id="ent-cantidad" min="1" required value="1" class="w-full text-xs p-2.5 border rounded-lg font-bold text-center font-mono">
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Cantidad (+)</label>
+                    <input type="number" id="ent-cantidad" min="1" required value="1" class="w-full text-xs p-2.5 border rounded-lg font-bold font-mono">
                   </div>
                   <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Nuevo Costo Unitario ($)</label>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Costo Unitario ($)</label>
                     <input type="number" step="0.01" id="ent-costo" required placeholder="0.00" class="w-full text-xs p-2.5 border rounded-lg font-mono">
                   </div>
                 </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Nº Factura de Proveedor</label>
-                    <input type="text" id="ent-factura" placeholder="Ej: FAC-98212" class="w-full text-xs p-2 border rounded-lg">
-                  </div>
-                  <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Motivo / Proveedor</label>
-                    <input type="text" id="ent-observacion" placeholder="Ej: Importación Lote SUPERCELL" class="w-full text-xs p-2 border rounded-lg">
-                  </div>
-                </div>
-
-                <div class="flex justify-end pt-2">
-                  <button type="submit" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow">
-                    <i data-lucide="plus-circle" class="w-4 h-4"></i> Asentar Entrada en Stock
-                  </button>
-                </div>
+                <button type="submit" class="px-6 py-2.5 bg-emerald-600 text-white font-bold rounded-xl text-xs">Asentar Entrada</button>
               </form>
             </div>
 
-            <!-- SUB-PÁGINA 6: SALIDA DE INVENTARIO -->
+            <!-- SALIDAS -->
             <div id="subvista-salidas" class="hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-              <div class="pb-3 border-b flex justify-between items-center">
-                <div>
-                  <h3 class="font-bold text-base text-slate-800 flex items-center gap-2">
-                    <i data-lucide="package-minus" class="w-5 h-5 text-red-600"></i> Salida de Inventario (Bajas y Mermas)
-                  </h3>
-                  <p class="text-xs text-slate-400">Descuenta unidades justificando defectos o deterioros</p>
-                </div>
-                <button type="button" onclick="abrirBuscadorGlobal()" class="px-2.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded-lg text-xs font-bold flex items-center gap-1 shadow-xs">
-                  <i data-lucide="search" class="w-3.5 h-3.5"></i> Seleccionar por Lupa
-                </button>
-              </div>
-
+              <h3 class="font-bold text-base text-slate-800">Salida de Inventario (Bajas / Deterioro)</h3>
               <form onsubmit="registrarSalidaInventario(event)" class="space-y-4">
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Producto a dar de baja</label>
-                    <select id="sal-producto-id" required class="w-full text-xs p-2.5 border rounded-lg font-semibold bg-white"></select>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Producto</label>
+                    <select id="sal-producto-id" required class="w-full text-xs p-2.5 border rounded-lg bg-white"></select>
                   </div>
                   <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Cantidad a Dar de Baja (-)</label>
-                    <input type="number" id="sal-cantidad" min="1" required value="1" class="w-full text-xs p-2.5 border rounded-lg font-bold text-center font-mono text-red-600">
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Cantidad (-)</label>
+                    <input type="number" id="sal-cantidad" min="1" required value="1" class="w-full text-xs p-2.5 border rounded-lg font-bold font-mono text-red-600">
                   </div>
                   <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Causa de la Salida</label>
-                    <select id="sal-motivo-tipo" required class="w-full text-xs p-2.5 border rounded-lg font-bold bg-white text-slate-700">
-                      <option value="DEFECTO_GARANTIA">⚠️ Defecto de Fábrica / Garantía</option>
-                      <option value="DETERIORO">🔨 Deterioro / Daño Físico</option>
-                      <option value="MERMA">📉 Pérdida / Descuadre de Conteo</option>
-                      <option value="USO_INTERNO">🏢 Uso Interno / Exhibición Local</option>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Causa</label>
+                    <select id="sal-motivo-tipo" required class="w-full text-xs p-2.5 border rounded-lg bg-white">
+                      <option value="DEFECTO_GARANTIA">Defecto de Fábrica</option>
+                      <option value="DETERIORO">Deterioro / Daño</option>
+                      <option value="MERMA">Pérdida / Descuadre</option>
                     </select>
                   </div>
                 </div>
-
                 <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1">Detalle o Justificación Obligatoria</label>
-                  <textarea id="sal-observacion" required rows="2" placeholder="Describe el estado del artículo o motivo..." class="w-full text-xs p-2.5 border rounded-lg"></textarea>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Justificación</label>
+                  <textarea id="sal-observacion" required rows="2" class="w-full text-xs p-2.5 border rounded-lg"></textarea>
                 </div>
-
-                <div class="flex justify-end pt-2">
-                  <button type="submit" class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow">
-                    <i data-lucide="trash-2" class="w-4 h-4"></i> Procesar Salida de Bodega
-                  </button>
-                </div>
+                <button type="submit" class="px-6 py-2.5 bg-red-600 text-white font-bold rounded-xl text-xs">Procesar Baja</button>
               </form>
             </div>
 
-            <!-- SUB-PÁGINA 7: TRANSFERENCIAS -->
-            <div id="subvista-transferencias" class="hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-              <div class="pb-3 border-b flex justify-between items-center">
-                <div>
-                  <h3 class="font-bold text-base text-slate-800 flex items-center gap-2">
-                    <i data-lucide="arrow-left-right" class="w-5 h-5 text-indigo-600"></i> Transferencias entre Sucursales
-                  </h3>
-                  <p class="text-xs text-slate-400">Traspaso de artículos entre locales</p>
-                </div>
-                <button type="button" onclick="abrirBuscadorGlobal()" class="px-2.5 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-bold flex items-center gap-1 shadow-xs">
-                  <i data-lucide="search" class="w-3.5 h-3.5"></i> Seleccionar por Lupa
-                </button>
-              </div>
-
-              <form onsubmit="registrarTransferencia(event)" class="space-y-4">
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Producto</label>
-                    <select id="tra-producto-id" required class="w-full text-xs p-2.5 border rounded-lg font-semibold bg-white"></select>
-                  </div>
-                  <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Sucursal Origen</label>
-                    <select id="tra-sucursal-origen" required class="w-full text-xs p-2.5 border rounded-lg bg-white"></select>
-                  </div>
-                  <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Sucursal Destino</label>
-                    <select id="tra-sucursal-destino" required class="w-full text-xs p-2.5 border rounded-lg bg-white"></select>
-                  </div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Cantidad a Trasladar</label>
-                    <input type="number" id="tra-cantidad" min="1" required value="1" class="w-full text-xs p-2.5 border rounded-lg font-bold text-center font-mono">
-                  </div>
-                  <div class="sm:col-span-2">
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Observación del Envío</label>
-                    <input type="text" id="tra-observacion" placeholder="Ej: Traspaso a vitrina local 2" class="w-full text-xs p-2.5 border rounded-lg">
-                  </div>
-                </div>
-
-                <div class="flex justify-end pt-2">
-                  <button type="submit" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow">
-                    <i data-lucide="send" class="w-4 h-4"></i> Ejecutar Traslado Interno
-                  </button>
-                </div>
-              </form>
+            <!-- CATÁLOGO -->
+            <div id="subvista-catalogo" class="hidden bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+              <h3 class="font-bold text-base text-slate-800">Catálogo General</h3>
+              <div id="grid-catalogo-visual" class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[500px] overflow-y-auto"></div>
             </div>
-
           </div>
         </div>
       </div>
 
-      <!-- ==================== SECCIÓN 6: HISTORIAL DE VENTAS ==================== -->
-      <div id="vista-ventas" class="hidden space-y-4">
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b">
-            <div>
-              <h2 class="font-bold text-slate-800 flex items-center gap-2">
-                <i data-lucide="history" class="w-5 h-5 text-indigo-600"></i> Historial y Reporte de Ventas
-              </h2>
-              <p class="text-xs text-slate-400">Reimprime comprobantes térmicos o descarga facturas en PDF</p>
-            </div>
-            <div class="flex flex-wrap items-center gap-2 text-xs">
-              <input type="date" id="filtro-fecha-inicio" class="p-1.5 border rounded-lg bg-slate-50 font-semibold">
-              <input type="date" id="filtro-fecha-fin" class="p-1.5 border rounded-lg bg-slate-50 font-semibold">
-              <button onclick="cargarVentas()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg flex items-center gap-1">
-                <i data-lucide="filter" class="w-3.5 h-3.5"></i> Filtrar
-              </button>
-              <button onclick="document.getElementById('filtro-fecha-inicio').value=''; document.getElementById('filtro-fecha-fin').value=''; cargarVentas();" class="px-2 py-1.5 bg-slate-200 hover:bg-slate-300 font-bold rounded-lg text-slate-700">Limpiar</button>
-            </div>
-          </div>
-
-          <div class="py-2 flex justify-between items-center text-xs text-slate-500">
-            <span>Total vendido: <b id="txt-total-periodo" class="text-sm font-bold text-indigo-700 font-mono">$0.00</b></span>
-          </div>
-
-          <div class="overflow-x-auto mt-2">
-            <table class="w-full text-sm text-left">
-              <thead class="bg-slate-50 text-slate-500 uppercase text-xs border-b">
-                <tr>
-                  <th class="p-3">Comprobante</th>
-                  <th class="p-3">Fecha y Hora</th>
-                  <th class="p-3">Método</th>
-                  <th class="p-3 text-right">Total ($)</th>
-                  <th class="p-3 text-center">Acciones</th>
-                </tr>
-              </thead>
-              <tbody id="tabla-ventas-body" class="divide-y"></tbody>
-            </table>
-          </div>
+      <!-- VISTA VENTAS -->
+      <div id="vista-ventas" class="hidden bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+        <h2 class="font-bold text-slate-800">Historial de Ventas</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left">
+            <thead class="bg-slate-50 text-slate-500 uppercase text-xs border-b">
+              <tr>
+                <th class="p-3">Comprobante</th>
+                <th class="p-3">Fecha</th>
+                <th class="p-3">Método</th>
+                <th class="p-3 text-right">Total ($)</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-ventas-body" class="divide-y"></tbody>
+          </table>
         </div>
       </div>
 
-      <!-- ==================== SECCIÓN 7: PERSONAL Y SUCURSALES (CORREGIDO) ==================== -->
-      <div id="vista-admin" class="hidden space-y-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
-          <!-- PANEL DE SUCURSALES -->
-          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-            <h2 class="font-bold mb-3 flex items-center gap-2 text-slate-800">
-              <i data-lucide="map-pin" class="w-5 h-5 text-indigo-600"></i> Gestión de Sucursales
-            </h2>
-            <form onsubmit="crearSucursal(event)" class="space-y-3">
-              <div>
-                <label class="block text-xs font-bold text-slate-600 mb-1">Nombre de la Sucursal</label>
-                <input type="text" id="suc-nombre" required placeholder="Ej: Sucursal Central / SUPERCELL 2" class="w-full text-xs p-2.5 border rounded-lg">
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-600 mb-1">Dirección del Local</label>
-                <input type="text" id="suc-dir" placeholder="Ej: Av. 29 de Mayo y Loja" class="w-full text-xs p-2.5 border rounded-lg">
-              </div>
-              <button type="submit" id="btn-crear-sucursal" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1.5 shadow-sm">
-                <i data-lucide="plus-circle" class="w-4 h-4"></i> Registrar Sucursal
-              </button>
-            </form>
-            <div class="mt-5 border-t pt-3">
-              <div class="flex justify-between items-center mb-2">
-                <h3 class="text-xs font-bold text-slate-500 uppercase">Sucursales Activas</h3>
-                <button type="button" onclick="cargarSucursales()" class="text-[11px] text-indigo-600 font-bold hover:underline">Refrescar</button>
-              </div>
-              <ul id="lista-sucursales" class="text-xs space-y-1.5 max-h-56 overflow-y-auto"></ul>
-            </div>
-          </div>
-
-          <!-- PANEL DE TRABAJADORES -->
-          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-            <h2 class="font-bold mb-3 flex items-center gap-2 text-slate-800">
-              <i data-lucide="users" class="w-5 h-5 text-indigo-600"></i> <span id="txt-form-user">Crear Nuevo Trabajador</span>
-            </h2>
-            <form onsubmit="guardarUsuario(event)" class="space-y-3">
-              <input type="hidden" id="edit-user-id">
-              <div>
-                <label class="block text-xs font-bold text-slate-600 mb-1">Nombre Completo</label>
-                <input type="text" id="user-nombre" required placeholder="Ej: Juan Pérez" class="w-full text-xs p-2.5 border rounded-lg">
-              </div>
-              <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label class="block text-xs font-bold text-slate-600 mb-1">Usuario de Sistema</label>
-                  <input type="text" id="user-alias" required placeholder="ej: juanp" class="w-full text-xs p-2.5 border rounded-lg font-mono">
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-slate-600 mb-1">Contraseña o PIN</label>
-                  <input type="password" id="user-clave" placeholder="••••••••" class="w-full text-xs p-2.5 border rounded-lg font-mono">
-                </div>
-              </div>
-              <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label class="block text-xs font-bold text-slate-600 mb-1">Rol</label>
-                  <select id="user-rol" class="w-full text-xs p-2.5 border rounded-lg font-bold bg-white">
-                    <option value="VENDEDOR">Vendedor (Solo Ventas/Envíos)</option>
-                    <option value="ADMIN">Administrador (Acceso Total)</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-slate-600 mb-1">Sede de Trabajo</label>
-                  <select id="user-sucursal" class="w-full text-xs p-2.5 border rounded-lg bg-white font-semibold">
-                    <option value="">Sin sede fija (Global)</option>
-                  </select>
-                </div>
-              </div>
-              <div class="flex gap-2 pt-1">
-                <button type="button" id="btn-cancel-user" onclick="cancelarEdicionUser()" class="hidden px-4 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-lg text-xs">Cancelar</button>
-                <button type="submit" id="btn-save-user" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1.5 shadow-sm">
-                  <i data-lucide="check" class="w-4 h-4"></i> Guardar Empleado
-                </button>
-              </div>
-            </form>
-            <div class="mt-5 border-t pt-3">
-              <div class="flex justify-between items-center mb-2">
-                <h3 class="text-xs font-bold text-slate-500 uppercase">Personal Registrado</h3>
-                <button type="button" onclick="cargarUsuariosLista()" class="text-[11px] text-indigo-600 font-bold hover:underline">Refrescar</button>
-              </div>
-              <div id="lista-personal" class="space-y-1.5 max-h-56 overflow-y-auto"></div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
+      <!-- VISTAS RESTANTES -->
+      <div id="vista-cotizacion" class="hidden p-6 bg-white rounded-xl border">Sección Cotización</div>
+      <div id="vista-plan" class="hidden p-6 bg-white rounded-xl border">Sección Plan Acumulativo</div>
+      <div id="vista-envios" class="hidden p-6 bg-white rounded-xl border">Sección Envíos</div>
+      <div id="vista-admin" class="hidden p-6 bg-white rounded-xl border">Sección Personal</div>
     </main>
   </div>
 
-  <!-- MODAL: CREAR NUEVA PLANTILLA -->
-  <div id="modal-nueva-plantilla" class="hidden fixed inset-0 bg-slate-900 bg-opacity-60 flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4">
-      <div class="flex justify-between items-center border-b pb-3">
-        <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
-          <i data-lucide="layout-template" class="w-5 h-5 text-indigo-600"></i> Diseñador de Plantilla
-        </h3>
-        <button onclick="cerrarModalNuevaPlantilla()" class="text-slate-400 hover:text-slate-700 text-xl font-bold">&times;</button>
-      </div>
-      <div class="space-y-3">
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Nombre de la Plantilla</label>
-          <input type="text" id="tpl-nuevo-nombre" placeholder="Ej: Electrónica / Joyas / Muebles" class="w-full text-xs p-2.5 border rounded-lg">
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Campos de la Plantilla (Separados por coma)</label>
-          <textarea id="tpl-nuevos-campos" rows="3" placeholder="Ej: IMEI, Color, Capacidad, Tamaño, Peso, Dimensiones" class="w-full text-xs p-2.5 border rounded-lg"></textarea>
-        </div>
-      </div>
-      <div class="flex justify-end gap-2 pt-2 border-t">
-        <button onclick="cerrarModalNuevaPlantilla()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 font-bold text-xs rounded-lg text-slate-700">Cancelar</button>
-        <button onclick="guardarNuevaPlantilla()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg">Guardar Plantilla</button>
-      </div>
-    </div>
+  <div id="ticket-impresion" class="hidden font-mono text-xs p-2">
+    <h2 class="font-bold text-center">COMPROBANTE</h2>
+    <p id="tkt-numero"></p>
+    <div id="tkt-items"></div>
+    <p id="tkt-total" class="font-bold"></p>
   </div>
 
-  <!-- PLANTILLA DE ETIQUETA ADHESIVA -->
-  <div id="area-impresion-etiqueta" class="hidden text-center bg-white p-2 border border-black font-sans">
-    <h3 id="eti-nombre" class="text-xs font-bold uppercase truncate max-w-[200px] mx-auto">PRODUCTO</h3>
-    <svg id="eti-barcode" class="mx-auto my-1 max-w-[190px]"></svg>
-    <p class="text-xs font-bold font-mono" id="eti-precio">$0.00</p>
-  </div>
-
-  <!-- MODAL: KARDEX DE ABONOS -->
-  <div id="modal-historial-abonos" class="hidden fixed inset-0 bg-slate-900 bg-opacity-60 flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4">
-      <div class="flex justify-between items-center border-b pb-3">
-        <div>
-          <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
-            <i data-lucide="history" class="w-5 h-5 text-indigo-600"></i> Historial Inmutable de Abonos
-          </h3>
-          <p id="modal-subtitulo-plan" class="text-xs text-slate-400 font-mono"></p>
-        </div>
-        <button onclick="cerrarModalHistorial()" class="text-slate-400 hover:text-slate-700 text-xl font-bold">&times;</button>
-      </div>
-      <div class="bg-slate-50 p-3 rounded-lg border grid grid-cols-3 gap-2 text-center text-xs">
-        <div><span class="text-slate-400 block text-[10px]">TOTAL:</span><b id="modal-plan-total" class="text-slate-700 font-bold font-mono">$0.00</b></div>
-        <div><span class="text-slate-400 block text-[10px]">ABONADO:</span><b id="modal-plan-abonado" class="text-emerald-600 font-bold font-mono">$0.00</b></div>
-        <div><span class="text-slate-400 block text-[10px]">PENDIENTE:</span><b id="modal-plan-saldo" class="text-red-600 font-bold font-mono">$0.00</b></div>
-      </div>
-      <div class="overflow-y-auto max-h-60 border rounded-lg">
-        <table class="w-full text-xs text-left">
-          <thead class="bg-slate-100 text-slate-500 uppercase text-[10px] border-b">
-            <tr>
-              <th class="p-2">#</th>
-              <th class="p-2">Fecha y Hora</th>
-              <th class="p-2 text-right">Abono ($)</th>
-              <th class="p-2 text-right">Saldo Restante</th>
-              <th class="p-2">Cajero</th>
-            </tr>
-          </thead>
-          <tbody id="modal-tabla-abonos-body" class="divide-y"></tbody>
-        </table>
-      </div>
-      <div class="flex justify-end pt-2 border-t">
-        <button onclick="cerrarModalHistorial()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 font-bold text-xs rounded-lg text-slate-700">Cerrar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- PLANTILLA DE TICKET TÉRMICO -->
-  <div id="ticket-impresion" class="hidden text-black font-mono text-xs max-w-[280px] mx-auto p-2">
-    <div class="text-center pb-2 border-b border-dashed border-black">
-      <h2 class="font-bold text-sm tracking-wider uppercase">SISTEMA POS & COURIER</h2>
-      <p class="text-[10px]">RUC: 9999999999001</p>
-    </div>
-    <div class="py-2 border-b border-dashed border-black text-[11px]">
-      <p><b>Comp:</b> <span id="tkt-numero"></span></p>
-      <p><b>Fecha:</b> <span id="tkt-fecha"></span></p>
-      <p><b>Cliente:</b> <span id="tkt-cliente"></span></p>
-      <p><b>Cajero:</b> <span id="tkt-cajero"></span></p>
-    </div>
-    <table class="w-full text-[11px] my-2">
-      <tbody id="tkt-items"></tbody>
-    </table>
-    <div class="border-t border-dashed border-black pt-1 text-[11px]">
-      <div class="flex justify-between font-bold text-xs"><span>TOTAL:</span><span id="tkt-total"></span></div>
-      <p class="text-[10px]"><b>Pago:</b> <span id="tkt-metodo"></span></p>
-    </div>
-  </div>
-
-  <!-- PLANTILLA PDF (OCULTO) -->
-  <div id="pdf-plantilla" class="hidden p-8 font-sans bg-white text-slate-800 text-xs max-w-xl mx-auto border">
-    <div class="flex justify-between items-start border-b pb-4 mb-4">
-      <div>
-        <h1 class="text-xl font-bold text-indigo-700" id="pdf-titulo-doc">DOCUMENTO</h1>
-        <p class="text-[10px] text-slate-500 font-mono" id="pdf-folio">Nº: -</p>
-      </div>
-      <div class="text-right text-[10px]">
-        <p class="font-bold text-sm text-slate-800">SISTEMA POS & LOGÍSTICA</p>
-        <p>RUC: 9999999999001</p>
-      </div>
-    </div>
-    <div class="bg-slate-50 p-3 rounded mb-4 text-[11px] grid grid-cols-2 gap-2">
-      <div>
-        <p><b>Cliente:</b> <span id="pdf-cliente-nom">-</span></p>
-        <p><b>Identificación:</b> <span id="pdf-cliente-doc">-</span></p>
-      </div>
-      <div>
-        <p><b>Teléfono:</b> <span id="pdf-cliente-tel">-</span></p>
-        <p><b>Fecha:</b> <span id="pdf-fecha">-</span></p>
-      </div>
-    </div>
-    <table class="w-full text-left mb-6">
-      <thead class="border-b bg-slate-100 text-[10px] uppercase">
-        <tr><th class="p-2">Cant</th><th class="p-2">Descripción</th><th class="p-2 text-right">Unitario</th><th class="p-2 text-right">Subtotal</th></tr>
-      </thead>
-      <tbody id="pdf-items" class="divide-y"></tbody>
-    </table>
-    <div class="flex justify-end border-t pt-2 mb-6">
-      <div class="w-48 text-right text-xs">
-        <p class="text-sm font-bold text-indigo-700">Total: <span id="pdf-total">$0.00</span></p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== JAVASCRIPT ==================== -->
   <script>
     const SUPABASE_URL = "https://pjpkcqyfocuwgxjxntan.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqcGtjcXlmb2N1d2d4anhudGFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMzMyMjcsImV4cCI6MjEwNzYwOTIyN30.a3pNRzsxjIK_xXFRBd8bP6JUENqBSf8JtsRXAI0sc3Y";
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    let usuarioActual = {
-      id: 3,
-      nombre_completo: 'PINA IBARRA (ADMIN)',
-      usuario: 'admin',
-      rol: 'ADMIN'
-    };
-
+    let usuarioActual = { id: 3, nombre_completo: 'PINA IBARRA (ADMIN)', usuario: 'admin', rol: 'ADMIN' };
     let productos = [];
-    let sucursales = [];
-    let plantillas = [];
     let carrito = [];
-    let carritoCotizacion = [];
-    let planesLista = [];
-    let enviosLista = [];
     let usuariosLista = [];
-    let fotoBase64 = null;
     let vistaActual = 'pos';
-
-    const CIUDADES_USA = [
-      "New York, NY", "Queens, NY", "Brooklyn, NY", "Bronx, NY", "Newark, NJ", 
-      "Jersey City, NJ", "Miami, FL", "Orlando, FL", "Tampa, FL", "Chicago, IL", 
-      "Houston, TX", "Dallas, TX", "Los Angeles, CA", "Atlanta, GA", "New Haven, CT"
-    ];
-
-    const CIUDADES_NICARAGUA = [
-      "Managua (Capital)", "Matagalpa", "Estelí", "León", "Chinandega", 
-      "Masaya", "Granada", "Jinotega", "Juigalpa", "Rivas", "Ocotal", "Bluefields"
-    ];
 
     window.addEventListener('DOMContentLoaded', async () => {
       lucide.createIcons();
       recuperarSesionCajero();
-      cambiarRutaEnvio();
-      await cargarSucursales();
       await cargarUsuariosLista();
-      await cargarPlantillas();
       await cargarProductos();
       await cargarVentas();
-      await cargarPlanesAcumulativos();
-      await cargarEnvios();
-      await actualizarProximoNumeroTicketVisual();
       aplicarPermisosRol();
       lucide.createIcons();
 
       window.addEventListener('keydown', (e) => {
-        if (e.key === 'F2') {
-          e.preventDefault();
-          abrirBuscadorGlobal();
-        }
-        if (e.key === 'Escape') {
-          cerrarBuscadorGlobal();
-        }
+        if (e.key === 'F2') { e.preventDefault(); abrirBuscadorGlobal(); }
+        if (e.key === 'Escape') cerrarBuscadorGlobal();
       });
     });
 
-    // ==================== BÚSQUEDA RÁPIDA GLOBAL ====================
+    function recuperarSesionCajero() {
+      const ses = localStorage.getItem('sesion_cajero_activo');
+      if (ses) {
+        try { usuarioActual = JSON.parse(ses); } catch (e) { localStorage.removeItem('sesion_cajero_activo'); }
+      }
+    }
+
+    function guardarSesionCajero() {
+      localStorage.setItem('sesion_cajero_activo', JSON.stringify(usuarioActual));
+    }
+
     function abrirBuscadorGlobal() {
-      const modal = document.getElementById('modal-buscador-global');
-      const input = document.getElementById('input-buscador-global');
-      modal.classList.remove('hidden');
-      input.value = '';
+      document.getElementById('modal-buscador-global').classList.remove('hidden');
+      document.getElementById('input-buscador-global').value = '';
       ejecutarBusquedaGlobal('');
-      setTimeout(() => input.focus(), 100);
+      setTimeout(() => document.getElementById('input-buscador-global').focus(), 100);
     }
 
     function cerrarBuscadorGlobal() {
@@ -1172,292 +409,343 @@
 
     function ejecutarBusquedaGlobal(query) {
       const q = (query || '').toLowerCase().trim();
-      const contResultados = document.getElementById('lista-resultados-global');
+      const cont = document.getElementById('lista-resultados-global');
       const contador = document.getElementById('txt-contador-busqueda');
 
-      let filtrados = productos;
+      let list = productos;
       if (q !== '') {
-        filtrados = productos.filter(p => {
-          const porNombre = p.nombre && p.nombre.toLowerCase().includes(q);
-          const porCodigo = p.codigo_barras && p.codigo_barras.toLowerCase().includes(q);
-          const porPlantilla = p.plantilla_nombre && p.plantilla_nombre.toLowerCase().includes(q);
-          const porAtributos = p.atributos && JSON.stringify(p.atributos).toLowerCase().includes(q);
-          return porNombre || porCodigo || porPlantilla || porAtributos;
-        });
+        list = productos.filter(p => (p.nombre && p.nombre.toLowerCase().includes(q)) || (p.codigo_barras && p.codigo_barras.toLowerCase().includes(q)));
       }
 
-      contador.innerText = filtrados.length;
-      contResultados.innerHTML = '';
-
-      if (filtrados.length === 0) {
-        contResultados.innerHTML = `
-          <div class="text-center py-8 text-slate-400 text-xs">
-            No se encontraron productos coincidentes con "<b>${query}</b>"
-          </div>
-        `;
+      contador.innerText = list.length;
+      cont.innerHTML = '';
+      if (list.length === 0) {
+        cont.innerHTML = '<div class="text-center py-6 text-slate-400 text-xs">Sin coincidencias.</div>';
         return;
       }
 
-      filtrados.forEach(p => {
-        let miniBadges = '';
-        if (p.atributos && typeof p.atributos === 'object') {
-          for (const [k, v] of Object.entries(p.atributos)) {
-            miniBadges += `<span class="bg-indigo-50 border border-indigo-200 text-indigo-700 text-[10px] px-1.5 py-0.5 rounded font-mono"><b>${k}:</b> ${v}</span> `;
+      list.forEach(p => {
+        const item = document.createElement('div');
+        item.className = "p-3 hover:bg-indigo-50 cursor-pointer rounded-xl flex items-center justify-between";
+        item.onclick = () => {
+          cerrarBuscadorGlobal();
+          if (vistaActual === 'pos') agregarCarrito(p.id);
+          else if (vistaActual === 'inventario') {
+            document.getElementById('ent-producto-id').value = p.id;
+            document.getElementById('sal-producto-id').value = p.id;
           }
-        }
-
-        const div = document.createElement('div');
-        div.className = "p-3 hover:bg-indigo-50/70 cursor-pointer rounded-xl transition flex items-center justify-between group";
-        div.onclick = () => seleccionarProductoDesdeBuscadorGlobal(p.id);
-
-        div.innerHTML = `
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg bg-slate-100 border flex items-center justify-center text-slate-500 font-bold text-xs group-hover:border-indigo-400 group-hover:bg-indigo-100 group-hover:text-indigo-700 transition">
-              <i data-lucide="package" class="w-5 h-5"></i>
-            </div>
-            <div>
-              <h4 class="font-bold text-xs text-slate-800 group-hover:text-indigo-600">${p.nombre}</h4>
-              <p class="text-[11px] text-slate-400 font-mono mt-0.5">${p.codigo_barras || 'S/C'} &bull; <span class="text-slate-500 font-semibold">${p.plantilla_nombre || 'ESTÁNDAR'}</span></p>
-              <div class="flex flex-wrap gap-1 mt-1">${miniBadges}</div>
-            </div>
+        };
+        item.innerHTML = `
+          <div>
+            <h4 class="font-bold text-xs text-slate-800">${p.nombre}</h4>
+            <p class="text-[11px] text-slate-400 font-mono">${p.codigo_barras || 'S/C'}</p>
           </div>
           <div class="text-right">
-            <span class="text-sm font-black text-slate-900 font-mono block">$${parseFloat(p.precio_venta).toFixed(2)}</span>
-            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${p.stock_actual > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-700'}">
-              Stock: ${p.stock_actual}
-            </span>
+            <span class="font-bold font-mono text-xs block">$${parseFloat(p.precio_venta).toFixed(2)}</span>
+            <span class="text-[10px] font-bold ${p.stock_actual > 0 ? 'text-emerald-600' : 'text-red-500'}">Stock: ${p.stock_actual}</span>
           </div>
         `;
-        contResultados.appendChild(div);
+        cont.appendChild(item);
       });
+    }
 
+    function cambiarSubMenuInv(sub) {
+      ['crear', 'mantenimiento', 'catalogo', 'entradas', 'salidas'].forEach(t => {
+        const v = document.getElementById('subvista-' + t);
+        const b = document.getElementById('subtab-' + t);
+        if (v) v.classList.toggle('hidden', t !== sub);
+        if (b) {
+          b.className = t === sub 
+            ? "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-[#65a30d] text-white font-bold" 
+            : "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:bg-[#1b263b]";
+        }
+      });
+      poblarSelectsOperacionesInventario();
+      if (sub === 'catalogo') renderizarCatalogoVisual(productos);
       lucide.createIcons();
     }
 
-    function seleccionarProductoDesdeBuscadorGlobal(id) {
-      cerrarBuscadorGlobal();
-      if (vistaActual === 'pos') {
-        agregarCarrito(id);
-      } else if (vistaActual === 'cotizacion') {
-        agregarCotizacion(id);
-      } else if (vistaActual === 'plan') {
-        const selPlan = document.getElementById('plan-producto-select');
-        if (selPlan) selPlan.value = id;
-      } else if (vistaActual === 'inventario') {
-        const selEnt = document.getElementById('ent-producto-id');
-        const selSal = document.getElementById('sal-producto-id');
-        const selTra = document.getElementById('tra-producto-id');
-        if (selEnt) selEnt.value = id;
-        if (selSal) selSal.value = id;
-        if (selTra) selTra.value = id;
-        prepararEdicionProd(id);
-      }
+    function poblarSelectsOperacionesInventario() {
+      const opts = productos.map(p => `<option value="${p.id}">${p.nombre} (Disp: ${p.stock_actual})</option>`).join('');
+      const se = document.getElementById('ent-producto-id');
+      const ss = document.getElementById('sal-producto-id');
+      if (se) se.innerHTML = opts;
+      if (ss) ss.innerHTML = opts;
     }
 
-    // ==================== PERSISTENCIA DE SESIÓN ====================
-    function recuperarSesionCajero() {
-      const sesionGuardada = localStorage.getItem('sesion_cajero_activo');
-      if (sesionGuardada) {
-        try {
-          usuarioActual = JSON.parse(sesionGuardada);
-        } catch (e) {
-          localStorage.removeItem('sesion_cajero_activo');
-        }
-      }
+    async function cargarProductos() {
+      const { data, error } = await db.from('productos').select('*').order('id', { ascending: false });
+      if (!error && data) productos = data;
+      renderizarPOS(productos);
+      renderizarTablaMantenimiento(productos);
+      poblarSelectsOperacionesInventario();
     }
 
-    function guardarSesionCajero() {
-      localStorage.setItem('sesion_cajero_activo', JSON.stringify(usuarioActual));
+    function renderizarPOS(list) {
+      const c = document.getElementById('grid-pos');
+      c.innerHTML = '';
+      list.forEach(p => {
+        c.innerHTML += `
+          <div onclick="agregarCarrito(${p.id})" class="border p-3 rounded-lg bg-white cursor-pointer hover:border-indigo-500 shadow-sm flex flex-col justify-between">
+            <div>
+              <p class="text-[10px] text-slate-400 font-mono">${p.codigo_barras || 'S/C'}</p>
+              <h4 class="font-bold text-xs text-slate-700">${p.nombre}</h4>
+            </div>
+            <div class="mt-2 flex justify-between items-center">
+              <span class="text-sm font-bold text-indigo-600 font-mono">$${parseFloat(p.precio_venta).toFixed(2)}</span>
+              <span class="text-[10px] font-bold ${p.stock_actual > 0 ? 'text-slate-500' : 'text-red-500'}">Stock: ${p.stock_actual}</span>
+            </div>
+          </div>
+        `;
+      });
     }
 
-    // ==================== GESTIÓN DE PERSONAL Y SUCURSALES (CORREGIDO) ====================
-    async function cargarSucursales() {
-      try {
-        const { data, error } = await db.from('sucursales').select('*').order('id', { ascending: true });
-        if (error) throw error;
-        sucursales = data || [];
-
-        // Rellenar selector en el formulario de trabajadores
-        const selectUser = document.getElementById('user-sucursal');
-        if (selectUser) {
-          selectUser.innerHTML = '<option value="">Sin sede fija (Global)</option>';
-          sucursales.forEach(s => {
-            selectUser.innerHTML += `<option value="${s.id}">${s.nombre}</option>`;
-          });
-        }
-
-        // Rellenar lista visual de sucursales
-        const lista = document.getElementById('lista-sucursales');
-        if (lista) {
-          lista.innerHTML = '';
-          if (sucursales.length === 0) {
-            lista.innerHTML = '<li class="text-slate-400 p-2 text-center">No hay sucursales registradas</li>';
-          } else {
-            sucursales.forEach(s => {
-              lista.innerHTML += `
-                <li class="p-2.5 bg-slate-50 border rounded-lg flex justify-between items-center">
-                  <div>
-                    <b class="text-slate-800">${s.nombre}</b>
-                    <p class="text-[10px] text-slate-400">${s.direccion || 'Sin dirección especificada'}</p>
-                  </div>
-                  <button onclick="eliminarSucursal(${s.id}, '${s.nombre}')" class="text-red-500 hover:text-red-700 font-bold px-2 py-1 text-xs">Eliminar</button>
-                </li>
-              `;
-            });
-          }
-        }
-      } catch (err) {
-        console.error("Error al cargar sucursales:", err);
-      }
+    function renderizarTablaMantenimiento(list) {
+      const tb = document.getElementById('tabla-mantenimiento-body');
+      if (!tb) return;
+      tb.innerHTML = '';
+      list.forEach(p => {
+        tb.innerHTML += `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3 font-mono font-bold">${p.codigo_barras || '-'}</td>
+            <td class="p-3 font-semibold">${p.nombre}</td>
+            <td class="p-3 text-right font-mono">$${parseFloat(p.precio_costo).toFixed(2)}</td>
+            <td class="p-3 text-right font-mono font-bold">$${parseFloat(p.precio_venta).toFixed(2)}</td>
+            <td class="p-3 text-center font-bold">${p.stock_actual}</td>
+            <td class="p-3 text-center">
+              <button onclick="eliminarProducto(${p.id})" class="px-2 py-1 bg-red-500 text-white rounded text-xs font-bold">Borrar</button>
+            </td>
+          </tr>
+        `;
+      });
     }
 
-    async function crearSucursal(e) {
+    function renderizarCatalogoVisual(list) {
+      const c = document.getElementById('grid-catalogo-visual');
+      if (!c) return;
+      c.innerHTML = '';
+      list.forEach(p => {
+        c.innerHTML += `
+          <div class="border rounded-xl p-3 bg-white">
+            <h4 class="font-bold text-xs text-slate-800">${p.nombre}</h4>
+            <p class="text-[10px] font-mono text-slate-400">${p.codigo_barras || 'S/C'}</p>
+            <div class="mt-2 flex justify-between font-bold text-xs">
+              <span class="font-mono text-indigo-600">$${parseFloat(p.precio_venta).toFixed(2)}</span>
+              <span>Stock: ${p.stock_actual}</span>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    async function guardarProducto(e) {
       e.preventDefault();
-      const btn = document.getElementById('btn-crear-sucursal');
-      const nombre = document.getElementById('suc-nombre').value.trim();
-      const direccion = document.getElementById('suc-dir').value.trim();
-
-      if (!nombre) return alert("Por favor escribe el nombre de la sucursal.");
-
-      btn.disabled = true;
-      btn.innerHTML = "Guardando...";
-
-      try {
-        const { error } = await db.from('sucursales').insert([{ nombre, direccion }]);
-        if (error) throw error;
-
-        alert(`¡Sucursal "${nombre}" registrada con éxito!`);
-        document.getElementById('suc-nombre').value = '';
-        document.getElementById('suc-dir').value = '';
-        await cargarSucursales();
-        poblarSelectsOperacionesInventario();
-      } catch (err) {
-        alert("Error al registrar sucursal: " + err.message);
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i data-lucide="plus-circle" class="w-4 h-4"></i> Registrar Sucursal';
-        lucide.createIcons();
-      }
+      const payload = {
+        nombre: document.getElementById('inv-nombre').value.trim(),
+        codigo_barras: document.getElementById('inv-codigo').value.trim() || null,
+        precio_costo: parseFloat(document.getElementById('inv-costo').value),
+        precio_venta: parseFloat(document.getElementById('inv-venta').value),
+        stock_actual: parseInt(document.getElementById('inv-stock').value)
+      };
+      await db.from('productos').insert([payload]);
+      alert("Producto guardado.");
+      e.target.reset();
+      await cargarProductos();
+      cambiarSubMenuInv('mantenimiento');
     }
 
-    async function eliminarSucursal(id, nombre) {
-      if (!confirm(`¿Eliminar la sucursal "${nombre}"?`)) return;
-      try {
-        const { error } = await db.from('sucursales').delete().eq('id', id);
-        if (error) throw error;
-        await cargarSucursales();
-        poblarSelectsOperacionesInventario();
-      } catch (err) {
-        alert("No se pudo eliminar la sucursal: " + err.message);
+    async function registrarEntradaInventario(e) {
+      e.preventDefault();
+      const id = document.getElementById('ent-producto-id').value;
+      const cant = parseInt(document.getElementById('ent-cantidad').value);
+      const costo = parseFloat(document.getElementById('ent-costo').value);
+      const prod = productos.find(p => p.id == id);
+      if (!prod) return;
+
+      const nStock = prod.stock_actual + cant;
+      await db.from('productos').update({ stock_actual: nStock, precio_costo: costo }).eq('id', id);
+      alert(`Entrada registrada. Nuevo stock: ${nStock}`);
+      e.target.reset();
+      await cargarProductos();
+    }
+
+    async function registrarSalidaInventario(e) {
+      e.preventDefault();
+      const id = document.getElementById('sal-producto-id').value;
+      const cant = parseInt(document.getElementById('sal-cantidad').value);
+      const prod = productos.find(p => p.id == id);
+      if (!prod || cant > prod.stock_actual) return alert("Stock insuficiente.");
+
+      const nStock = prod.stock_actual - cant;
+      await db.from('productos').update({ stock_actual: nStock }).eq('id', id);
+      alert(`Baja registrada. Stock restante: ${nStock}`);
+      e.target.reset();
+      await cargarProductos();
+    }
+
+    async function eliminarProducto(id) {
+      if (!confirm("¿Eliminar producto?")) return;
+      await db.from('productos').delete().eq('id', id);
+      await cargarProductos();
+    }
+
+    function agregarCarrito(id) {
+      const prod = productos.find(p => p.id == id);
+      if (!prod || prod.stock_actual <= 0) return alert("Sin existencias.");
+      const item = carrito.find(c => c.id == id);
+      if (item) {
+        if (item.cantidad >= prod.stock_actual) return alert("Stock máximo alcanzado.");
+        item.cantidad++;
+      } else {
+        carrito.push({ ...prod, cantidad: 1 });
       }
+      renderCarrito();
+    }
+
+    function renderCarrito() {
+      const c = document.getElementById('carrito-items');
+      c.innerHTML = '';
+      let tot = 0;
+      carrito.forEach((it, idx) => {
+        const sub = it.cantidad * it.precio_venta;
+        tot += sub;
+        c.innerHTML += `
+          <div class="flex justify-between items-center text-xs pb-1 border-b">
+            <span>${it.nombre} x${it.cantidad}</span>
+            <div class="flex items-center gap-1">
+              <span class="font-bold font-mono">$${sub.toFixed(2)}</span>
+              <button onclick="carrito.splice(${idx},1); renderCarrito();" class="text-red-500 font-bold ml-1">×</button>
+            </div>
+          </div>
+        `;
+      });
+      document.getElementById('pos-total-usd').innerText = `$${tot.toFixed(2)}`;
+    }
+
+    function limpiarCarrito() { carrito = []; renderCarrito(); }
+
+    async function cobrarTicket() {
+      if (carrito.length === 0) return alert("Ticket vacío.");
+      const tot = carrito.reduce((acc, i) => acc + (i.cantidad * i.precio_venta), 0);
+      const num = "TKT-" + Math.floor(10000000 + Math.random() * 90000000);
+
+      const { data: v } = await db.from('ventas').insert([{
+        numero_comprobante: num,
+        total: tot,
+        metodo_pago: document.getElementById('pos-metodo').value,
+        usuario_sistema_id: usuarioActual.id
+      }]).select().single();
+
+      for (const it of carrito) {
+        await db.from('detalle_ventas').insert([{
+          venta_id: v.id, producto_id: it.id, cantidad: it.cantidad, precio_unitario: it.precio_venta, subtotal: it.cantidad * it.precio_venta
+        }]);
+        await db.from('productos').update({ stock_actual: it.stock_actual - it.cantidad }).eq('id', it.id);
+      }
+
+      alert(`¡Venta cobrada con éxito!\nComprobante: ${num}`);
+      limpiarCarrito();
+      await cargarProductos();
+      await cargarVentas();
+    }
+
+    async function cargarVentas() {
+      const { data } = await db.from('ventas').select('*').order('id', { ascending: false });
+      const tb = document.getElementById('tabla-ventas-body');
+      if (!tb) return;
+      tb.innerHTML = '';
+      (data || []).forEach(v => {
+        tb.innerHTML += `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3 font-mono font-bold">${v.numero_comprobante}</td>
+            <td class="p-3 text-slate-500">${new Date(v.fecha).toLocaleDateString()}</td>
+            <td class="p-3">${v.metodo_pago}</td>
+            <td class="p-3 text-right font-bold font-mono">$${parseFloat(v.total).toFixed(2)}</td>
+          </tr>
+        `;
+      });
+    }
+
+    function mostrarModalLogin() {
+      document.getElementById('input-clave-login').value = '';
+      document.getElementById('pantalla-login').classList.remove('hidden');
+    }
+
+    function cerrarModalLogin() {
+      document.getElementById('pantalla-login').classList.add('hidden');
     }
 
     async function cargarUsuariosLista() {
-      try {
-        const { data, error } = await db.from('usuarios_sistema').select('*, sucursales(nombre)').order('id', { ascending: true });
-        if (error) throw error;
-        usuariosLista = data || [];
-
-        if (!usuariosLista.some(u => u.usuario === 'admin')) {
-          usuariosLista.unshift({
-            id: 3,
-            nombre_completo: 'PINA IBARRA (ADMIN)',
-            usuario: 'admin',
-            clave: 'admin123',
-            rol: 'ADMIN'
-          });
-        }
-
-        // Rellenar modal de cambio de turno
-        const selectLogin = document.getElementById('select-usuario-login');
-        if (selectLogin) {
-          selectLogin.innerHTML = '';
-          usuariosLista.forEach(u => {
-            selectLogin.innerHTML += `<option value="${u.id}">${u.nombre_completo} (${u.rol})</option>`;
-          });
-        }
-
-        // Rellenar lista de personal en la pestaña
-        const l = document.getElementById('lista-personal');
-        if (l) {
-          l.innerHTML = '';
-          if (usuariosLista.length === 0) {
-            l.innerHTML = '<p class="text-slate-400 p-2 text-center text-xs">No hay trabajadores registrados</p>';
-          } else {
-            usuariosLista.forEach(u => {
-              const sucursalNombre = u.sucursales ? u.sucursales.nombre : (u.sucursal_id ? `Sede #${u.sucursal_id}` : 'Global');
-              l.innerHTML += `
-                <div class="p-2.5 bg-slate-50 border rounded-lg flex justify-between items-center text-xs">
-                  <div>
-                    <p class="font-bold text-slate-800">${u.nombre_completo} <span class="text-indigo-600 font-normal">(@${u.usuario})</span></p>
-                    <p class="text-[10px] text-slate-400">Rol: <b>${u.rol}</b> &bull; Sede: <b>${sucursalNombre}</b></p>
-                  </div>
-                  <div class="flex gap-1">
-                    <button type="button" onclick="prepararEdicionUser(${u.id})" class="px-2 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded font-bold text-[10px]">Editar</button>
-                    ${u.usuario !== 'admin' ? `<button type="button" onclick="eliminarUsuario(${u.id}, '${u.usuario}')" class="px-2 py-1 bg-red-500 hover:bg-red-600 text-white rounded font-bold text-[10px]">Borrar</button>` : ''}
-                  </div>
-                </div>
-              `;
-            });
-          }
-        }
-      } catch (err) {
-        console.error("Error al cargar usuarios:", err);
+      const { data } = await db.from('usuarios_sistema').select('*');
+      usuariosLista = data || [];
+      if (!usuariosLista.some(u => u.usuario === 'admin')) {
+        usuariosLista.unshift(usuarioActual);
+      }
+      const sel = document.getElementById('select-usuario-login');
+      if (sel) {
+        sel.innerHTML = '';
+        usuariosLista.forEach(u => sel.innerHTML += `<option value="${u.id}">${u.nombre_completo}</option>`);
       }
     }
 
-    async function guardarUsuario(e) {
-      e.preventDefault();
-      const btn = document.getElementById('btn-save-user');
-      const id = document.getElementById('edit-user-id').value;
-      const nombre = document.getElementById('user-nombre').value.trim();
-      const alias = document.getElementById('user-alias').value.trim();
-      const clave = document.getElementById('user-clave').value.trim();
-      const rol = document.getElementById('user-rol').value;
-      const sucursalVal = document.getElementById('user-sucursal').value;
-      const sucursal_id = sucursalVal !== "" ? parseInt(sucursalVal) : null;
+    async function confirmarAccesoCajero() {
+      const userId = document.getElementById('select-usuario-login').value;
+      const clave = document.getElementById('input-clave-login').value.trim();
+      const user = usuariosLista.find(u => String(u.id) === String(userId));
+      if (!user) return alert("Selecciona un usuario.");
 
-      btn.disabled = true;
-      btn.innerHTML = "Guardando...";
+      if (clave !== 'admin123' && user.clave && user.clave !== clave) {
+        return alert("Contraseña incorrecta.");
+      }
 
-      try {
-        if (id) {
-          const payload = { nombre_completo: nombre, usuario: alias, rol: rol, sucursal_id: sucursal_id };
-          if (clave !== '') payload.clave = clave;
-          const { error } = await db.from('usuarios_sistema').update(payload).eq('id', id);
-          if (error) throw error;
-          alert(`¡Empleado "${nombre}" actualizado correctamente!`);
-        } else {
-          if (!clave) {
-            btn.disabled = false;
-            btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> Guardar Empleado';
-            lucide.createIcons();
-            return alert("Por favor ingresa una contraseña o PIN para el trabajador.");
-          }
-          const { error } = await db.from('usuarios_sistema').insert([{
-            nombre_completo: nombre,
-            usuario: alias,
-            clave: clave,
-            rol: rol,
-            sucursal_id: sucursal_id
-          }]);
-          if (error) throw error;
-          alert(`¡Trabajador "${nombre}" registrado con éxito!`);
-        }
-        cancelarEdicionUser();
-        await cargarUsuariosLista();
-      } catch (err) {
-        alert("Error al guardar usuario: " + err.message);
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> Guardar Empleado';
-        lucide.createIcons();
+      usuarioActual = user;
+      guardarSesionCajero();
+      cerrarModalLogin();
+      aplicarPermisosRol();
+      alert(`Turno activado: ${usuarioActual.nombre_completo}`);
+    }
+
+    function aplicarPermisosRol() {
+      document.getElementById('badge-sucursal').innerText = `${usuarioActual.nombre_completo} [${usuarioActual.rol}]`;
+      const ti = document.getElementById('tab-inv');
+      const ta = document.getElementById('tab-admin');
+      if (usuarioActual.rol === 'ADMIN') {
+        if (ti) ti.classList.remove('hidden');
+        if (ta) ta.classList.remove('hidden');
+      } else {
+        if (ti) ti.classList.add('hidden');
+        if (ta) ta.classList.add('hidden');
+        cambiarVista('pos');
       }
     }
 
-    function prepararEdicionUser(id) {
-      const u = usuariosLista.find(x => String(x.id) === String(id));
-      if (!u) return;
-      document.getElementById('edit-user-id').value = u.id;
-      document.getElementById('user-nombre').value = u.nombre_completo;
-      document.getElementById('user-alias').
+    function cambiarVista(v) {
+      vistaActual = v;
+      ['pos', 'cotizacion', 'plan', 'envios', 'inventario', 'ventas', 'admin'].forEach(x => {
+        const el = document.getElementById('vista-' + x);
+        const tb = document.getElementById('tab-' + x);
+        if (el) el.classList.toggle('hidden', x !== v);
+        if (tb) {
+          tb.classList.toggle('bg-indigo-800', x === v);
+          tb.classList.toggle('hover:bg-indigo-600', x !== v);
+        }
+      });
+      if (v === 'inventario') cambiarSubMenuInv('mantenimiento');
+      lucide.createIcons();
+    }
+
+    function filtrarProductosPOS() {
+      const q = document.getElementById('buscar-pos').value.toLowerCase();
+      renderizarPOS(productos.filter(p => p.nombre.toLowerCase().includes(q) || (p.codigo_barras && p.codigo_barras.toLowerCase().includes(q))));
+    }
+
+    function verificarEnterEscaneo(e) {
+      if (e.key === 'Enter') {
+        const val = e.target.value.trim().toLowerCase();
+        const p = productos.find(x => (x.codigo_barras && x.codigo_barras.toLowerCase() === val) || x.nombre.toLowerCase() === val);
+        if (p) { agregarCarrito(p.id); e.target.value = ''; }
+      }
+    }
+  </script>
+</body>
+</html>
