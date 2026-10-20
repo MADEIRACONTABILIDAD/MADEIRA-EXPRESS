@@ -7,22 +7,13 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     @media print {
-      body * {
-        visibility: hidden;
-      }
-      #ticket-impresion, #ticket-impresion * {
-        visibility: visible;
-      }
+      body * { visibility: hidden; }
+      #ticket-impresion, #ticket-impresion * { visibility: visible; }
       #ticket-impresion {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        margin: 0;
-        padding: 0;
-        display: block !important;
+        position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; display: block !important;
       }
     }
   </style>
@@ -42,11 +33,11 @@
       <form onsubmit="iniciarSesion(event)" class="space-y-4">
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Usuario</label>
-          <input type="text" id="login-user" required autocomplete="off" placeholder="Ingresa tu usuario" class="w-full text-sm p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+          <input type="text" id="login-user" required autocomplete="off" placeholder="Usuario" class="w-full text-sm p-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500">
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Contraseña</label>
-          <input type="password" id="login-pass" required placeholder="Ingresa tu contraseña" class="w-full text-sm p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+          <input type="password" id="login-pass" required placeholder="Contraseña" class="w-full text-sm p-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500">
         </div>
         <button type="submit" id="btn-login" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-sm transition">
           Ingresar
@@ -70,6 +61,12 @@
         <button onclick="cambiarVista('pos')" id="tab-pos" class="px-3 py-1.5 bg-indigo-800 rounded-md text-xs font-semibold flex items-center gap-1.5">
           <i data-lucide="shopping-cart" class="w-4 h-4"></i> Ventas
         </button>
+        <button onclick="cambiarVista('cotizacion')" id="tab-cotizacion" class="px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
+          <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Cotización
+        </button>
+        <button onclick="cambiarVista('plan')" id="tab-plan" class="px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
+          <i data-lucide="calendar-clock" class="w-4 h-4"></i> Plan Acumulativo
+        </button>
         <button onclick="cambiarVista('envios')" id="tab-envios" class="px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
           <i data-lucide="send" class="w-4 h-4"></i> Envíos
         </button>
@@ -77,10 +74,10 @@
           <i data-lucide="package" class="w-4 h-4"></i> Inventario
         </button>
         <button onclick="cambiarVista('ventas')" id="tab-ventas" class="px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
-          <i data-lucide="receipt" class="w-4 h-4"></i> Historial Ventas
+          <i data-lucide="receipt" class="w-4 h-4"></i> Historial
         </button>
         <button onclick="cambiarVista('admin')" id="tab-admin" class="hidden px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
-          <i data-lucide="shield-check" class="w-4 h-4"></i> Sucursales y Usuarios
+          <i data-lucide="shield-check" class="w-4 h-4"></i> Sucursales / Usuarios
         </button>
         <button onclick="cerrarSesion()" class="ml-4 px-3 py-1.5 bg-red-600 hover:bg-red-700 rounded-md text-xs font-semibold flex items-center gap-1">
           <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Salir
@@ -102,21 +99,30 @@
 
         <div class="bg-white rounded-xl border border-slate-200 p-5 flex flex-col justify-between">
           <div>
-            <div class="flex justify-between items-center pb-3 border-b mb-3">
+            <div class="flex justify-between items-center pb-2 border-b mb-3">
               <h2 class="font-bold text-slate-800 flex items-center gap-2"><i data-lucide="file-text" class="w-5 h-5 text-indigo-600"></i> Ticket de Venta</h2>
               <button onclick="limpiarCarrito()" class="text-xs text-red-500 hover:underline">Vaciar</button>
             </div>
             
-            <div class="mb-3">
-              <label class="block text-xs font-bold text-slate-500 mb-1">Cédula / RUC del Cliente</label>
-              <input type="text" id="pos-doc-cliente" value="9999999999" class="w-full text-xs p-2 border rounded">
+            <!-- FORMULARIO CLIENTE EXTENDIDO -->
+            <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 mb-3 space-y-2">
+              <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Datos del Cliente</span>
+              <div class="grid grid-cols-2 gap-2">
+                <input type="text" id="pos-doc-cliente" placeholder="Cédula / RUC" class="text-xs p-1.5 border rounded bg-white font-mono">
+                <input type="text" id="pos-tel-cliente" placeholder="Teléfono" class="text-xs p-1.5 border rounded bg-white">
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <input type="text" id="pos-nom-cliente" placeholder="Nombres" class="text-xs p-1.5 border rounded bg-white">
+                <input type="text" id="pos-ape-cliente" placeholder="Apellidos" class="text-xs p-1.5 border rounded bg-white">
+              </div>
+              <input type="email" id="pos-mail-cliente" placeholder="Correo electrónico" class="w-full text-xs p-1.5 border rounded bg-white">
             </div>
 
             <!-- MONEDA DE COBRO -->
             <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200 mb-3 space-y-2">
               <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-slate-700">Moneda de Cobro:</span>
-                <select id="pos-moneda" onchange="actualizarMonedaPOS()" class="text-xs font-bold p-1.5 border rounded bg-white text-indigo-700">
+                <span class="text-xs font-bold text-slate-700">Moneda:</span>
+                <select id="pos-moneda" onchange="actualizarMonedaPOS()" class="text-xs font-bold p-1 border rounded bg-white text-indigo-700">
                   <option value="USD">Dólares (USD $)</option>
                   <option value="NIO">Córdobas (NIO C$)</option>
                 </select>
@@ -130,71 +136,167 @@
               </div>
             </div>
 
-            <div id="carrito-items" class="space-y-2 max-h-[220px] overflow-y-auto"></div>
+            <div id="carrito-items" class="space-y-1.5 max-h-[160px] overflow-y-auto"></div>
           </div>
 
-          <div class="border-t pt-4">
-            <div class="flex justify-between text-lg font-bold mb-1">
+          <div class="border-t pt-3">
+            <div class="flex justify-between text-base font-bold mb-1">
               <span>Total USD:</span>
               <span id="pos-total-usd" class="text-slate-700">$0.00</span>
             </div>
-            <div id="fila-total-moneda" class="hidden flex justify-between text-xl font-black mb-3 text-indigo-600">
+            <div id="fila-total-moneda" class="hidden flex justify-between text-lg font-black mb-2 text-indigo-600">
               <span>Total a Pagar:</span>
               <span id="pos-total-moneda">C$ 0.00</span>
             </div>
-            <select id="pos-metodo" class="w-full text-sm p-2 border rounded mb-3">
+            <select id="pos-metodo" class="w-full text-xs p-2 border rounded mb-2">
               <option value="EFECTIVO">Efectivo</option>
               <option value="TRANSFERENCIA">Transferencia</option>
               <option value="CREDITO">Crédito</option>
             </select>
-            <button onclick="cobrarTicket()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition">
-              <i data-lucide="check-circle" class="w-5 h-5"></i> Procesar Venta
+            <button onclick="cobrarTicket()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition text-sm">
+              <i data-lucide="check-circle" class="w-4 h-4"></i> Procesar Venta
             </button>
           </div>
         </div>
       </div>
 
-      <!-- ==================== SECCIÓN 2: HISTORIAL DE VENTAS CON FILTRO DE FECHAS ==================== -->
+      <!-- ==================== SECCIÓN 2: COTIZACIÓN (NO TOCA STOCK) ==================== -->
+      <div id="vista-cotizacion" class="hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-5">
+            <h2 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
+              <i data-lucide="file-spreadsheet" class="w-5 h-5 text-indigo-600"></i> Catálogo para Cotizar (Sin reserva de stock)
+            </h2>
+            <div id="grid-cotizar" class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[500px] overflow-y-auto"></div>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-200 p-5 flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-center pb-2 border-b mb-3">
+                <h3 class="font-bold text-slate-800 text-sm">Detalle de Cotización</h3>
+                <button onclick="carritoCotizacion = []; renderCotizacion();" class="text-xs text-red-500 hover:underline">Vaciar</button>
+              </div>
+
+              <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 mb-3 space-y-2">
+                <input type="text" id="cot-doc" placeholder="Cédula / RUC" class="w-full text-xs p-1.5 border rounded bg-white">
+                <input type="text" id="cot-nom" placeholder="Nombres y Apellidos" class="w-full text-xs p-1.5 border rounded bg-white">
+                <div class="grid grid-cols-2 gap-2">
+                  <input type="text" id="cot-tel" placeholder="Teléfono" class="text-xs p-1.5 border rounded bg-white">
+                  <input type="email" id="cot-mail" placeholder="Correo" class="text-xs p-1.5 border rounded bg-white">
+                </div>
+              </div>
+
+              <div id="items-cotizacion" class="space-y-1.5 max-h-[180px] overflow-y-auto"></div>
+            </div>
+
+            <div class="border-t pt-3">
+              <div class="flex justify-between text-lg font-bold mb-3">
+                <span>Total Cotizado:</span>
+                <span id="cot-total" class="text-indigo-600">$0.00</span>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <button onclick="guardarYDescargarCotizacion(false)" class="py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1.5">
+                  <i data-lucide="printer" class="w-4 h-4"></i> Imprimir
+                </button>
+                <button onclick="guardarYDescargarCotizacion(true)" class="py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1.5">
+                  <i data-lucide="download" class="w-4 h-4"></i> Descargar PDF
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== SECCIÓN 3: PLAN ACUMULATIVO ==================== -->
+      <div id="vista-plan" class="hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-1 bg-white p-5 rounded-xl border border-slate-200 space-y-4">
+            <h2 class="font-bold text-slate-800 flex items-center gap-2">
+              <i data-lucide="calendar-clock" class="w-5 h-5 text-indigo-600"></i> Apertura de Plan Acumulativo
+            </h2>
+            <form onsubmit="crearPlanAcumulativo(event)" class="space-y-3">
+              <input type="text" id="plan-doc" required placeholder="Cédula / Documento" class="w-full text-xs p-2 border rounded">
+              <input type="text" id="plan-nom" required placeholder="Nombre completo" class="w-full text-xs p-2 border rounded">
+              <div class="grid grid-cols-2 gap-2">
+                <input type="text" id="plan-tel" required placeholder="Teléfono" class="text-xs p-2 border rounded">
+                <input type="email" id="plan-mail" placeholder="Email" class="text-xs p-2 border rounded">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Producto a Reservar</label>
+                <select id="plan-producto-select" class="w-full text-xs p-2 border rounded"></select>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 mb-1">Abono Inicial ($)</label>
+                  <input type="number" step="0.01" id="plan-abono-inicial" required placeholder="0.00" class="w-full text-xs p-2 border rounded font-bold text-emerald-600">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 mb-1">Próximo Abono</label>
+                  <input type="date" id="plan-proxima-fecha" required class="w-full text-xs p-2 border rounded">
+                </div>
+              </div>
+              <button type="submit" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs">
+                Aperturar Plan Acumulativo
+              </button>
+            </form>
+          </div>
+
+          <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+            <div class="p-4 border-b flex justify-between items-center">
+              <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+                <i data-lucide="list" class="w-4 h-4 text-indigo-600"></i> Planes Activos y Seguimiento de Cuotas
+              </h3>
+              <button onclick="cargarPlanesAcumulativos()" class="text-xs text-indigo-600 font-bold flex items-center gap-1 hover:underline">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Actualizar
+              </button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs text-left">
+                <thead class="bg-slate-50 text-slate-500 uppercase border-b">
+                  <tr>
+                    <th class="p-3">Código</th>
+                    <th class="p-3">Cliente</th>
+                    <th class="p-3">Total</th>
+                    <th class="p-3 text-red-600 font-bold">Saldo</th>
+                    <th class="p-3">Próx. Abono</th>
+                    <th class="p-3">Estado</th>
+                    <th class="p-3 text-center">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="tabla-planes-body" class="divide-y"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== SECCIÓN 4: HISTORIAL DE VENTAS ==================== -->
       <div id="vista-ventas" class="hidden space-y-4">
         <div class="bg-white p-5 rounded-xl border border-slate-200">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b">
             <div>
-              <h2 class="font-bold text-slate-800 flex items-center gap-2"><i data-lucide="history" class="w-5 h-5 text-indigo-600"></i> Reporte e Historial de Ventas</h2>
-              <p class="text-xs text-slate-400">Consulta ventas por rango de fechas y reimprime comprobantes térmicos</p>
+              <h2 class="font-bold text-slate-800 flex items-center gap-2"><i data-lucide="history" class="w-5 h-5 text-indigo-600"></i> Historial y Reimpresión</h2>
+              <p class="text-xs text-slate-400">Reimprime en ticket térmico o descarga factura formal en PDF</p>
             </div>
             
-            <!-- FILTRO DE FECHAS -->
             <div class="flex flex-wrap items-center gap-2 text-xs">
-              <div class="flex items-center gap-1">
-                <span class="font-bold text-slate-600">Desde:</span>
-                <input type="date" id="filtro-fecha-inicio" class="p-1.5 border rounded-lg bg-slate-50 font-semibold">
-              </div>
-              <div class="flex items-center gap-1">
-                <span class="font-bold text-slate-600">Hasta:</span>
-                <input type="date" id="filtro-fecha-fin" class="p-1.5 border rounded-lg bg-slate-50 font-semibold">
-              </div>
+              <input type="date" id="filtro-fecha-inicio" class="p-1.5 border rounded-lg bg-slate-50 font-semibold">
+              <input type="date" id="filtro-fecha-fin" class="p-1.5 border rounded-lg bg-slate-50 font-semibold">
               <button onclick="cargarVentas()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg flex items-center gap-1">
                 <i data-lucide="filter" class="w-3.5 h-3.5"></i> Filtrar
               </button>
-              <button onclick="limpiarFiltroFechas()" class="px-2 py-1.5 bg-slate-200 hover:bg-slate-300 font-bold rounded-lg text-slate-700">
-                Limpiar
-              </button>
             </div>
           </div>
 
-          <div class="py-2 flex justify-between items-center text-xs text-slate-500">
-            <span>Total vendido en el periodo: <b id="txt-total-periodo" class="text-sm font-bold text-indigo-700">$0.00</b></span>
-          </div>
-
-          <div class="overflow-x-auto">
+          <div class="overflow-x-auto mt-4">
             <table class="w-full text-sm text-left">
               <thead class="bg-slate-50 text-slate-500 uppercase text-xs border-b">
                 <tr>
-                  <th class="p-3">Nº Comprobante</th>
-                  <th class="p-3">Fecha y Hora</th>
-                  <th class="p-3">Método / Moneda</th>
+                  <th class="p-3">Comprobante</th>
+                  <th class="p-3">Fecha</th>
+                  <th class="p-3">Método</th>
                   <th class="p-3 text-right">Total USD</th>
-                  <th class="p-3 text-center">Acción</th>
+                  <th class="p-3 text-center">Reimprimir</th>
                 </tr>
               </thead>
               <tbody id="tabla-ventas-body" class="divide-y"></tbody>
@@ -203,7 +305,7 @@
         </div>
       </div>
 
-      <!-- ==================== SECCIÓN 3: GESTIÓN DE ENVÍOS ==================== -->
+      <!-- ==================== SECCIÓN 5: GESTIÓN DE ENVÍOS ==================== -->
       <div id="vista-envios" class="hidden space-y-6">
         <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
           <div class="border-b pb-4 mb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -211,7 +313,6 @@
               <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
                 <i data-lucide="plane-takeoff" class="w-6 h-6 text-indigo-600"></i> Guía de Envío Internacional
               </h2>
-              <p class="text-xs text-slate-400">Selecciona la ruta de transporte y completa los datos aduaneros</p>
             </div>
             <div class="flex items-center gap-2">
               <label class="text-xs font-bold text-slate-600">Ruta:</label>
@@ -220,271 +321,117 @@
                 <option value="USA_NICARAGUA">🇳🇮 Estados Unidos ➔ Nicaragua</option>
               </select>
             </div>
-            <div class="flex items-center gap-2 bg-indigo-50 border border-indigo-200 px-3 py-1.5 rounded-lg">
-              <i data-lucide="scan-barcode" class="w-5 h-5 text-indigo-600"></i>
-              <div>
-                <span class="block text-[10px] uppercase font-bold text-indigo-700">Guía / Tracking</span>
-                <input type="text" id="env-tracking" placeholder="Escanear..." class="text-xs font-mono font-bold bg-transparent outline-none w-32 text-indigo-900">
-              </div>
-              <button type="button" onclick="generarTracking()" class="px-2 py-1 bg-white hover:bg-indigo-100 border border-indigo-300 text-[11px] font-bold rounded text-indigo-700">Auto</button>
-            </div>
           </div>
-          
-          <form onsubmit="registrarEnvio(event)" class="space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Modalidad de Transporte</label>
-                <select id="env-tipo" onchange="actualizarTarifaSugerida()" class="w-full text-sm p-2 border rounded-lg bg-white font-bold text-indigo-800">
-                  <option value="AEREO">✈️ Aéreo (Express)</option>
-                  <option value="MARITIMO">🚢 Marítimo (Cajas / Carga)</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Forma de Entrega en Destino</label>
-                <select id="env-entrega" onchange="toggleDireccionDestino()" class="w-full text-sm p-2 border rounded-lg bg-white font-semibold">
-                  <option value="OFICINA">🏢 Retiro en Sucursal / Oficina</option>
-                  <option value="DOMICILIO">🏠 Entrega a Domicilio (Delivery)</option>
-                </select>
-              </div>
-              <div>
-                <label id="lbl-ciudad-destino" class="block text-xs font-bold text-slate-700 mb-1">Ciudad Destino</label>
-                <input list="lista-ciudades-destino" id="env-ciudad" required placeholder="Escribe o selecciona..." class="w-full text-sm p-2 border rounded-lg bg-white">
-                <datalist id="lista-ciudades-destino"></datalist>
-              </div>
+          <!-- Formulario Envíos -->
+          <form onsubmit="registrarEnvio(event)" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <input type="text" id="env-tracking" placeholder="Tracking / Barcode" class="text-xs p-2.5 border rounded-lg font-mono">
+              <select id="env-tipo" class="text-xs p-2.5 border rounded-lg font-bold">
+                <option value="AEREO">Aéreo Express</option>
+                <option value="MARITIMO">Marítimo Carga</option>
+              </select>
+              <input list="lista-ciudades-destino" id="env-ciudad" required placeholder="Ciudad Destino" class="text-xs p-2.5 border rounded-lg">
+              <datalist id="lista-ciudades-destino"></datalist>
             </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div class="p-4 border rounded-xl bg-white space-y-3">
-                <h3 id="titulo-remitente" class="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1.5 pb-2 border-b">
-                  <i data-lucide="user" class="w-4 h-4"></i> Datos del Remitente
-                </h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <input type="text" id="rem-nombre" required placeholder="Nombres y Apellidos" class="text-xs p-2 border rounded-lg">
-                  <input type="text" id="rem-cedula" required placeholder="Nº Documento / Cédula" class="text-xs p-2 border rounded-lg font-mono">
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <input type="text" id="rem-telefono" required placeholder="Teléfono" class="text-xs p-2 border rounded-lg">
-                  <input type="text" id="rem-direccion" required placeholder="Dirección Origen" class="text-xs p-2 border rounded-lg">
-                </div>
-              </div>
-
-              <div class="p-4 border rounded-xl bg-white space-y-3">
-                <h3 id="titulo-destinatario" class="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1.5 pb-2 border-b">
-                  <i data-lucide="map-pin" class="w-4 h-4"></i> Datos del Destinatario
-                </h3>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  <input type="text" id="dest-nombre" required placeholder="Nombre receptor" class="text-xs p-2 border rounded-lg">
-                  <input type="text" id="dest-doc" required placeholder="ID / Cédula" class="text-xs p-2 border rounded-lg font-mono">
-                  <input type="text" id="dest-telefono" required placeholder="Teléfono" class="text-xs p-2 border rounded-lg">
-                </div>
-                <div id="bloque-direccion-destino" class="hidden space-y-2 bg-indigo-50/40 p-2.5 rounded-lg border border-indigo-100">
-                  <input type="text" id="dest-direccion" placeholder="Dirección exacta en destino..." class="w-full text-xs p-2 border rounded-lg bg-white">
-                  <div id="bloque-zip-code">
-                    <input type="text" id="dest-zip" placeholder="ZIP Code (EE.UU.)" class="w-full text-xs p-2 border rounded-lg bg-white font-mono">
-                  </div>
-                </div>
-              </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <input type="text" id="rem-nombre" required placeholder="Nombre Remitente" class="text-xs p-2 border rounded">
+              <input type="text" id="dest-nombre" required placeholder="Nombre Destinatario" class="text-xs p-2 border rounded">
             </div>
-
-            <div class="p-4 border rounded-xl bg-white grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-              <div class="md:col-span-2">
-                <label class="block text-xs font-bold text-slate-700 mb-1">Contenido del Paquete</label>
-                <textarea id="env-contenido" rows="2" required placeholder="Detalle aduanero del contenido..." class="w-full text-xs p-2.5 border rounded-lg"></textarea>
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Foto del Paquete</label>
-                <input type="file" id="env-foto-input" accept="image/*" onchange="previsualizarFoto(event)" class="text-xs w-full">
-                <div id="preview-contenedor" class="hidden flex items-center gap-2 mt-2 p-1.5 bg-slate-50 border rounded-lg">
-                  <img id="preview-img" src="" class="w-10 h-10 object-cover rounded border">
-                  <button type="button" onclick="quitarFoto()" class="text-[11px] text-red-500 hover:underline ml-auto">Quitar</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="bg-indigo-50/70 p-4 rounded-xl border border-indigo-100 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Peso</label>
-                <div class="flex gap-1.5">
-                  <input type="number" step="0.01" id="env-peso" required oninput="calcularTotalEnvio()" placeholder="0.00" class="w-full text-base font-bold p-2 border rounded-lg bg-white">
-                  <select id="env-unidad-peso" onchange="cambiarUnidadPeso()" class="text-xs p-2 border rounded-lg font-bold bg-white">
-                    <option value="LBS">lbs</option>
-                    <option value="KG">kg</option>
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label id="lbl-tarifa" class="block text-xs font-bold text-slate-700 mb-1">Precio x Libra ($)</label>
-                <input type="number" step="0.01" id="env-tarifa-unidad" value="4.50" oninput="calcularTotalEnvio()" class="w-full text-base font-bold p-2 border rounded-lg bg-white">
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Seguro / Extras ($)</label>
-                <input type="number" step="0.01" id="env-cargos-extra" value="0.00" oninput="calcularTotalEnvio()" class="w-full text-base font-bold p-2 border rounded-lg bg-white">
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Condición de Pago</label>
-                <select id="env-estado-pago" class="w-full text-xs font-bold p-2.5 border rounded-lg bg-white">
-                  <option value="PAGADO">✅ PAGADO</option>
-                  <option value="POR COBRAR">⏳ POR COBRAR</option>
-                </select>
-              </div>
-              <div class="bg-indigo-600 text-white p-2.5 rounded-lg flex flex-col justify-between shadow-sm">
-                <span class="text-[10px] font-bold uppercase text-indigo-200">Total Envíos</span>
-                <span id="txt-total-envio" class="text-xl font-black">$0.00</span>
-                <input type="hidden" id="env-valor-final" value="0.00">
-              </div>
-            </div>
-
-            <div class="pt-2 flex justify-end">
-              <button type="submit" id="btn-guardar-envio" class="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm flex items-center gap-2">
-                <i data-lucide="printer" class="w-5 h-5"></i> Guardar e Imprimir Guía
-              </button>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <input type="number" step="0.01" id="env-peso" required placeholder="Peso" class="text-xs p-2 border rounded">
+              <input type="number" step="0.01" id="env-valor-final" required placeholder="Valor Cobrado ($)" class="text-xs p-2 border rounded font-bold text-emerald-600">
+              <button type="submit" class="bg-indigo-600 text-white font-bold py-2 rounded-lg text-xs">Guardar Envío</button>
             </div>
           </form>
-        </div>
-
-        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
-          <div class="p-4 border-b flex justify-between items-center">
-            <h3 class="font-bold text-slate-800 flex items-center gap-2"><i data-lucide="archive" class="w-4 h-4 text-indigo-600"></i> Registro de Envíos</h3>
-            <button onclick="cargarEnvios()" class="text-xs text-indigo-600 font-bold flex items-center gap-1 hover:underline">
-              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Actualizar
-            </button>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm text-left">
-              <thead class="bg-slate-50 text-slate-500 uppercase text-xs border-b">
-                <tr>
-                  <th class="p-3">Guía</th>
-                  <th class="p-3">Ruta</th>
-                  <th class="p-3">Remitente</th>
-                  <th class="p-3">Destinatario</th>
-                  <th class="p-3">Contenido</th>
-                  <th class="p-3">Peso</th>
-                  <th class="p-3 text-right">Valor</th>
-                  <th class="p-3 text-center">Pago</th>
-                  <th class="p-3 text-center">Foto</th>
-                  <th class="p-3 text-center">Estado</th>
-                </tr>
-              </thead>
-              <tbody id="tabla-envios-body" class="divide-y"></tbody>
-            </table>
+          <div class="overflow-x-auto mt-4">
+            <table class="w-full text-xs text-left"><tbody id="tabla-envios-body" class="divide-y"></tbody></table>
           </div>
         </div>
       </div>
 
-      <!-- ==================== SECCIÓN 4: INVENTARIO (ADMIN) ==================== -->
+      <!-- ==================== SECCIÓN 6: INVENTARIO ==================== -->
       <div id="vista-inventario" class="hidden space-y-6">
         <div class="bg-white p-5 rounded-xl border border-slate-200">
-          <h2 id="titulo-form-prod" class="font-bold mb-4 flex items-center gap-2">
-            <i data-lucide="plus-circle" class="w-5 h-5 text-indigo-600"></i> <span id="txt-form-prod">Registrar Nuevo Producto</span>
-          </h2>
-          <form onsubmit="guardarProducto(event)" class="grid grid-cols-1 sm:grid-cols-6 gap-3">
+          <form onsubmit="guardarProducto(event)" class="grid grid-cols-1 sm:grid-cols-5 gap-3">
             <input type="hidden" id="edit-prod-id">
-            <input type="text" id="inv-nombre" required placeholder="Nombre del producto" class="text-sm p-2 border rounded sm:col-span-2">
-            <input type="text" id="inv-codigo" placeholder="Código / IMEI" class="text-sm p-2 border rounded">
-            <input type="number" step="0.01" id="inv-costo" required placeholder="P. Costo ($)" class="text-sm p-2 border rounded">
-            <input type="number" step="0.01" id="inv-venta" required placeholder="P. Venta ($)" class="text-sm p-2 border rounded">
-            <div class="flex gap-2">
-              <input type="number" id="inv-stock" required placeholder="Stock" value="1" class="w-full text-sm p-2 border rounded">
-              <button type="submit" id="btn-save-prod" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 rounded font-bold text-sm">Guardar</button>
-              <button type="button" id="btn-cancel-prod" onclick="cancelarEdicionProd()" class="hidden bg-slate-400 text-white px-2 rounded text-xs">X</button>
-            </div>
+            <input type="text" id="inv-nombre" required placeholder="Producto" class="text-sm p-2 border rounded">
+            <input type="number" step="0.01" id="inv-costo" required placeholder="P. Costo" class="text-sm p-2 border rounded">
+            <input type="number" step="0.01" id="inv-venta" required placeholder="P. Venta" class="text-sm p-2 border rounded">
+            <input type="number" id="inv-stock" required placeholder="Stock" value="1" class="text-sm p-2 border rounded">
+            <button type="submit" class="bg-indigo-600 text-white px-3 py-2 rounded font-bold text-sm">Guardar</button>
           </form>
-        </div>
-
-        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
-          <table class="w-full text-sm text-left">
-            <thead class="bg-slate-50 text-slate-500 uppercase text-xs border-b">
-              <tr>
-                <th class="p-3">Código</th>
-                <th class="p-3">Producto</th>
-                <th class="p-3 text-right">P. Costo</th>
-                <th class="p-3 text-right">P. Venta</th>
-                <th class="p-3 text-center">Stock Actual</th>
-                <th class="p-3 text-center">Acciones</th>
-              </tr>
-            </thead>
-            <tbody id="tabla-stock" class="divide-y"></tbody>
-          </table>
+          <table class="w-full text-sm text-left mt-4"><tbody id="tabla-stock" class="divide-y"></tbody></table>
         </div>
       </div>
 
-      <!-- ==================== SECCIÓN 5: ADMINISTRACIÓN ==================== -->
+      <!-- ==================== SECCIÓN 7: ADMINISTRACIÓN ==================== -->
       <div id="vista-admin" class="hidden space-y-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="bg-white p-5 rounded-xl border border-slate-200">
-            <h2 class="font-bold mb-3 flex items-center gap-2"><i data-lucide="map-pin" class="w-5 h-5 text-indigo-600"></i> Sucursales</h2>
-            <form onsubmit="crearSucursal(event)" class="space-y-3">
-              <input type="text" id="suc-nombre" required placeholder="Nombre de la sucursal" class="w-full text-sm p-2 border rounded">
-              <input type="text" id="suc-dir" placeholder="Dirección" class="w-full text-sm p-2 border rounded">
-              <button type="submit" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded text-sm">Registrar</button>
-            </form>
-            <ul id="lista-sucursales" class="text-sm space-y-1 mt-4"></ul>
-          </div>
-
-          <div class="bg-white p-5 rounded-xl border border-slate-200">
-            <h2 class="font-bold mb-3 flex items-center gap-2">
-              <i data-lucide="users" class="w-5 h-5 text-indigo-600"></i> <span id="txt-form-user">Personal</span>
-            </h2>
-            <form onsubmit="guardarUsuario(event)" class="space-y-3">
-              <input type="hidden" id="edit-user-id">
-              <input type="text" id="user-nombre" required placeholder="Nombre completo" class="w-full text-sm p-2 border rounded">
-              <div class="grid grid-cols-2 gap-2">
-                <input type="text" id="user-alias" required placeholder="Usuario" class="text-sm p-2 border rounded">
-                <input type="password" id="user-clave" placeholder="Contraseña" class="text-sm p-2 border rounded">
-              </div>
-              <div class="grid grid-cols-2 gap-2">
-                <select id="user-rol" class="text-sm p-2 border rounded">
-                  <option value="VENDEDOR">Vendedor</option>
-                  <option value="ADMIN">Administrador</option>
-                </select>
-                <select id="user-sucursal" class="text-sm p-2 border rounded"></select>
-              </div>
-              <div class="flex gap-2">
-                <button type="submit" id="btn-save-user" class="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded text-sm">Guardar</button>
-                <button type="button" id="btn-cancel-user" onclick="cancelarEdicionUser()" class="hidden px-3 py-2 bg-slate-400 text-white font-bold rounded text-sm">Cancelar</button>
-              </div>
-            </form>
-            <div id="lista-personal" class="space-y-2 max-h-60 overflow-y-auto mt-4"></div>
-          </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200">
+          <h2 class="font-bold mb-3">Gestión de Usuarios</h2>
+          <div id="lista-personal" class="space-y-2"></div>
         </div>
       </div>
 
     </main>
   </div>
 
-  <!-- PLANTILLA DE TICKET TÉRMICO (SOLO VISIBLE AL IMPRIMIR) -->
+  <!-- CONTENEDOR FACTURA / COTIZACIÓN PDF (OCULTO EN PANTALLA) -->
+  <div id="pdf-plantilla" class="hidden p-8 font-sans bg-white text-slate-800 text-xs max-w-xl mx-auto border">
+    <div class="flex justify-between items-start border-b pb-4 mb-4">
+      <div>
+        <h1 class="text-xl font-bold text-indigo-700" id="pdf-titulo-doc">DOCUMENTO</h1>
+        <p class="text-[10px] text-slate-500 font-mono" id="pdf-folio">Nº: -</p>
+      </div>
+      <div class="text-right text-[10px]">
+        <p class="font-bold text-sm text-slate-800">SISTEMA POS & LOGÍSTICA</p>
+        <p>RUC: 9999999999001</p>
+        <p>Ecuador / Nicaragua / USA</p>
+      </div>
+    </div>
+    <div class="bg-slate-50 p-3 rounded mb-4 text-[11px] grid grid-cols-2 gap-2">
+      <div>
+        <p><b>Cliente:</b> <span id="pdf-cliente-nom">-</span></p>
+        <p><b>Identificación:</b> <span id="pdf-cliente-doc">-</span></p>
+      </div>
+      <div>
+        <p><b>Teléfono:</b> <span id="pdf-cliente-tel">-</span></p>
+        <p><b>Fecha:</b> <span id="pdf-fecha">-</span></p>
+      </div>
+    </div>
+    <table class="w-full text-left mb-6">
+      <thead class="border-b bg-slate-100 text-[10px] uppercase">
+        <tr><th class="p-2">Cant</th><th class="p-2">Descripción</th><th class="p-2 text-right">Unitario</th><th class="p-2 text-right">Subtotal</th></tr>
+      </thead>
+      <tbody id="pdf-items" class="divide-y"></tbody>
+    </table>
+    <div class="flex justify-end border-t pt-2 mb-6">
+      <div class="w-48 text-right text-xs">
+        <p class="text-sm font-bold text-indigo-700">Total: <span id="pdf-total">$0.00</span></p>
+      </div>
+    </div>
+    <div class="text-center text-[10px] text-slate-400 border-t pt-3">
+      <p id="pdf-nota">Comprobante generado electrónicamente.</p>
+    </div>
+  </div>
+
+  <!-- PLANTILLA DE TICKET TÉRMICO -->
   <div id="ticket-impresion" class="hidden text-black font-mono text-xs max-w-[280px] mx-auto p-2">
     <div class="text-center pb-2 border-b border-dashed border-black">
-      <h2 class="font-bold text-sm tracking-wider uppercase" id="tkt-empresa">SISTEMA POS & COURIER</h2>
-      <p id="tkt-sucursal" class="text-[10px]">Sucursal Principal</p>
+      <h2 class="font-bold text-sm tracking-wider uppercase">SISTEMA POS & COURIER</h2>
       <p class="text-[10px]">RUC: 9999999999001</p>
     </div>
-    <div class="py-2 border-b border-dashed border-black text-[11px] space-y-0.5">
+    <div class="py-2 border-b border-dashed border-black text-[11px]">
       <p><b>Comp:</b> <span id="tkt-numero"></span></p>
       <p><b>Fecha:</b> <span id="tkt-fecha"></span></p>
       <p><b>Cliente:</b> <span id="tkt-cliente"></span></p>
-      <p><b>Atendido por:</b> <span id="tkt-cajero"></span></p>
+      <p><b>Cajero:</b> <span id="tkt-cajero"></span></p>
     </div>
     <table class="w-full text-[11px] my-2">
-      <thead>
-        <tr class="border-b border-black text-left">
-          <th>Cant</th>
-          <th>Desc</th>
-          <th class="text-right">Total</th>
-        </tr>
-      </thead>
       <tbody id="tkt-items"></tbody>
     </table>
-    <div class="border-t border-dashed border-black pt-1.5 space-y-1 text-[11px]">
-      <div class="flex justify-between font-bold text-xs">
-        <span>TOTAL:</span>
-        <span id="tkt-total"></span>
-      </div>
+    <div class="border-t border-dashed border-black pt-1 text-[11px]">
+      <div class="flex justify-between font-bold text-xs"><span>TOTAL:</span><span id="tkt-total"></span></div>
       <p class="text-[10px]"><b>Pago:</b> <span id="tkt-metodo"></span></p>
-    </div>
-    <div class="text-center pt-3 text-[10px] space-y-1">
-      <p>¡Gracias por su preferencia!</p>
-      <p>Revise su mercadería antes de salir.</p>
     </div>
   </div>
 
@@ -494,36 +441,14 @@
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let usuarioActual = null;
-    let sucursales = [];
     let productos = [];
-    let usuariosLista = [];
-    let enviosLista = [];
     let carrito = [];
-    let fotoBase64 = null;
-
-    const CIUDADES_USA = [
-      "New York, NY", "Queens, NY", "Brooklyn, NY", "Bronx, NY", "Newark, NJ", 
-      "Jersey City, NJ", "Miami, FL", "Orlando, FL", "Tampa, FL", "Chicago, IL", 
-      "Houston, TX", "Dallas, TX", "Los Angeles, CA", "Atlanta, GA", "New Haven, CT"
-    ];
-
-    const CIUDADES_NICARAGUA = [
-      "Managua (Capital)", "Matagalpa", "Estelí", "León", "Chinandega", 
-      "Masaya", "Granada", "Jinotega", "Juigalpa", "Rivas", "Ocotal", "Bluefields"
-    ];
+    let carritoCotizacion = [];
+    let planesLista = [];
 
     window.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
       verificarSesionGuardada();
-      cambiarRutaEnvio();
-
-      // Fechas por defecto para el filtro (inicio del mes al día de hoy)
-      const hoy = new Date();
-      const anio = hoy.getFullYear();
-      const mes = String(hoy.getMonth() + 1).padStart(2, '0');
-      const dia = String(hoy.getDate()).padStart(2, '0');
-      document.getElementById('filtro-fecha-fin').value = `${anio}-${mes}-${dia}`;
-      document.getElementById('filtro-fecha-inicio').value = `${anio}-${mes}-01`;
     });
 
     function verificarSesionGuardada() {
@@ -532,8 +457,7 @@
         try {
           usuarioActual = JSON.parse(guardado);
           aplicarSesionUsuario();
-          const ultimaVista = localStorage.getItem('sesion_pos_vista') || 'pos';
-          cambiarVista(ultimaVista);
+          cambiarVista(localStorage.getItem('sesion_pos_vista') || 'pos');
         } catch(e) {
           localStorage.removeItem('sesion_pos_usuario');
         }
@@ -542,79 +466,50 @@
 
     async function iniciarSesion(e) {
       e.preventDefault();
-      const btn = document.getElementById('btn-login');
-      btn.innerText = "Verificando...";
-      btn.disabled = true;
-
       const u = document.getElementById('login-user').value.trim();
       const p = document.getElementById('login-pass').value.trim();
-
       try {
         const { data, error } = await db.from('usuarios_sistema').select('*').eq('usuario', u).eq('clave', p);
-        if (error) throw error;
-        if (!data || data.length === 0) {
-          alert("Usuario o contraseña incorrectos.");
-          return;
-        }
-
+        if (error || !data || data.length === 0) return alert("Credenciales incorrectas.");
         usuarioActual = data[0];
         localStorage.setItem('sesion_pos_usuario', JSON.stringify(usuarioActual));
         aplicarSesionUsuario();
         cambiarVista('pos');
-      } catch (err) {
-        alert("Error de conexión: " + err.message);
-      } finally {
-        btn.innerText = "Ingresar";
-        btn.disabled = false;
-      }
+      } catch (err) { alert(err.message); }
     }
 
     async function aplicarSesionUsuario() {
       document.getElementById('pantalla-login').classList.add('hidden');
       document.getElementById('app-contenido').classList.remove('hidden');
-      document.getElementById('badge-sucursal').innerText = `Usuario: ${usuarioActual.nombre_completo} [Rol: ${usuarioActual.rol}]`;
+      document.getElementById('badge-sucursal').innerText = `${usuarioActual.nombre_completo} [${usuarioActual.rol}]`;
 
       if (usuarioActual.rol === 'ADMIN') {
         document.getElementById('tab-inv').classList.remove('hidden');
         document.getElementById('tab-admin').classList.remove('hidden');
-      } else {
-        document.getElementById('tab-inv').classList.add('hidden');
-        document.getElementById('tab-admin').classList.add('hidden');
       }
-
-      await cargarDatos();
+      await cargarProductos();
+      await cargarVentas();
+      await cargarPlanesAcumulativos();
       lucide.createIcons();
     }
 
     function cerrarSesion() {
-      localStorage.removeItem('sesion_pos_usuario');
-      localStorage.removeItem('sesion_pos_vista');
-      usuarioActual = null;
-      document.getElementById('login-user').value = '';
-      document.getElementById('login-pass').value = '';
-      document.getElementById('pantalla-login').classList.remove('hidden');
-      document.getElementById('app-contenido').classList.add('hidden');
+      localStorage.clear();
+      location.reload();
     }
 
-    async function cargarDatos() {
-      await cargarSucursales();
-      await cargarProductos();
-      await cargarVentas();
-      await cargarEnvios();
-      if (usuarioActual && usuarioActual.rol === 'ADMIN') {
-        await cargarUsuariosLista();
-      }
+    // ==================== POS & VENTAS ====================
+    async function cargarProductos() {
+      const { data } = await db.from('productos').select('*').order('id', { ascending: false });
+      productos = data || [];
+      renderizarPOS(productos);
+      renderizarCotizarGrid(productos);
+      poblarSelectProductosPlan(productos);
     }
 
-    // ==================== LÓGICA DE VENTAS & TICKET ====================
     function renderizarPOS(lista) {
       const c = document.getElementById('grid-pos');
       c.innerHTML = '';
-      if (lista.length === 0) {
-        c.innerHTML = `<p class="col-span-3 text-center py-10 text-slate-400 text-sm">No hay productos disponibles.</p>`;
-        return;
-      }
-
       lista.forEach(p => {
         const sinStock = p.stock_actual <= 0;
         c.innerHTML += `
@@ -624,10 +519,10 @@
               <p class="text-[11px] text-slate-400 font-mono">${p.codigo_barras || 'S/C'}</p>
               <h4 class="font-bold text-xs text-slate-700">${p.nombre}</h4>
             </div>
-            <div class="mt-3 flex justify-between items-center">
+            <div class="mt-2 flex justify-between items-center">
               <span class="text-sm font-bold text-indigo-600">$${parseFloat(p.precio_venta).toFixed(2)}</span>
               <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${sinStock ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-700'}">
-                ${sinStock ? 'AGOTADO' : `Stock: ${p.stock_actual}`}
+                ${sinStock ? '0' : p.stock_actual}
               </span>
             </div>
           </div>
@@ -637,47 +532,13 @@
 
     function agregarCarrito(id) {
       const prod = productos.find(p => p.id === id);
-      if (!prod || prod.stock_actual <= 0) return alert("Producto agotado.");
-
-      const itemEnCarrito = carrito.find(c => c.id === id);
-      if (itemEnCarrito) {
-        if (itemEnCarrito.cantidad >= prod.stock_actual) {
-          return alert(`Stock insuficiente. Solo quedan ${prod.stock_actual} unidades.`);
-        }
-        itemEnCarrito.cantidad++;
+      if (!prod || prod.stock_actual <= 0) return alert("Agotado");
+      const item = carrito.find(c => c.id === id);
+      if (item) {
+        if (item.cantidad >= prod.stock_actual) return alert("Tope de stock alcanzado.");
+        item.cantidad++;
       } else {
         carrito.push({ ...prod, cantidad: 1 });
-      }
-      renderCarrito();
-    }
-
-    function cambiarCantidadCarrito(idx, delta) {
-      const item = carrito[idx];
-      const prod = productos.find(p => p.id === item.id);
-      const nuevaCantidad = item.cantidad + delta;
-
-      if (nuevaCantidad <= 0) {
-        carrito.splice(idx, 1);
-      } else if (nuevaCantidad > prod.stock_actual) {
-        alert(`Stock máximo alcanzado (${prod.stock_actual} unidades disponibles).`);
-        return;
-      } else {
-        item.cantidad = nuevaCantidad;
-      }
-      renderCarrito();
-    }
-
-    function actualizarMonedaPOS() {
-      const moneda = document.getElementById('pos-moneda').value;
-      const bloqueTasa = document.getElementById('bloque-tasa-cambio');
-      const filaMoneda = document.getElementById('fila-total-moneda');
-
-      if (moneda === 'NIO') {
-        bloqueTasa.classList.remove('hidden');
-        filaMoneda.classList.remove('hidden');
-      } else {
-        bloqueTasa.classList.add('hidden');
-        filaMoneda.classList.add('hidden');
       }
       renderCarrito();
     }
@@ -686,34 +547,26 @@
       const c = document.getElementById('carrito-items');
       c.innerHTML = '';
       let totalUSD = 0;
-
       carrito.forEach((item, idx) => {
         const sub = item.cantidad * item.precio_venta;
         totalUSD += sub;
         c.innerHTML += `
-          <div class="flex justify-between items-center text-xs pb-2 border-b">
-            <div>
-              <p class="font-bold text-slate-800">${item.nombre}</p>
-              <p class="text-slate-400">$${item.precio_venta.toFixed(2)} c/u</p>
-            </div>
-            <div class="flex items-center gap-1.5">
-              <button onclick="cambiarCantidadCarrito(${idx}, -1)" class="w-5 h-5 bg-slate-200 rounded font-bold hover:bg-slate-300">-</button>
-              <span class="font-bold w-4 text-center">${item.cantidad}</span>
-              <button onclick="cambiarCantidadCarrito(${idx}, 1)" class="w-5 h-5 bg-slate-200 rounded font-bold hover:bg-slate-300">+</button>
+          <div class="flex justify-between items-center text-xs pb-1 border-b">
+            <span class="truncate max-w-[120px]">${item.nombre}</span>
+            <div class="flex items-center gap-1">
+              <button onclick="carrito[${idx}].cantidad--; if(carrito[${idx}].cantidad<=0) carrito.splice(${idx},1); renderCarrito();" class="px-1.5 bg-slate-200 rounded">-</button>
+              <span class="font-bold">${item.cantidad}</span>
+              <button onclick="if(carrito[${idx}].cantidad < ${item.stock_actual}) carrito[${idx}].cantidad++; renderCarrito();" class="px-1.5 bg-slate-200 rounded">+</button>
               <span class="font-bold w-12 text-right">$${sub.toFixed(2)}</span>
-              <button onclick="carrito.splice(${idx},1); renderCarrito();" class="text-red-500 font-bold ml-1">×</button>
             </div>
           </div>
         `;
       });
-
       document.getElementById('pos-total-usd').innerText = `$${totalUSD.toFixed(2)}`;
-
       const moneda = document.getElementById('pos-moneda').value;
       if (moneda === 'NIO') {
         const tasa = parseFloat(document.getElementById('pos-tasa-cambio').value) || 36.80;
-        const totalNIO = totalUSD * tasa;
-        document.getElementById('pos-total-moneda').innerText = `C$ ${totalNIO.toFixed(2)}`;
+        document.getElementById('pos-total-moneda').innerText = `C$ ${(totalUSD * tasa).toFixed(2)}`;
       }
     }
 
@@ -722,80 +575,264 @@
       renderCarrito();
     }
 
+    function actualizarMonedaPOS() {
+      const m = document.getElementById('pos-moneda').value;
+      document.getElementById('bloque-tasa-cambio').classList.toggle('hidden', m !== 'NIO');
+      document.getElementById('fila-total-moneda').classList.toggle('hidden', m !== 'NIO');
+      renderCarrito();
+    }
+
     async function cobrarTicket() {
-      if (carrito.length === 0) return alert("Ticket vacío.");
-
-      for (const item of carrito) {
-        const prod = productos.find(p => p.id === item.id);
-        if (!prod || prod.stock_actual < item.cantidad) {
-          return alert(`Stock insuficiente para "${item.nombre}". Disponible: ${prod ? prod.stock_actual : 0}`);
-        }
-      }
-
+      if (carrito.length === 0) return alert("El carrito está vacío.");
       const totalUSD = carrito.reduce((sum, i) => sum + (i.cantidad * i.precio_venta), 0);
-      const moneda = document.getElementById('pos-moneda').value;
-      const metodo = document.getElementById('pos-metodo').value;
-      const docCliente = document.getElementById('pos-doc-cliente').value.trim() || '9999999999';
       const numComp = 'TKT-' + Math.floor(100000 + Math.random() * 900000);
 
-      let totalFinalTexto = `$${totalUSD.toFixed(2)} USD`;
-      if (moneda === 'NIO') {
-        const tasa = parseFloat(document.getElementById('pos-tasa-cambio').value) || 36.80;
-        totalFinalTexto += ` (C$ ${(totalUSD * tasa).toFixed(2)} NIO)`;
-      }
+      const doc = document.getElementById('pos-doc-cliente').value.trim() || '9999999999';
+      const nom = document.getElementById('pos-nom-cliente').value.trim();
+      const ape = document.getElementById('pos-ape-cliente').value.trim();
+      const tel = document.getElementById('pos-tel-cliente').value.trim();
+      const mail = document.getElementById('pos-mail-cliente').value.trim();
+      const nombreCompleto = (nom || ape) ? `${nom} ${ape}`.trim() : 'CONSUMIDOR FINAL';
 
-      let { data: cliente } = await db.from('clientes').select('id, nombre_completo').eq('identificacion', docCliente).single();
+      let { data: cliente } = await db.from('clientes').select('id').eq('identificacion', doc).maybeSingle();
       if (!cliente) {
-        const { data: nc } = await db.from('clientes').insert([{ identificacion: docCliente, nombre_completo: docCliente === '9999999999' ? 'CONSUMIDOR FINAL' : 'CLIENTE POS' }]).select().single();
+        const { data: nc } = await db.from('clientes').insert([{
+          identificacion: doc, nombre_completo: nombreCompleto, nombres: nom, apellidos: ape, telefono: tel, email: mail
+        }]).select().single();
         cliente = nc;
       }
 
-      const metodoDetalle = `${metodo} [${moneda}]`;
-      const { data: venta, error } = await db.from('ventas').insert([{
+      const { data: venta } = await db.from('ventas').insert([{
         numero_comprobante: numComp,
-        cliente_id: cliente.id,
+        cliente_id: cliente ? cliente.id : null,
         total: totalUSD,
-        metodo_pago: metodoDetalle,
+        metodo_pago: document.getElementById('pos-metodo').value,
         usuario_sistema_id: usuarioActual.id
       }]).select().single();
 
-      if (error) return alert("Error al registrar venta: " + error.message);
-
-      const itemsGuardar = carrito.map(i => ({
-        venta_id: venta.id,
-        producto_id: i.id,
-        cantidad: i.cantidad,
-        precio_unitario: i.precio_venta,
-        subtotal: i.cantidad * i.precio_venta
-      }));
-      await db.from('detalle_ventas').insert(itemsGuardar);
-
-      for (const item of carrito) {
-        const nuevoStock = item.stock_actual - item.cantidad;
-        await db.from('productos').update({ stock_actual: nuevoStock }).eq('id', item.id);
+      for (const it of carrito) {
+        await db.from('detalle_ventas').insert([{
+          venta_id: venta.id, producto_id: it.id, cantidad: it.cantidad, precio_unitario: it.precio_venta, subtotal: it.cantidad * it.precio_venta
+        }]);
+        await db.from('productos').update({ stock_actual: it.stock_actual - it.cantidad }).eq('id', it.id);
       }
 
-      // Preguntar si desea imprimir
-      const deseaImprimir = confirm(`¡Venta realizada con éxito!\nTicket: ${numComp}\nTotal: ${totalFinalTexto}\n\n¿Deseas imprimir el recibo ahora?`);
-
-      if (deseaImprimir) {
-        imprimirReciboTermico({
-          numero: numComp,
-          fecha: new Date().toLocaleString(),
-          cliente: `${cliente.nombre_completo} (${docCliente})`,
-          cajero: usuarioActual.nombre_completo,
-          items: carrito.map(c => ({ cantidad: c.cantidad, nombre: c.nombre, subtotal: (c.cantidad * c.precio_venta).toFixed(2) })),
-          total: totalFinalTexto,
-          metodo: metodoDetalle
+      const opt = confirm("¿Deseas imprimir el recibo ahora?");
+      if (opt) {
+        imprimirTicketTermicoRaw({
+          numero: numComp, fecha: new Date().toLocaleString(), cliente: nombreCompleto,
+          cajero: usuarioActual.nombre_completo, items: carrito, total: `$${totalUSD.toFixed(2)}`,
+          metodo: document.getElementById('pos-metodo').value
         });
       }
-
       limpiarCarrito();
       await cargarProductos();
       await cargarVentas();
     }
 
-    function imprimirReciboTermico(datos) {
+    // ==================== COTIZACIONES (SIN AFECTAR STOCK) ====================
+    function renderizarCotizarGrid(lista) {
+      const g = document.getElementById('grid-cotizar');
+      if (!g) return;
+      g.innerHTML = '';
+      lista.forEach(p => {
+        g.innerHTML += `
+          <div onclick="agregarCotizacion(${p.id})" class="border p-3 rounded-lg bg-white cursor-pointer hover:border-indigo-500">
+            <h4 class="font-bold text-xs text-slate-700">${p.nombre}</h4>
+            <span class="text-sm font-bold text-indigo-600">$${parseFloat(p.precio_venta).toFixed(2)}</span>
+          </div>
+        `;
+      });
+    }
+
+    function agregarCotizacion(id) {
+      const prod = productos.find(p => p.id === id);
+      const existe = carritoCotizacion.find(c => c.id === id);
+      if (existe) existe.cantidad++;
+      else carritoCotizacion.push({ ...prod, cantidad: 1 });
+      renderCotizacion();
+    }
+
+    function renderCotizacion() {
+      const cont = document.getElementById('items-cotizacion');
+      cont.innerHTML = '';
+      let tot = 0;
+      carritoCotizacion.forEach((it, idx) => {
+        const sub = it.cantidad * it.precio_venta;
+        tot += sub;
+        cont.innerHTML += `
+          <div class="flex justify-between items-center text-xs pb-1 border-b">
+            <span>${it.nombre} x${it.cantidad}</span>
+            <div class="flex items-center gap-1">
+              <span class="font-bold">$${sub.toFixed(2)}</span>
+              <button onclick="carritoCotizacion.splice(${idx},1); renderCotizacion();" class="text-red-500 font-bold ml-1">×</button>
+            </div>
+          </div>
+        `;
+      });
+      document.getElementById('cot-total').innerText = `$${tot.toFixed(2)}`;
+    }
+
+    async function guardarYDescargarCotizacion(descargarPDF) {
+      if (carritoCotizacion.length === 0) return alert("Cotización vacía.");
+      const total = carritoCotizacion.reduce((s, i) => s + (i.cantidad * i.precio_venta), 0);
+      const fol = 'COT-' + Math.floor(100000 + Math.random() * 900000);
+      const nom = document.getElementById('cot-nom').value.trim() || 'Cliente Cotización';
+      const doc = document.getElementById('cot-doc').value.trim() || 'S/N';
+      const tel = document.getElementById('cot-tel').value.trim() || '-';
+
+      await db.from('cotizaciones').insert([{
+        numero_cotizacion: fol, cliente_nombre: nom, cliente_identificacion: doc, cliente_telefono: tel,
+        total: total, usuario_id: usuarioActual.id
+      }]);
+
+      generarDocumentoPDF({
+        titulo: "COTIZACIÓN", folio: fol, cliente: nom, doc: doc, tel: tel,
+        fecha: new Date().toLocaleDateString(), items: carritoCotizacion, total: `$${total.toFixed(2)}`,
+        nota: "Cotización válida por 15 días. No reserva mercadería en inventario."
+      }, descargarPDF);
+    }
+
+    // ==================== PLAN ACUMULATIVO ====================
+    function poblarSelectProductosPlan(lista) {
+      const sel = document.getElementById('plan-producto-select');
+      if (!sel) return;
+      sel.innerHTML = '';
+      lista.forEach(p => {
+        sel.innerHTML += `<option value="${p.id}">${p.nombre} - $${p.precio_venta} (Disp: ${p.stock_actual})</option>`;
+      });
+    }
+
+    async function crearPlanAcumulativo(e) {
+      e.preventDefault();
+      const prodId = document.getElementById('plan-producto-select').value;
+      const prod = productos.find(p => p.id == prodId);
+      if (!prod || prod.stock_actual <= 0) return alert("Producto sin existencias.");
+
+      const abonoIni = parseFloat(document.getElementById('plan-abono-inicial').value);
+      if (abonoIni <= 0 || abonoIni > prod.precio_venta) return alert("Monto de abono inválido.");
+
+      const codigo = 'PLAN-' + Math.floor(100000 + Math.random() * 900000);
+      const saldo = prod.precio_venta - abonoIni;
+
+      const { data: plan, error } = await db.from('planes_acumulativos').insert([{
+        codigo_plan: codigo,
+        cliente_identificacion: document.getElementById('plan-doc').value,
+        cliente_nombre: document.getElementById('plan-nom').value,
+        cliente_telefono: document.getElementById('plan-tel').value,
+        cliente_email: document.getElementById('plan-mail').value,
+        total: prod.precio_venta,
+        saldo_pendiente: saldo,
+        fecha_proximo_abono: document.getElementById('plan-proxima-fecha').value,
+        usuario_id: usuarioActual.id
+      }]).select().single();
+
+      if (error) return alert(error.message);
+
+      await db.from('abonos_plan').insert([{
+        plan_id: plan.id, monto: abonoIni, metodo_pago: 'EFECTIVO', usuario_id: usuarioActual.id
+      }]);
+
+      // Reserva 1 unidad de stock
+      await db.from('productos').update({ stock_actual: prod.stock_actual - 1 }).eq('id', prod.id);
+
+      alert(`Plan Acumulativo Creado: ${codigo}\nSaldo pendiente: $${saldo.toFixed(2)}`);
+      e.target.reset();
+      cargarProductos();
+      cargarPlanesAcumulativos();
+    }
+
+    async function cargarPlanesAcumulativos() {
+      const { data } = await db.from('planes_acumulativos').select('*').order('id', { ascending: false });
+      planesLista = data || [];
+      const tbody = document.getElementById('tabla-planes-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      planesLista.forEach(pl => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3 font-mono font-bold text-indigo-700">${pl.codigo_plan}</td>
+            <td class="p-3"><b>${pl.cliente_nombre}</b><br><span class="text-[10px] text-slate-400">${pl.cliente_telefono}</span></td>
+            <td class="p-3 font-bold">$${parseFloat(pl.total).toFixed(2)}</td>
+            <td class="p-3 font-bold text-red-600">$${parseFloat(pl.saldo_pendiente).toFixed(2)}</td>
+            <td class="p-3 font-semibold">${pl.fecha_proximo_abono || '-'}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${pl.saldo_pendiente <= 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${pl.saldo_pendiente <= 0 ? 'LIQUIDADO' : 'ACTIVO'}</span></td>
+            <td class="p-3 text-center">
+              ${pl.saldo_pendiente > 0 ? `<button onclick="registrarNuevoAbono(${pl.id}, ${pl.saldo_pendiente})" class="px-2 py-1 bg-emerald-600 text-white rounded font-bold">Abonar</button>` : '<span class="text-emerald-600 font-bold">Entregado</span>'}
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    async function registrarNuevoAbono(planId, saldoActual) {
+      const montoStr = prompt(`Saldo adeudado: $${saldoActual.toFixed(2)}\nIngresa el valor del abono ($):`);
+      if (!montoStr) return;
+      const monto = parseFloat(montoStr);
+      if (isNaN(monto) || monto <= 0 || monto > saldoActual) return alert("Monto incorrecto.");
+
+      const proxFecha = prompt("Fecha coordinada para el siguiente abono (AAAA-MM-DD):", new Date().toISOString().split('T')[0]);
+
+      await db.from('abonos_plan').insert([{ plan_id: planId, monto: monto, metodo_pago: 'EFECTIVO', usuario_id: usuarioActual.id }]);
+      const nuevoSaldo = saldoActual - monto;
+      await db.from('planes_acumulativos').update({
+        saldo_pendiente: nuevoSaldo,
+        fecha_proximo_abono: proxFecha || null,
+        estado: nuevoSaldo <= 0 ? 'LIQUIDADO' : 'ACTIVO'
+      }).eq('id', planId);
+
+      alert(`Abono registrado con éxito.\nNuevo saldo: $${nuevoSaldo.toFixed(2)}`);
+      cargarPlanesAcumulativos();
+    }
+
+    // ==================== GENERACIÓN DE PDF Y TICKETS ====================
+    function generarDocumentoPDF(datos, descargar) {
+      document.getElementById('pdf-titulo-doc').innerText = datos.titulo;
+      document.getElementById('pdf-folio').innerText = `Nº: ${datos.folio}`;
+      document.getElementById('pdf-cliente-nom').innerText = datos.cliente;
+      document.getElementById('pdf-cliente-doc').innerText = datos.doc;
+      document.getElementById('pdf-cliente-tel').innerText = datos.tel;
+      document.getElementById('pdf-fecha').innerText = datos.fecha;
+      document.getElementById('pdf-total').innerText = datos.total;
+      document.getElementById('pdf-nota').innerText = datos.nota || '';
+
+      const tbody = document.getElementById('pdf-items');
+      tbody.innerHTML = '';
+      datos.items.forEach(it => {
+        const sub = (it.cantidad * it.precio_venta).toFixed(2);
+        tbody.innerHTML += `
+          <tr class="text-xs">
+            <td class="p-2">${it.cantidad}</td>
+            <td class="p-2">${it.nombre}</td>
+            <td class="p-2 text-right">$${parseFloat(it.precio_venta).toFixed(2)}</td>
+            <td class="p-2 text-right font-bold">$${sub}</td>
+          </tr>
+        `;
+      });
+
+      const elemento = document.getElementById('pdf-plantilla');
+      elemento.classList.remove('hidden');
+
+      const opt = {
+        margin: 10,
+        filename: `${datos.folio}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      if (descargar) {
+        html2pdf().set(opt).from(elemento).save().then(() => elemento.classList.add('hidden'));
+      } else {
+        html2pdf().set(opt).from(elemento).toPdf().get('pdf').then((pdf) => {
+          pdf.autoPrint();
+          window.open(pdf.output('bloburl'), '_blank');
+          elemento.classList.add('hidden');
+        });
+      }
+    }
+
+    function imprimirTicketTermicoRaw(datos) {
       document.getElementById('tkt-numero').innerText = datos.numero;
       document.getElementById('tkt-fecha').innerText = datos.fecha;
       document.getElementById('tkt-cliente').innerText = datos.cliente;
@@ -808,502 +845,84 @@
       datos.items.forEach(it => {
         tb.innerHTML += `
           <tr>
-            <td class="pr-1">${it.cantidad}</td>
-            <td class="pr-1">${it.nombre}</td>
-            <td class="text-right">$${it.subtotal}</td>
+            <td>${it.cantidad}x ${it.nombre}</td>
+            <td class="text-right font-bold">$${(it.cantidad * it.precio_venta).toFixed(2)}</td>
           </tr>
         `;
       });
-
       window.print();
     }
 
-    async function reimprimirTicket(ventaId) {
-      const { data: venta } = await db.from('ventas').select('*, clientes(nombre_completo, identificacion), usuarios_sistema(nombre_completo)').eq('id', ventaId).single();
-      if (!venta) return alert("No se encontró la venta.");
+    async function reimprimirVentaDual(ventaId, modo) {
+      const { data: venta } = await db.from('ventas').select('*, clientes(*)').eq('id', ventaId).single();
+      const { data: det } = await db.from('detalle_ventas').select('*, productos(nombre)').eq('venta_id', ventaId);
 
-      const { data: detalles } = await db.from('detalle_ventas').select('*, productos(nombre)').eq('venta_id', ventaId);
-
-      const items = (detalles || []).map(d => ({
+      const itemsFormateados = (det || []).map(d => ({
         cantidad: d.cantidad,
-        nombre: d.productos ? d.productos.nombre : 'Producto',
-        subtotal: parseFloat(d.subtotal).toFixed(2)
+        nombre: d.productos ? d.productos.nombre : 'Articulo',
+        precio_venta: d.precio_unitario
       }));
 
-      const nombreCliente = venta.clientes ? `${venta.clientes.nombre_completo} (${venta.clientes.identificacion})` : 'CONSUMIDOR FINAL';
-      const nombreCajero = venta.usuarios_sistema ? venta.usuarios_sistema.nombre_completo : 'Cajero';
+      const nombreCli = venta.clientes ? (venta.clientes.nombre_completo || venta.clientes.identificacion) : 'CONSUMIDOR FINAL';
+      const docCli = venta.clientes ? venta.clientes.identificacion : '9999999999';
+      const telCli = venta.clientes ? (venta.clientes.telefono || '-') : '-';
 
-      imprimirReciboTermico({
-        numero: venta.numero_comprobante,
-        fecha: new Date(venta.fecha).toLocaleString(),
-        cliente: nombreCliente,
-        cajero: nombreCajero,
-        items: items,
-        total: `$${parseFloat(venta.total).toFixed(2)} USD`,
-        metodo: venta.metodo_pago
-      });
+      if (modo === 'TICKET') {
+        imprimirTicketTermicoRaw({
+          numero: venta.numero_comprobante,
+          fecha: new Date(venta.fecha).toLocaleString(),
+          cliente: nombreCli,
+          cajero: 'Cajero',
+          items: itemsFormateados,
+          total: `$${parseFloat(venta.total).toFixed(2)}`,
+          metodo: venta.metodo_pago
+        });
+      } else {
+        generarDocumentoPDF({
+          titulo: "FACTURA DE VENTA",
+          folio: venta.numero_comprobante,
+          cliente: nombreCli,
+          doc: docCli,
+          tel: telCli,
+          fecha: new Date(venta.fecha).toLocaleDateString(),
+          items: itemsFormateados,
+          total: `$${parseFloat(venta.total).toFixed(2)}`,
+          nota: "Gracias por su compra. Conserve este comprobante para reclamos de garantía."
+        }, true);
+      }
     }
 
-    // ==================== HISTORIAL Y FILTRO POR FECHAS ====================
+    // ==================== HISTORIAL DE VENTAS ====================
     async function cargarVentas() {
-      let query = db.from('ventas').select('*').order('fecha', { ascending: false });
+      let q = db.from('ventas').select('*').order('fecha', { ascending: false });
+      const fi = document.getElementById('filtro-fecha-inicio').value;
+      const ff = document.getElementById('filtro-fecha-fin').value;
+      if (fi) q = q.gte('fecha', `${fi}T00:00:00.000Z`);
+      if (ff) q = q.lte('fecha', `${ff}T23:59:59.999Z`);
 
-      if (usuarioActual && usuarioActual.rol !== 'ADMIN') {
-        query = query.eq('usuario_sistema_id', usuarioActual.id);
-      }
-
-      const fechaIni = document.getElementById('filtro-fecha-inicio').value;
-      const fechaFin = document.getElementById('filtro-fecha-fin').value;
-
-      if (fechaIni) {
-        query = query.gte('fecha', `${fechaIni}T00:00:00.000Z`);
-      }
-      if (fechaFin) {
-        query = query.lte('fecha', `${fechaFin}T23:59:59.999Z`);
-      }
-
-      const { data, error } = await query;
-      if (error) return console.error(error);
-
-      const t = document.getElementById('tabla-ventas-body');
-      t.innerHTML = '';
-      let totalPeriodo = 0;
-
-      if (!data || data.length === 0) {
-        t.innerHTML = `<tr><td colspan="5" class="text-center p-4 text-slate-400">No hay ventas registradas en las fechas seleccionadas.</td></tr>`;
-        document.getElementById('txt-total-periodo').innerText = "$0.00";
-        return;
-      }
-
-      data.forEach(v => {
-        totalPeriodo += parseFloat(v.total);
-        t.innerHTML += `
+      const { data } = await q;
+      const tb = document.getElementById('tabla-ventas-body');
+      if (!tb) return;
+      tb.innerHTML = '';
+      (data || []).forEach(v => {
+        tb.innerHTML += `
           <tr class="hover:bg-slate-50">
             <td class="p-3 font-mono font-bold text-indigo-700">${v.numero_comprobante}</td>
-            <td class="p-3 text-slate-500">${new Date(v.fecha).toLocaleString()}</td>
+            <td class="p-3 text-slate-500">${new Date(v.fecha).toLocaleDateString()}</td>
             <td class="p-3"><span class="px-2 py-0.5 rounded text-xs bg-slate-100 font-bold">${v.metodo_pago}</span></td>
             <td class="p-3 text-right font-bold text-slate-800">$${parseFloat(v.total).toFixed(2)}</td>
-            <td class="p-3 text-center">
-              <button onclick="reimprimirTicket(${v.id})" title="Reimprimir Ticket" class="p-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg inline-flex items-center gap-1 text-xs font-bold transition">
-                <i data-lucide="printer" class="w-4 h-4"></i> Reimprimir
-              </button>
+            <td class="p-3 text-center space-x-1">
+              <button onclick="reimprimirVentaDual(${v.id}, 'TICKET')" class="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-xs font-bold" title="Ticket"><i data-lucide="printer" class="w-3.5 h-3.5"></i></button>
+              <button onclick="reimprimirVentaDual(${v.id}, 'PDF')" class="p-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded text-xs font-bold" title="Descargar PDF"><i data-lucide="download" class="w-3.5 h-3.5"></i></button>
             </td>
           </tr>
         `;
       });
-
-      document.getElementById('txt-total-periodo').innerText = `$${totalPeriodo.toFixed(2)}`;
       lucide.createIcons();
-    }
-
-    function limpiarFiltroFechas() {
-      document.getElementById('filtro-fecha-inicio').value = '';
-      document.getElementById('filtro-fecha-fin').value = '';
-      cargarVentas();
-    }
-
-    function filtrarProductosPOS() {
-      const q = document.getElementById('buscar-pos').value.toLowerCase();
-      renderizarPOS(productos.filter(p => p.nombre.toLowerCase().includes(q) || (p.codigo_barras && p.codigo_barras.toLowerCase().includes(q))));
-    }
-
-    // ==================== RESTO DE FUNCIONES (ENVÍOS, INVENTARIO, ADMIN) ====================
-    function cambiarRutaEnvio() {
-      const ruta = document.getElementById('env-ruta').value;
-      const datalist = document.getElementById('lista-ciudades-destino');
-      const inputCiudad = document.getElementById('env-ciudad');
-      const lblCiudad = document.getElementById('lbl-ciudad-destino');
-      const tituloRem = document.getElementById('titulo-remitente');
-      const tituloDest = document.getElementById('titulo-destinatario');
-      const bloqueZip = document.getElementById('bloque-zip-code');
-
-      datalist.innerHTML = '';
-      inputCiudad.value = '';
-
-      if (ruta === 'USA_NICARAGUA') {
-        lblCiudad.innerText = "Departamento / Ciudad en Nicaragua";
-        tituloRem.innerHTML = '<i data-lucide="user" class="w-4 h-4"></i> Remitente en EE.UU.';
-        tituloDest.innerHTML = '<i data-lucide="map-pin" class="w-4 h-4"></i> Destinatario en Nicaragua';
-        if (bloqueZip) bloqueZip.classList.add('hidden');
-        CIUDADES_NICARAGUA.forEach(c => datalist.innerHTML += `<option value="${c}">`);
-      } else {
-        lblCiudad.innerText = "Ciudad Destino en EE.UU.";
-        tituloRem.innerHTML = '<i data-lucide="user" class="w-4 h-4"></i> Remitente';
-        tituloDest.innerHTML = '<i data-lucide="map-pin" class="w-4 h-4"></i> Destinatario en EE.UU.';
-        if (bloqueZip) bloqueZip.classList.remove('hidden');
-        CIUDADES_USA.forEach(c => datalist.innerHTML += `<option value="${c}">`);
-      }
-
-      actualizarTarifaSugerida();
-      lucide.createIcons();
-    }
-
-    function cambiarUnidadPeso() {
-      const unidad = document.getElementById('env-unidad-peso').value;
-      document.getElementById('lbl-tarifa').innerText = unidad === 'LBS' ? 'Precio x Libra ($)' : 'Precio x Kilo ($)';
-      calcularTotalEnvio();
-    }
-
-    function actualizarTarifaSugerida() {
-      const tipo = document.getElementById('env-tipo').value;
-      const ruta = document.getElementById('env-ruta').value;
-      const inputTarifa = document.getElementById('env-tarifa-unidad');
-
-      if (ruta === 'USA_NICARAGUA') {
-        inputTarifa.value = tipo === 'AEREO' ? "5.50" : "2.25";
-      } else {
-        inputTarifa.value = tipo === 'AEREO' ? "4.50" : "2.00";
-      }
-      calcularTotalEnvio();
-    }
-
-    function calcularTotalEnvio() {
-      const peso = parseFloat(document.getElementById('env-peso').value) || 0;
-      const tarifa = parseFloat(document.getElementById('env-tarifa-unidad').value) || 0;
-      const extra = parseFloat(document.getElementById('env-cargos-extra').value) || 0;
-      const total = (peso * tarifa) + extra;
-      document.getElementById('txt-total-envio').innerText = `$${total.toFixed(2)}`;
-      document.getElementById('env-valor-final').value = total.toFixed(2);
-    }
-
-    function toggleDireccionDestino() {
-      const tipo = document.getElementById('env-entrega').value;
-      document.getElementById('bloque-direccion-destino').classList.toggle('hidden', tipo === 'OFICINA');
-    }
-
-    function generarTracking() {
-      const ruta = document.getElementById('env-ruta').value;
-      const tipo = document.getElementById('env-tipo').value;
-      const prefijoTipo = tipo === 'AEREO' ? 'AIR' : 'SEA';
-      const sufijoPais = ruta === 'USA_NICARAGUA' ? 'NI' : 'US';
-      const num = Math.floor(10000000 + Math.random() * 90000000);
-      document.getElementById('env-tracking').value = `${prefijoTipo}-${num}${sufijoPais}`;
-    }
-
-    function previsualizarFoto(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(evt) {
-        fotoBase64 = evt.target.result;
-        document.getElementById('preview-img').src = fotoBase64;
-        document.getElementById('preview-contenedor').classList.remove('hidden');
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function quitarFoto() {
-      fotoBase64 = null;
-      document.getElementById('env-foto-input').value = '';
-      document.getElementById('preview-contenedor').classList.add('hidden');
-    }
-
-    async function registrarEnvio(e) {
-      e.preventDefault();
-      const btn = document.getElementById('btn-guardar-envio');
-      btn.innerText = "Guardando...";
-      btn.disabled = true;
-
-      let tracking = document.getElementById('env-tracking').value.trim();
-      if (!tracking) {
-        generarTracking();
-        tracking = document.getElementById('env-tracking').value;
-      }
-
-      const ruta = document.getElementById('env-ruta').value;
-      const tipo = document.getElementById('env-tipo').value;
-      const entrega = document.getElementById('env-entrega').value;
-      const ciudad = document.getElementById('env-ciudad').value;
-
-      const remNombre = document.getElementById('rem-nombre').value;
-      const remCedula = document.getElementById('rem-cedula').value;
-      const remTelefono = document.getElementById('rem-telefono').value;
-      const remDireccion = document.getElementById('rem-direccion').value;
-
-      const destNombre = document.getElementById('dest-nombre').value;
-      const destDoc = document.getElementById('dest-doc').value;
-      const destTelefono = document.getElementById('dest-telefono').value;
-      const destDireccion = entrega === 'DOMICILIO' ? document.getElementById('dest-direccion').value : 'Retiro en Sucursal/Oficina';
-      const destZip = (entrega === 'DOMICILIO' && ruta === 'USA') ? document.getElementById('dest-zip').value : null;
-
-      const contenido = document.getElementById('env-contenido').value;
-      const peso = parseFloat(document.getElementById('env-peso').value);
-      const unidad = document.getElementById('env-unidad-peso').value;
-      const valor = parseFloat(document.getElementById('env-valor-final').value);
-      const estadoPago = document.getElementById('env-estado-pago').value;
-
-      try {
-        const { error } = await db.from('envios_internacionales').insert([{
-          numero_guia: tracking,
-          ruta_envio: ruta,
-          tipo_transporte: tipo,
-          cliente_nombre: destNombre,
-          cliente_telefono: destTelefono,
-          destinatario_documento: destDoc,
-          ciudad_destino: ciudad,
-          tipo_entrega: entrega,
-          direccion_destino: destDireccion,
-          zip_code: destZip,
-          remitente_cedula: remCedula,
-          remitente_direccion: `${remNombre} (ID: ${remCedula}) - Tel: ${remTelefono} - Origen: ${remDireccion}`,
-          contenido_paquete: contenido,
-          peso: peso,
-          unidad_peso: unidad,
-          valor_envio: valor,
-          estado_pago: estadoPago,
-          foto_paquete_url: fotoBase64,
-          usuario_id: usuarioActual.id,
-          sucursal_id: usuarioActual.sucursal_id
-        }]);
-
-        if (error) throw error;
-
-        alert(`¡Envío Registrado!\nGuía: ${tracking}\nTotal: $${valor.toFixed(2)} (${estadoPago})`);
-        window.print();
-
-        e.target.reset();
-        quitarFoto();
-        actualizarTarifaSugerida();
-        toggleDireccionDestino();
-        cargarEnvios();
-      } catch (err) {
-        alert("Error al registrar envío: " + err.message);
-      } finally {
-        btn.innerText = "Guardar e Imprimir Guía";
-        btn.disabled = false;
-      }
-    }
-
-    async function cargarEnvios() {
-      const { data } = await db.from('envios_internacionales').select('*').order('id', { ascending: false });
-      enviosLista = data || [];
-      const t = document.getElementById('tabla-envios-body');
-      t.innerHTML = '';
-
-      if (enviosLista.length === 0) {
-        t.innerHTML = `<tr><td colspan="10" class="text-center p-4 text-slate-400">No hay envíos registrados.</td></tr>`;
-        return;
-      }
-
-      enviosLista.forEach(env => {
-        const esNica = env.ruta_envio === 'USA_NICARAGUA';
-        t.innerHTML += `
-          <tr class="hover:bg-slate-50 text-xs">
-            <td class="p-3 font-mono font-bold text-indigo-700">${env.numero_guia}</td>
-            <td class="p-3">
-              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${esNica ? 'bg-indigo-100 text-indigo-800' : 'bg-slate-100 text-slate-800'}">
-                ${esNica ? '🇺🇸 ➔ 🇳🇮' : '➔ 🇺🇸'}
-              </span>
-            </td>
-            <td class="p-3 font-bold text-slate-700">${env.remitente_direccion ? env.remitente_direccion.split('-')[0] : 'S/D'}</td>
-            <td class="p-3"><b>${env.cliente_nombre}</b> (${env.ciudad_destino})</td>
-            <td class="p-3 text-slate-500 truncate max-w-xs">${env.contenido_paquete || '-'}</td>
-            <td class="p-3 font-bold">${env.peso} ${env.unidad_peso}</td>
-            <td class="p-3 text-right font-bold text-slate-800">$${parseFloat(env.valor_envio).toFixed(2)}</td>
-            <td class="p-3 text-center">
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${env.estado_pago === 'PAGADO' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
-                ${env.estado_pago || 'PAGADO'}
-              </span>
-            </td>
-            <td class="p-3 text-center">
-              ${env.foto_paquete_url ? `<img src="${env.foto_paquete_url}" onclick="window.open(this.src)" class="w-8 h-8 object-cover rounded cursor-pointer mx-auto border">` : '<span class="text-slate-400 text-[10px]">Sin foto</span>'}
-            </td>
-            <td class="p-3 text-center"><span class="px-2 py-1 rounded text-[10px] bg-slate-100">${env.estado}</span></td>
-          </tr>
-        `;
-      });
-      lucide.createIcons();
-    }
-
-    async function cargarSucursales() {
-      const { data } = await db.from('sucursales').select('*');
-      sucursales = data || [];
-      const select = document.getElementById('user-sucursal');
-      if (select) select.innerHTML = '<option value="">Sin sede fija (Global)</option>';
-      const lista = document.getElementById('lista-sucursales');
-      if (lista) lista.innerHTML = '';
-
-      sucursales.forEach(s => {
-        if (select) select.innerHTML += `<option value="${s.id}">${s.nombre}</option>`;
-        if (lista) lista.innerHTML += `<li class="p-2 bg-slate-50 border rounded flex justify-between"><b>${s.nombre}</b> <span class="text-xs text-slate-400">${s.direccion || ''}</span></li>`;
-      });
-    }
-
-    async function cargarProductos() {
-      const { data } = await db.from('productos').select('*').order('id', { ascending: false });
-      productos = data || [];
-      renderizarPOS(productos);
-      if (usuarioActual && usuarioActual.rol === 'ADMIN') {
-        renderizarInventario(productos);
-      }
-    }
-
-    async function cargarUsuariosLista() {
-      const { data } = await db.from('usuarios_sistema').select('*');
-      usuariosLista = data || [];
-      const l = document.getElementById('lista-personal');
-      if (!l) return;
-      l.innerHTML = '';
-      usuariosLista.forEach(u => {
-        l.innerHTML += `
-          <div class="p-2 bg-slate-50 border rounded flex justify-between items-center text-xs">
-            <div>
-              <p class="font-bold text-slate-800">${u.nombre_completo} <span class="text-indigo-600 font-normal">(@${u.usuario})</span></p>
-              <p class="text-slate-400">Rol: <b>${u.rol}</b></p>
-            </div>
-            <div class="flex gap-1">
-              <button onclick="prepararEdicionUser(${u.id})" class="px-2 py-1 bg-amber-500 text-white rounded font-bold">Editar</button>
-              ${u.id !== usuarioActual.id ? `<button onclick="eliminarUsuario(${u.id}, '${u.usuario}')" class="px-2 py-1 bg-red-500 text-white rounded font-bold">Eliminar</button>` : ''}
-            </div>
-          </div>
-        `;
-      });
-    }
-
-    async function guardarUsuario(e) {
-      e.preventDefault();
-      const id = document.getElementById('edit-user-id').value;
-      const nombre = document.getElementById('user-nombre').value;
-      const alias = document.getElementById('user-alias').value;
-      const clave = document.getElementById('user-clave').value;
-      const rol = document.getElementById('user-rol').value;
-      const sucursal_id = document.getElementById('user-sucursal').value || null;
-
-      if (id) {
-        const payload = { nombre_completo: nombre, usuario: alias, rol: rol, sucursal_id: sucursal_id };
-        if (clave.trim() !== '') payload.clave = clave;
-        const { error } = await db.from('usuarios_sistema').update(payload).eq('id', id);
-        if (error) return alert(error.message);
-        alert("Usuario actualizado.");
-      } else {
-        if (!clave) return alert("Debes asignar una contraseña.");
-        const { error } = await db.from('usuarios_sistema').insert([{ nombre_completo: nombre, usuario: alias, clave: clave, rol: rol, sucursal_id: sucursal_id }]);
-        if (error) return alert(error.message);
-        alert("Usuario registrado.");
-      }
-      cancelarEdicionUser();
-      cargarUsuariosLista();
-    }
-
-    function prepararEdicionUser(id) {
-      const u = usuariosLista.find(x => x.id === id);
-      if (!u) return;
-      document.getElementById('edit-user-id').value = u.id;
-      document.getElementById('user-nombre').value = u.nombre_completo;
-      document.getElementById('user-alias').value = u.usuario;
-      document.getElementById('user-clave').value = '';
-      document.getElementById('user-rol').value = u.rol;
-      document.getElementById('user-sucursal').value = u.sucursal_id || '';
-      document.getElementById('txt-form-user').innerText = "Modificar Usuario";
-      document.getElementById('btn-save-user').innerText = "Actualizar";
-      document.getElementById('btn-cancel-user').classList.remove('hidden');
-    }
-
-    function cancelarEdicionUser() {
-      document.getElementById('edit-user-id').value = '';
-      document.getElementById('user-nombre').value = '';
-      document.getElementById('user-alias').value = '';
-      document.getElementById('user-clave').value = '';
-      document.getElementById('txt-form-user').innerText = "Personal";
-      document.getElementById('btn-save-user').innerText = "Guardar";
-      document.getElementById('btn-cancel-user').classList.add('hidden');
-    }
-
-    async function eliminarUsuario(id, alias) {
-      if (!confirm(`¿Eliminar al usuario @${alias}?`)) return;
-      const { error } = await db.from('usuarios_sistema').delete().eq('id', id);
-      if (error) alert(error.message);
-      else { alert("Usuario eliminado."); cargarUsuariosLista(); }
-    }
-
-    async function guardarProducto(e) {
-      e.preventDefault();
-      const id = document.getElementById('edit-prod-id').value;
-      const nombre = document.getElementById('inv-nombre').value;
-      const codigo = document.getElementById('inv-codigo').value || null;
-      const costo = parseFloat(document.getElementById('inv-costo').value);
-      const venta = parseFloat(document.getElementById('inv-venta').value);
-      const stock = parseInt(document.getElementById('inv-stock').value);
-
-      if (id) {
-        const { error } = await db.from('productos').update({ nombre, codigo_barras: codigo, precio_costo: costo, precio_venta: venta, stock_actual: stock }).eq('id', id);
-        if (error) return alert(error.message);
-        alert("Producto modificado.");
-      } else {
-        const { error } = await db.from('productos').insert([{ nombre, codigo_barras: codigo, precio_costo: costo, precio_venta: venta, stock_actual: stock }]);
-        if (error) return alert(error.message);
-        alert("Producto guardado.");
-      }
-      cancelarEdicionProd();
-      cargarProductos();
-    }
-
-    function prepararEdicionProd(id) {
-      const p = productos.find(x => x.id === id);
-      if (!p) return;
-      document.getElementById('edit-prod-id').value = p.id;
-      document.getElementById('inv-nombre').value = p.nombre;
-      document.getElementById('inv-codigo').value = p.codigo_barras || '';
-      document.getElementById('inv-costo').value = p.precio_costo;
-      document.getElementById('inv-venta').value = p.precio_venta;
-      document.getElementById('inv-stock').value = p.stock_actual;
-      document.getElementById('txt-form-prod').innerText = "Modificar Producto";
-      document.getElementById('btn-save-prod').innerText = "Actualizar";
-      document.getElementById('btn-cancel-prod').classList.remove('hidden');
-    }
-
-    function cancelarEdicionProd() {
-      document.getElementById('edit-prod-id').value = '';
-      document.getElementById('inv-nombre').value = '';
-      document.getElementById('inv-codigo').value = '';
-      document.getElementById('inv-costo').value = '';
-      document.getElementById('inv-venta').value = '';
-      document.getElementById('inv-stock').value = '1';
-      document.getElementById('txt-form-prod').innerText = "Registrar Nuevo Producto";
-      document.getElementById('btn-save-prod').innerText = "Guardar";
-      document.getElementById('btn-cancel-prod').classList.add('hidden');
-    }
-
-    async function eliminarProducto(id, nombre) {
-      if (!confirm(`¿Eliminar permanentemente "${nombre}"?`)) return;
-      const { error } = await db.from('productos').delete().eq('id', id);
-      if (error) alert(error.message);
-      else { alert("Producto eliminado."); cargarProductos(); }
-    }
-
-    function renderizarInventario(lista) {
-      const t = document.getElementById('tabla-stock');
-      t.innerHTML = '';
-      lista.forEach(p => {
-        t.innerHTML += `
-          <tr class="hover:bg-slate-50">
-            <td class="p-3 font-mono text-xs">${p.codigo_barras || '-'}</td>
-            <td class="p-3 font-semibold text-slate-700">${p.nombre}</td>
-            <td class="p-3 text-right font-mono text-slate-500">$${parseFloat(p.precio_costo).toFixed(2)}</td>
-            <td class="p-3 text-right font-mono font-bold text-slate-800">$${parseFloat(p.precio_venta).toFixed(2)}</td>
-            <td class="p-3 text-center font-bold ${p.stock_actual <= 0 ? 'text-red-600' : 'text-slate-800'}">${p.stock_actual}</td>
-            <td class="p-3 text-center">
-              <button onclick="prepararEdicionProd(${p.id})" class="px-2 py-1 bg-amber-500 text-white rounded text-xs font-bold mr-1">Editar</button>
-              <button onclick="eliminarProducto(${p.id}, '${p.nombre}')" class="px-2 py-1 bg-red-500 text-white rounded text-xs font-bold">Borrar</button>
-            </td>
-          </tr>
-        `;
-      });
-    }
-
-    async function crearSucursal(e) {
-      e.preventDefault();
-      const nombre = document.getElementById('suc-nombre').value;
-      const direccion = document.getElementById('suc-dir').value;
-      await db.from('sucursales').insert([{ nombre, direccion }]);
-      alert("Sucursal creada.");
-      document.getElementById('suc-nombre').value = '';
-      document.getElementById('suc-dir').value = '';
-      cargarSucursales();
     }
 
     function cambiarVista(v) {
-      ['pos', 'envios', 'inventario', 'ventas', 'admin'].forEach(x => {
+      ['pos', 'cotizacion', 'plan', 'envios', 'inventario', 'ventas', 'admin'].forEach(x => {
         const el = document.getElementById('vista-' + x);
         const tb = document.getElementById('tab-' + x);
         if (el) el.classList.toggle('hidden', x !== v);
@@ -1312,21 +931,13 @@
           tb.classList.toggle('hover:bg-indigo-600', x !== v);
         }
       });
-
       localStorage.setItem('sesion_pos_vista', v);
-
-      if (v === 'envios') {
-        setTimeout(() => {
-          const input = document.getElementById('env-tracking');
-          if (input) input.focus();
-        }, 300);
-      }
-
-      if (v === 'ventas') {
-        cargarVentas();
-      }
-
       lucide.createIcons();
+    }
+
+    function filtrarProductosPOS() {
+      const q = document.getElementById('buscar-pos').value.toLowerCase();
+      renderizarPOS(productos.filter(p => p.nombre.toLowerCase().includes(q) || (p.codigo_barras && p.codigo_barras.toLowerCase().includes(q))));
     }
   </script>
 </body>
