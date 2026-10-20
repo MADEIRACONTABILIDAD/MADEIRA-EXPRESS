@@ -90,20 +90,18 @@
 
     <main class="flex-1 p-6 max-w-7xl mx-auto w-full">
 
-      <!-- ==================== SECCIÓN 1: VENTAS (TPV / POS ANTERIOR) ==================== -->
+      <!-- ==================== SECCIÓN 1: VENTAS (TPV / POS) ==================== -->
       <div id="vista-pos" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Catálogo de Productos con Buscador -->
         <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
           <div class="flex justify-between items-center mb-4">
             <h2 class="font-bold text-slate-800 flex items-center gap-2">
               <i data-lucide="grid" class="w-5 h-5 text-indigo-600"></i> Catálogo de Productos
             </h2>
-            <input type="text" id="buscar-pos" oninput="filtrarProductosPOS()" placeholder="Buscar producto o código..." class="text-sm p-2 border rounded-lg w-64 focus:ring-2 focus:ring-indigo-500 outline-none">
+            <input type="text" id="buscar-pos" oninput="filtrarProductosPOS()" placeholder="Buscar por nombre, código o atributo..." class="text-sm p-2 border rounded-lg w-64 focus:ring-2 focus:ring-indigo-500 outline-none">
           </div>
           <div id="grid-pos" class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[550px] overflow-y-auto"></div>
         </div>
 
-        <!-- Panel de Ticket de Venta -->
         <div class="bg-white rounded-xl border border-slate-200 p-5 flex flex-col justify-between shadow-sm">
           <div>
             <div class="flex justify-between items-center pb-2 border-b mb-3">
@@ -116,7 +114,6 @@
               <button onclick="limpiarCarrito()" class="text-xs text-red-500 hover:underline">Vaciar</button>
             </div>
             
-            <!-- Datos del Cliente -->
             <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 mb-3 space-y-2">
               <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Datos del Cliente</span>
               <div class="grid grid-cols-2 gap-2">
@@ -130,7 +127,6 @@
               <input type="email" id="pos-mail-cliente" placeholder="Correo electrónico" class="w-full text-xs p-1.5 border rounded bg-white">
             </div>
 
-            <!-- Moneda de Cobro -->
             <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200 mb-3 space-y-2">
               <div class="flex items-center justify-between">
                 <span class="text-xs font-bold text-slate-700">Moneda de Cobro:</span>
@@ -172,12 +168,12 @@
         </div>
       </div>
 
-      <!-- ==================== SECCIÓN 2: COTIZACIÓN (NO TOCA STOCK) ==================== -->
+      <!-- ==================== SECCIÓN 2: COTIZACIÓN ==================== -->
       <div id="vista-cotizacion" class="hidden space-y-6">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
             <h2 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
-              <i data-lucide="file-spreadsheet" class="w-5 h-5 text-indigo-600"></i> Catálogo para Cotizar (Sin tocar inventario)
+              <i data-lucide="file-spreadsheet" class="w-5 h-5 text-indigo-600"></i> Catálogo para Cotizar
             </h2>
             <div id="grid-cotizar" class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[500px] overflow-y-auto"></div>
           </div>
@@ -288,10 +284,9 @@
               <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
                 <i data-lucide="plane-takeoff" class="w-6 h-6 text-indigo-600"></i> Guía de Envío Internacional
               </h2>
-              <p class="text-xs text-slate-400">Rutas hacia EE.UU. o desde EE.UU. hacia Nicaragua</p>
             </div>
             <div class="flex items-center gap-2">
-              <label class="text-xs font-bold text-slate-600">Ruta de Envío:</label>
+              <label class="text-xs font-bold text-slate-600">Ruta:</label>
               <select id="env-ruta" onchange="cambiarRutaEnvio()" class="text-xs font-bold py-2 px-3 border-2 border-indigo-500 rounded-lg bg-indigo-50 text-indigo-800">
                 <option value="USA">✈️ Hacia Estados Unidos (USA)</option>
                 <option value="USA_NICARAGUA">🇳🇮 Estados Unidos ➔ Nicaragua</option>
@@ -310,54 +305,50 @@
           <form onsubmit="registrarEnvio(event)" class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
               <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Modalidad de Transporte</label>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Transporte</label>
                 <select id="env-tipo" onchange="actualizarTarifaSugerida()" class="w-full text-sm p-2 border rounded-lg bg-white font-bold text-indigo-800">
                   <option value="AEREO">✈️ Aéreo (Express)</option>
-                  <option value="MARITIMO">🚢 Marítimo (Cajas / Carga)</option>
+                  <option value="MARITIMO">🚢 Marítimo (Cajas)</option>
                 </select>
               </div>
               <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Forma de Entrega en Destino</label>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Entrega</label>
                 <select id="env-entrega" onchange="toggleDireccionDestino()" class="w-full text-sm p-2 border rounded-lg bg-white font-semibold">
-                  <option value="OFICINA">🏢 Retiro en Sucursal / Oficina</option>
-                  <option value="DOMICILIO">🏠 Entrega a Domicilio (Delivery)</option>
+                  <option value="OFICINA">🏢 Retiro en Sucursal</option>
+                  <option value="DOMICILIO">🏠 Entrega a Domicilio</option>
                 </select>
               </div>
               <div>
-                <label id="lbl-ciudad-destino" class="block text-xs font-bold text-slate-700 mb-1">Ciudad Destino en EE.UU.</label>
-                <input list="lista-ciudades-destino" id="env-ciudad" required placeholder="Escribe o selecciona ciudad..." class="w-full text-sm p-2 border rounded-lg bg-white">
+                <label id="lbl-ciudad-destino" class="block text-xs font-bold text-slate-700 mb-1">Ciudad Destino</label>
+                <input list="lista-ciudades-destino" id="env-ciudad" required placeholder="Ciudad..." class="w-full text-sm p-2 border rounded-lg bg-white">
                 <datalist id="lista-ciudades-destino"></datalist>
               </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div class="p-4 border rounded-xl bg-white space-y-3">
-                <h3 id="titulo-remitente" class="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1.5 pb-2 border-b">
-                  <i data-lucide="user" class="w-4 h-4"></i> Datos de Quien Envía (Remitente)
-                </h3>
+                <h3 id="titulo-remitente" class="text-xs font-bold text-indigo-600 uppercase pb-2 border-b">Datos del Remitente</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <input type="text" id="rem-nombre" required placeholder="Nombres y Apellidos" class="w-full text-xs p-2 border rounded-lg">
-                  <input type="text" id="rem-cedula" required placeholder="Cédula / Identificación" class="w-full text-xs p-2 border rounded-lg font-mono">
+                  <input type="text" id="rem-nombre" required placeholder="Nombres" class="w-full text-xs p-2 border rounded-lg">
+                  <input type="text" id="rem-cedula" required placeholder="Cédula / ID" class="w-full text-xs p-2 border rounded-lg font-mono">
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <input type="text" id="rem-telefono" required placeholder="Teléfono" class="text-xs p-2 border rounded-lg">
-                  <input type="text" id="rem-direccion" required placeholder="Dirección de Origen" class="text-xs p-2 border rounded-lg">
+                  <input type="text" id="rem-direccion" required placeholder="Dirección Origen" class="text-xs p-2 border rounded-lg">
                 </div>
               </div>
 
               <div class="p-4 border rounded-xl bg-white space-y-3">
-                <h3 id="titulo-destinatario" class="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1.5 pb-2 border-b">
-                  <i data-lucide="map-pin" class="w-4 h-4"></i> Datos de Quien Recibe (Destinatario)
-                </h3>
+                <h3 id="titulo-destinatario" class="text-xs font-bold text-indigo-600 uppercase pb-2 border-b">Datos del Destinatario</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  <input type="text" id="dest-nombre" required placeholder="Nombre completo" class="w-full text-xs p-2 border rounded-lg">
-                  <input type="text" id="dest-doc" required placeholder="Nº Documento / ID" class="w-full text-xs p-2 border rounded-lg font-mono">
-                  <input type="text" id="dest-telefono" required placeholder="Teléfono" class="text-xs p-2 border rounded-lg">
+                  <input type="text" id="dest-nombre" required placeholder="Nombre receptor" class="w-full text-xs p-2 border rounded-lg">
+                  <input type="text" id="dest-doc" required placeholder="Nº Documento" class="w-full text-xs p-2 border rounded-lg font-mono">
+                  <input type="text" id="dest-telefono" required placeholder="Teléfono" class="w-full text-xs p-2 border rounded-lg">
                 </div>
                 <div id="bloque-direccion-destino" class="hidden space-y-2 bg-indigo-50/40 p-2.5 rounded-lg border border-indigo-100">
-                  <input type="text" id="dest-direccion" placeholder="Dirección exacta en destino..." class="w-full text-xs p-2 border rounded-lg bg-white">
+                  <input type="text" id="dest-direccion" placeholder="Dirección exacta..." class="w-full text-xs p-2 border rounded-lg bg-white">
                   <div id="bloque-zip-code">
-                    <input type="text" id="dest-zip" placeholder="ZIP Code (EE.UU.)" class="w-full text-xs p-2 border rounded-lg bg-white font-mono">
+                    <input type="text" id="dest-zip" placeholder="ZIP Code" class="w-full text-xs p-2 border rounded-lg bg-white font-mono">
                   </div>
                 </div>
               </div>
@@ -365,8 +356,8 @@
 
             <div class="p-4 border rounded-xl bg-white grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
               <div class="md:col-span-2">
-                <label class="block text-xs font-bold text-slate-700 mb-1">Contenido del Paquete</label>
-                <textarea id="env-contenido" rows="2" required placeholder="Detalla los artículos contenidos..." class="w-full text-xs p-2.5 border rounded-lg"></textarea>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Contenido Aduanero</label>
+                <textarea id="env-contenido" rows="2" required placeholder="Artículos contenidos..." class="w-full text-xs p-2.5 border rounded-lg"></textarea>
               </div>
               <div>
                 <label class="block text-xs font-bold text-slate-700 mb-1">Foto del Paquete</label>
@@ -394,11 +385,11 @@
                 <input type="number" step="0.01" id="env-tarifa-unidad" value="4.50" oninput="calcularTotalEnvio()" class="w-full text-base font-bold p-2 border rounded-lg bg-white">
               </div>
               <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Seguro / Extras ($)</label>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Extras ($)</label>
                 <input type="number" step="0.01" id="env-cargos-extra" value="0.00" oninput="calcularTotalEnvio()" class="w-full text-base font-bold p-2 border rounded-lg bg-white">
               </div>
               <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">Condición de Pago</label>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Condición Pago</label>
                 <select id="env-estado-pago" class="w-full text-xs font-bold p-2.5 border rounded-lg bg-white">
                   <option value="PAGADO">✅ PAGADO</option>
                   <option value="POR COBRAR">⏳ POR COBRAR</option>
@@ -413,7 +404,7 @@
 
             <div class="pt-2 flex justify-end">
               <button type="submit" id="btn-guardar-envio" class="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm flex items-center gap-2">
-                <i data-lucide="printer" class="w-5 h-5"></i> Guardar e Imprimir Guía Internacional
+                <i data-lucide="printer" class="w-5 h-5"></i> Guardar e Imprimir Guía
               </button>
             </div>
           </form>
@@ -421,9 +412,7 @@
 
         <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
           <div class="p-4 border-b flex justify-between items-center">
-            <h3 class="font-bold text-slate-800 flex items-center gap-2">
-              <i data-lucide="archive" class="w-4 h-4 text-indigo-600"></i> Registro General de Envíos
-            </h3>
+            <h3 class="font-bold text-slate-800 flex items-center gap-2"><i data-lucide="archive" class="w-4 h-4 text-indigo-600"></i> Registro de Envíos</h3>
             <button onclick="cargarEnvios()" class="text-xs text-indigo-600 font-bold flex items-center gap-1 hover:underline">
               <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Actualizar
             </button>
@@ -450,32 +439,85 @@
         </div>
       </div>
 
-      <!-- ==================== SECCIÓN 5: INVENTARIO ==================== -->
+      <!-- ==================== SECCIÓN 5: INVENTARIO CON PLANTILLAS Y ATRIBUTOS ==================== -->
       <div id="vista-inventario" class="hidden space-y-6">
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <h2 id="titulo-form-prod" class="font-bold mb-4 flex items-center gap-2">
-            <i data-lucide="plus-circle" class="w-5 h-5 text-indigo-600"></i> <span id="txt-form-prod">Registrar Nuevo Producto</span>
-          </h2>
-          <form onsubmit="guardarProducto(event)" class="grid grid-cols-1 sm:grid-cols-6 gap-3">
+        
+        <!-- BARRA SUPERIOR DE INVENTARIO: SELECCIÓN Y GESTIÓN DE PLANTILLAS -->
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b">
+            <div>
+              <h2 id="titulo-form-prod" class="font-bold flex items-center gap-2 text-base text-slate-800">
+                <i data-lucide="plus-circle" class="w-5 h-5 text-indigo-600"></i> <span id="txt-form-prod">Registrar Nuevo Producto</span>
+              </h2>
+              <p class="text-xs text-slate-400">Selecciona o crea una plantilla para personalizar los campos (IMEI, Color, Peso, Capacidad, etc.)</p>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <label class="text-xs font-bold text-slate-600">Plantilla:</label>
+              <select id="select-plantilla-activa" onchange="cambiarPlantillaFormulario()" class="text-xs font-bold p-2 border-2 border-indigo-400 rounded-lg bg-indigo-50/50 text-indigo-800 outline-none"></select>
+              <button onclick="abrirModalNuevaPlantilla()" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold flex items-center gap-1 shadow-sm">
+                <i data-lucide="layout-template" class="w-3.5 h-3.5"></i> + Nueva Plantilla
+              </button>
+            </div>
+          </div>
+
+          <!-- FORMULARIO DE PRODUCTO -->
+          <form onsubmit="guardarProducto(event)" class="space-y-4">
             <input type="hidden" id="edit-prod-id">
-            <input type="text" id="inv-nombre" required placeholder="Nombre del producto" class="text-sm p-2 border rounded sm:col-span-2">
-            <input type="text" id="inv-codigo" placeholder="Código / IMEI" class="text-sm p-2 border rounded">
-            <input type="number" step="0.01" id="inv-costo" required placeholder="P. Costo ($)" class="text-sm p-2 border rounded">
-            <input type="number" step="0.01" id="inv-venta" required placeholder="P. Venta ($)" class="text-sm p-2 border rounded">
-            <div class="flex gap-2">
-              <input type="number" id="inv-stock" required placeholder="Stock" value="1" class="w-full text-sm p-2 border rounded">
-              <button type="submit" id="btn-save-prod" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 rounded font-bold text-sm">Guardar</button>
-              <button type="button" id="btn-cancel-prod" onclick="cancelarEdicionProd()" class="hidden bg-slate-400 text-white px-2 rounded text-xs">X</button>
+            
+            <!-- DATOS BÁSICOS -->
+            <div class="grid grid-cols-1 sm:grid-cols-6 gap-3">
+              <div class="sm:col-span-2">
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Nombre del Producto</label>
+                <input type="text" id="inv-nombre" required placeholder="Ej: iPhone 13 Pro Max" class="w-full text-xs p-2 border rounded-lg">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Código / Barras</label>
+                <input type="text" id="inv-codigo" placeholder="Código o escaneo" class="w-full text-xs p-2 border rounded-lg font-mono">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">P. Costo ($)</label>
+                <input type="number" step="0.01" id="inv-costo" required placeholder="0.00" class="w-full text-xs p-2 border rounded-lg">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">P. Venta ($)</label>
+                <input type="number" step="0.01" id="inv-venta" required placeholder="0.00" class="w-full text-xs p-2 border rounded-lg font-bold text-indigo-700">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Stock Actual</label>
+                <input type="number" id="inv-stock" required value="1" class="w-full text-xs p-2 border rounded-lg font-bold">
+              </div>
+            </div>
+
+            <!-- CONTENEDOR DINÁMICO DE ATRIBUTOS SEGÚN LA PLANTILLA -->
+            <div id="contenedor-campos-plantilla" class="bg-indigo-50/40 p-3.5 rounded-xl border border-indigo-100">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-800 block mb-2" id="txt-nombre-plantilla-activa">
+                Atributos de la Plantilla
+              </span>
+              <div id="grid-campos-dinamicos" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5"></div>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-1">
+              <button type="button" id="btn-cancel-prod" onclick="cancelarEdicionProd()" class="hidden px-4 py-2 bg-slate-300 hover:bg-slate-400 text-slate-700 rounded-lg text-xs font-bold">Cancelar Edición</button>
+              <button type="submit" id="btn-save-prod" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-xs flex items-center gap-1.5 shadow-sm">
+                <i data-lucide="save" class="w-4 h-4"></i> Guardar Producto
+              </button>
             </div>
           </form>
         </div>
 
+        <!-- TABLA DE PRODUCTOS CON VISUALIZACIÓN DE ATRIBUTOS -->
         <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+          <div class="p-4 border-b flex justify-between items-center">
+            <h3 class="font-bold text-slate-800 flex items-center gap-2"><i data-lucide="package" class="w-4 h-4 text-indigo-600"></i> Existencias en Bodega</h3>
+            <span class="text-xs text-slate-400 font-semibold" id="txt-total-productos-count">Total productos: 0</span>
+          </div>
           <table class="w-full text-sm text-left">
             <thead class="bg-slate-50 text-slate-500 uppercase text-xs border-b">
               <tr>
                 <th class="p-3">Código</th>
-                <th class="p-3">Producto</th>
+                <th class="p-3">Producto & Atributos</th>
+                <th class="p-3">Plantilla</th>
                 <th class="p-3 text-right">P. Costo</th>
                 <th class="p-3 text-right">P. Venta</th>
                 <th class="p-3 text-center">Stock</th>
@@ -578,6 +620,36 @@
     </main>
   </div>
 
+  <!-- MODAL: CREAR NUEVA PLANTILLA DE INVENTARIO -->
+  <div id="modal-nueva-plantilla" class="hidden fixed inset-0 bg-slate-900 bg-opacity-60 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+          <i data-lucide="layout-template" class="w-5 h-5 text-indigo-600"></i> Diseñador de Plantilla
+        </h3>
+        <button onclick="cerrarModalNuevaPlantilla()" class="text-slate-400 hover:text-slate-700 text-xl font-bold">&times;</button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Nombre de la Plantilla</label>
+          <input type="text" id="tpl-nuevo-nombre" placeholder="Ej: Electrónica / Joyas / Muebles" class="w-full text-xs p-2.5 border rounded-lg">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Campos de la Plantilla (Separados por coma)</label>
+          <textarea id="tpl-nuevos-campos" rows="3" placeholder="Ej: IMEI, Color, Capacidad, Tamaño, Peso, Dimensiones" class="w-full text-xs p-2.5 border rounded-lg"></textarea>
+          <p class="text-[10px] text-slate-400 mt-1">Escribe cada atributo que desees solicitar al registrar productos con esta plantilla.</p>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2 border-t">
+        <button onclick="cerrarModalNuevaPlantilla()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 font-bold text-xs rounded-lg text-slate-700">Cancelar</button>
+        <button onclick="guardarNuevaPlantilla()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 font-bold text-xs rounded-lg text-white">Guardar Plantilla</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: KARDEX DE ABONOS -->
   <div id="modal-historial-abonos" class="hidden fixed inset-0 bg-slate-900 bg-opacity-60 flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4">
@@ -613,9 +685,7 @@
       </div>
 
       <div class="flex justify-end pt-2 border-t">
-        <button onclick="cerrarModalHistorial()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 font-bold text-xs rounded-lg text-slate-700">
-          Cerrar
-        </button>
+        <button onclick="cerrarModalHistorial()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 font-bold text-xs rounded-lg text-slate-700">Cerrar</button>
       </div>
     </div>
   </div>
@@ -691,6 +761,7 @@
 
     let productos = [];
     let sucursales = [];
+    let plantillas = [];
     let carrito = [];
     let carritoCotizacion = [];
     let planesLista = [];
@@ -714,6 +785,7 @@
       cambiarRutaEnvio();
       await cargarUsuariosLista();
       await cargarSucursales();
+      await cargarPlantillas();
       await cargarProductos();
       await cargarVentas();
       await cargarPlanesAcumulativos();
@@ -723,195 +795,230 @@
       lucide.createIcons();
     });
 
-    // ==================== GESTIÓN DE TURNOS ====================
-    function mostrarModalLogin() {
-      document.getElementById('input-clave-login').value = '';
-      document.getElementById('pantalla-login').classList.remove('hidden');
-    }
-
-    async function confirmarAccesoCajero() {
-      const select = document.getElementById('select-usuario-login');
-      const userId = parseInt(select.value);
-      const clave = document.getElementById('input-clave-login').value.trim();
-
-      const user = usuariosLista.find(u => u.id === userId);
-      if (!user) return alert("Usuario no encontrado.");
-
-      if (user.rol === 'ADMIN') {
-        if (clave !== 'admin123' && clave !== user.clave) {
-          return alert("Contraseña de Administrador incorrecta.");
-        }
+    // ==================== GESTIÓN DE PLANTILLAS DINÁMICAS ====================
+    async function cargarPlantillas() {
+      const { data, error } = await db.from('plantillas_inventario').select('*').order('id', { ascending: true });
+      if (!error && data && data.length > 0) {
+        plantillas = data;
       } else {
-        if (user.clave && user.clave !== clave) {
-          return alert("Contraseña incorrecta para " + user.nombre_completo);
-        }
+        // Fallback local por defecto si la tabla está vacía
+        plantillas = [
+          { id: 1, nombre: 'Celulares / Móviles', campos: ['IMEI', 'Color', 'Capacidad (GB)', 'RAM (GB)'] },
+          { id: 2, nombre: 'Ropa / Calzado', campos: ['Talla / Tamaño', 'Color', 'Material'] },
+          { id: 3, nombre: 'Paquetería / Carga', campos: ['Peso (lbs/kg)', 'Dimensiones', 'Tipo'] },
+          { id: 4, nombre: 'General / Accesorios', campos: ['Modelo', 'Color'] }
+        ];
       }
 
-      usuarioActual = user;
-      document.getElementById('pantalla-login').classList.add('hidden');
-      aplicarPermisosRol();
-      alert(`Turno activo: ${usuarioActual.nombre_completo} [${usuarioActual.rol}]`);
-    }
-
-    function aplicarPermisosRol() {
-      document.getElementById('badge-sucursal').innerText = `${usuarioActual.nombre_completo} [${usuarioActual.rol}]`;
-      const tabInv = document.getElementById('tab-inv');
-      const tabAdmin = document.getElementById('tab-admin');
-
-      if (usuarioActual.rol === 'ADMIN') {
-        tabInv.classList.remove('hidden');
-        tabAdmin.classList.remove('hidden');
-      } else {
-        tabInv.classList.add('hidden');
-        tabAdmin.classList.add('hidden');
-        cambiarVista('pos');
-      }
-    }
-
-    async function cargarUsuariosLista() {
-      const { data } = await db.from('usuarios_sistema').select('*');
-      usuariosLista = data || [];
-      if (!usuariosLista.some(u => u.usuario === 'admin')) {
-        usuariosLista.unshift(usuarioActual);
-      }
-
-      const selectLogin = document.getElementById('select-usuario-login');
-      if (selectLogin) {
-        selectLogin.innerHTML = '';
-        usuariosLista.forEach(u => {
-          selectLogin.innerHTML += `<option value="${u.id}">${u.nombre_completo} (${u.rol})</option>`;
+      const select = document.getElementById('select-plantilla-activa');
+      if (select) {
+        select.innerHTML = '';
+        plantillas.forEach(tpl => {
+          select.innerHTML += `<option value="${tpl.nombre}">${tpl.nombre}</option>`;
         });
       }
+      cambiarPlantillaFormulario();
+    }
 
-      const l = document.getElementById('lista-personal');
-      if (!l) return;
-      l.innerHTML = '';
-      usuariosLista.forEach(u => {
-        l.innerHTML += `
-          <div class="p-2 bg-slate-50 border rounded flex justify-between items-center text-xs">
-            <div>
-              <p class="font-bold text-slate-800">${u.nombre_completo} <span class="text-indigo-600 font-normal">(@${u.usuario})</span></p>
-              <p class="text-slate-400">Rol: <b>${u.rol}</b></p>
-            </div>
-            <div class="flex gap-1">
-              <button onclick="prepararEdicionUser(${u.id})" class="px-2 py-1 bg-amber-500 text-white rounded font-bold">Editar</button>
-              ${u.usuario !== 'admin' ? `<button onclick="eliminarUsuario(${u.id}, '${u.usuario}')" class="px-2 py-1 bg-red-500 text-white rounded font-bold">Eliminar</button>` : ''}
-            </div>
+    function cambiarPlantillaFormulario() {
+      const selNombre = document.getElementById('select-plantilla-activa').value;
+      const tpl = plantillas.find(t => t.nombre === selNombre);
+      const contenedor = document.getElementById('grid-campos-dinamicos');
+      const titulo = document.getElementById('txt-nombre-plantilla-activa');
+      
+      contenedor.innerHTML = '';
+      if (!tpl) return;
+
+      titulo.innerText = `Atributos específicos: Plantilla "${tpl.nombre}"`;
+
+      const campos = Array.isArray(tpl.campos) ? tpl.campos : [];
+      campos.forEach(campo => {
+        const idCampo = 'attr-' + campo.toLowerCase().replace(/[^a-z0-9]/g, '_');
+        contenedor.innerHTML += `
+          <div>
+            <label class="block text-[10px] font-bold text-slate-700 uppercase mb-0.5">${campo}</label>
+            <input type="text" data-campo-nombre="${campo}" id="${idCampo}" placeholder="Ingresa ${campo}..." class="input-atributo-dinamico w-full text-xs p-1.5 border border-indigo-200 rounded-lg bg-white outline-none focus:border-indigo-500">
           </div>
         `;
       });
     }
 
-    async function guardarUsuario(e) {
+    function abrirModalNuevaPlantilla() {
+      document.getElementById('tpl-nuevo-nombre').value = '';
+      document.getElementById('tpl-nuevos-campos').value = '';
+      document.getElementById('modal-nueva-plantilla').classList.remove('hidden');
+    }
+
+    function cerrarModalNuevaPlantilla() {
+      document.getElementById('modal-nueva-plantilla').classList.add('hidden');
+    }
+
+    async function guardarNuevaPlantilla() {
+      const nombre = document.getElementById('tpl-nuevo-nombre').value.trim();
+      const camposTexto = document.getElementById('tpl-nuevos-campos').value.trim();
+
+      if (!nombre || !camposTexto) {
+        return alert("Por favor escribe el nombre de la plantilla y al menos un campo.");
+      }
+
+      // Convertir lista separada por comas en Array limpio
+      const camposArray = camposTexto.split(',').map(c => c.trim()).filter(c => c.length > 0);
+
+      const { data, error } = await db.from('plantillas_inventario').insert([{
+        nombre: nombre,
+        campos: camposArray
+      }]).select();
+
+      if (error) {
+        alert("Error al guardar la plantilla: " + error.message);
+      } else {
+        alert(`¡Plantilla "${nombre}" creada con éxito!`);
+        cerrarModalNuevaPlantilla();
+        await cargarPlantillas();
+        document.getElementById('select-plantilla-activa').value = nombre;
+        cambiarPlantillaFormulario();
+      }
+    }
+
+    // ==================== INVENTARIO (CON ATRIBUTOS DINÁMICOS) ====================
+    async function guardarProducto(e) {
       e.preventDefault();
-      const id = document.getElementById('edit-user-id').value;
-      const nombre = document.getElementById('user-nombre').value;
-      const alias = document.getElementById('user-alias').value;
-      const clave = document.getElementById('user-clave').value;
-      const rol = document.getElementById('user-rol').value;
-      const sucursal_id = document.getElementById('user-sucursal').value || null;
+      const id = document.getElementById('edit-prod-id').value;
+      const nombre = document.getElementById('inv-nombre').value.trim();
+      const codigo = document.getElementById('inv-codigo').value.trim() || null;
+      const costo = parseFloat(document.getElementById('inv-costo').value);
+      const venta = parseFloat(document.getElementById('inv-venta').value);
+      const stock = parseInt(document.getElementById('inv-stock').value);
+      const plantillaNombre = document.getElementById('select-plantilla-activa').value;
+
+      // Recolectar atributos dinámicos
+      const atributos = {};
+      const inputs = document.querySelectorAll('.input-atributo-dinamico');
+      inputs.forEach(inp => {
+        const campo = inp.getAttribute('data-campo-nombre');
+        const valor = inp.value.trim();
+        if (valor) atributos[campo] = valor;
+      });
+
+      const payload = {
+        nombre: nombre,
+        codigo_barras: codigo,
+        precio_costo: costo,
+        precio_venta: venta,
+        stock_actual: stock,
+        plantilla_nombre: plantillaNombre,
+        atributos: atributos
+      };
 
       if (id) {
-        const payload = { nombre_completo: nombre, usuario: alias, rol: rol, sucursal_id: sucursal_id };
-        if (clave.trim() !== '') payload.clave = clave;
-        await db.from('usuarios_sistema').update(payload).eq('id', id);
-        alert("Usuario actualizado.");
+        const { error } = await db.from('productos').update(payload).eq('id', id);
+        if (error) return alert("Error al modificar producto: " + error.message);
+        alert("Producto modificado correctamente.");
       } else {
-        if (!clave) return alert("Asigne una contraseña.");
-        await db.from('usuarios_sistema').insert([{ nombre_completo: nombre, usuario: alias, clave: clave, rol: rol, sucursal_id: sucursal_id }]);
-        alert("Trabajador registrado.");
+        const { error } = await db.from('productos').insert([payload]);
+        if (error) return alert("Error al registrar producto: " + error.message);
+        alert("Producto guardado correctamente en el inventario.");
       }
-      cancelarEdicionUser();
-      await cargarUsuariosLista();
+      cancelarEdicionProd();
+      await cargarProductos();
     }
 
-    function prepararEdicionUser(id) {
-      const u = usuariosLista.find(x => x.id === id);
-      if (!u) return;
-      document.getElementById('edit-user-id').value = u.id;
-      document.getElementById('user-nombre').value = u.nombre_completo;
-      document.getElementById('user-alias').value = u.usuario;
-      document.getElementById('user-clave').value = '';
-      document.getElementById('user-rol').value = u.rol;
-      document.getElementById('user-sucursal').value = u.sucursal_id || '';
-      document.getElementById('txt-form-user').innerText = "Modificar Trabajador";
-      document.getElementById('btn-save-user').innerText = "Actualizar";
-      document.getElementById('btn-cancel-user').classList.remove('hidden');
-    }
+    function renderizarInventario(lista) {
+      const t = document.getElementById('tabla-stock');
+      const count = document.getElementById('txt-total-productos-count');
+      if (!t) return;
+      t.innerHTML = '';
+      if (count) count.innerText = `Total productos: ${lista.length}`;
 
-    function cancelarEdicionUser() {
-      document.getElementById('edit-user-id').value = '';
-      document.getElementById('user-nombre').value = '';
-      document.getElementById('user-alias').value = '';
-      document.getElementById('user-clave').value = '';
-      document.getElementById('txt-form-user').innerText = "Crear Nuevo Trabajador";
-      document.getElementById('btn-save-user').innerText = "Guardar Empleado";
-      document.getElementById('btn-cancel-user').classList.add('hidden');
-    }
-
-    async function eliminarUsuario(id, alias) {
-      if (!confirm(`¿Eliminar al empleado @${alias}?`)) return;
-      await db.from('usuarios_sistema').delete().eq('id', id);
-      cargarUsuariosLista();
-    }
-
-    async function cargarSucursales() {
-      const { data } = await db.from('sucursales').select('*');
-      sucursales = data || [];
-      const selectUser = document.getElementById('user-sucursal');
-      const lista = document.getElementById('lista-sucursales');
-      if (selectUser) selectUser.innerHTML = '<option value="">Sin sede fija (Global)</option>';
-      if (lista) lista.innerHTML = '';
-
-      sucursales.forEach(s => {
-        if (selectUser) selectUser.innerHTML += `<option value="${s.id}">${s.nombre}</option>`;
-        if (lista) lista.innerHTML += `<li class="p-2 bg-slate-50 border rounded flex justify-between"><b>${s.nombre}</b> <span class="text-xs text-slate-400">${s.direccion || ''}</span></li>`;
-      });
-    }
-
-    async function crearSucursal(e) {
-      e.preventDefault();
-      const nombre = document.getElementById('suc-nombre').value.trim();
-      const direccion = document.getElementById('suc-dir').value.trim();
-      await db.from('sucursales').insert([{ nombre, direccion }]);
-      alert("Sucursal creada.");
-      document.getElementById('suc-nombre').value = '';
-      document.getElementById('suc-dir').value = '';
-      cargarSucursales();
-    }
-
-    // ==================== GENERADOR DE SECUENCIA CORRELATIVA 00000001 ====================
-    async function obtenerSiguienteNumeroSecuencia() {
-      const { data, error } = await db.from('ventas').select('numero_comprobante');
-      if (error || !data || data.length === 0) {
-        return "TKT-00000001";
+      if (lista.length === 0) {
+        t.innerHTML = `<tr><td colspan="7" class="text-center p-4 text-slate-400">No hay productos en bodega.</td></tr>`;
+        return;
       }
 
-      let maxNumero = 0;
-      data.forEach(v => {
-        if (v.numero_comprobante) {
-          // Extrae los dígitos numéricos del comprobante
-          const match = v.numero_comprobante.match(/\d+/g);
-          if (match) {
-            const num = parseInt(match[match.length - 1], 10);
-            if (!isNaN(num) && num > maxNumero) {
-              maxNumero = num;
-            }
+      lista.forEach(p => {
+        // Formatear etiquetas de atributos visuales
+        let atributosBadge = '';
+        if (p.atributos && typeof p.atributos === 'object' && Object.keys(p.atributos).length > 0) {
+          atributosBadge = '<div class="flex flex-wrap gap-1 mt-1">';
+          for (const [k, v] of Object.entries(p.atributos)) {
+            atributosBadge += `<span class="bg-indigo-50 border border-indigo-200 text-indigo-700 text-[9px] px-1.5 py-0.5 rounded font-mono font-semibold"><b>${k}:</b> ${v}</span>`;
           }
+          atributosBadge += '</div>';
         }
+
+        t.innerHTML += `
+          <tr class="hover:bg-slate-50 text-xs">
+            <td class="p-3 font-mono text-slate-500 font-bold">${p.codigo_barras || '-'}</td>
+            <td class="p-3 font-semibold text-slate-800">
+              ${p.nombre}
+              ${atributosBadge}
+            </td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] bg-slate-100 font-bold text-slate-600">${p.plantilla_nombre || 'ESTÁNDAR'}</span></td>
+            <td class="p-3 text-right font-mono text-slate-500">$${parseFloat(p.precio_costo).toFixed(2)}</td>
+            <td class="p-3 text-right font-mono font-bold text-slate-800">$${parseFloat(p.precio_venta).toFixed(2)}</td>
+            <td class="p-3 text-center font-bold ${p.stock_actual <= 0 ? 'text-red-600' : 'text-slate-800'}">${p.stock_actual}</td>
+            <td class="p-3 text-center">
+              <button onclick="prepararEdicionProd(${p.id})" class="px-2 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded text-xs font-bold mr-1">Editar</button>
+              <button onclick="eliminarProducto(${p.id}, '${p.nombre}')" class="px-2 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-xs font-bold">Borrar</button>
+            </td>
+          </tr>
+        `;
       });
-
-      const siguiente = maxNumero + 1;
-      return "TKT-" + String(siguiente).padStart(8, '0');
     }
 
-    async function actualizarProximoNumeroTicketVisual() {
-      const proximo = await obtenerSiguienteNumeroSecuencia();
-      const elem = document.getElementById('pos-proximo-ticket');
-      if (elem) elem.innerText = `Próximo: ${proximo}`;
+    function prepararEdicionProd(id) {
+      const p = productos.find(x => x.id === id);
+      if (!p) return;
+      document.getElementById('edit-prod-id').value = p.id;
+      document.getElementById('inv-nombre').value = p.nombre;
+      document.getElementById('inv-codigo').value = p.codigo_barras || '';
+      document.getElementById('inv-costo').value = p.precio_costo;
+      document.getElementById('inv-venta').value = p.precio_venta;
+      document.getElementById('inv-stock').value = p.stock_actual;
+
+      if (p.plantilla_nombre) {
+        document.getElementById('select-plantilla-activa').value = p.plantilla_nombre;
+      }
+      cambiarPlantillaFormulario();
+
+      // Cargar los valores de atributos guardados en los inputs dinámicos
+      if (p.atributos && typeof p.atributos === 'object') {
+        const inputs = document.querySelectorAll('.input-atributo-dinamico');
+        inputs.forEach(inp => {
+          const campo = inp.getAttribute('data-campo-nombre');
+          if (p.atributos[campo]) {
+            inp.value = p.atributos[campo];
+          }
+        });
+      }
+
+      document.getElementById('txt-form-prod').innerText = "Modificar Producto";
+      document.getElementById('btn-save-prod').innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> Actualizar Producto';
+      document.getElementById('btn-cancel-prod').classList.remove('hidden');
+      lucide.createIcons();
     }
 
-    // ==================== VENTAS / POS (INTERFAZ ORIGINAL) ====================
+    function cancelarEdicionProd() {
+      document.getElementById('edit-prod-id').value = '';
+      document.getElementById('inv-nombre').value = '';
+      document.getElementById('inv-codigo').value = '';
+      document.getElementById('inv-costo').value = '';
+      document.getElementById('inv-venta').value = '';
+      document.getElementById('inv-stock').value = '1';
+      cambiarPlantillaFormulario();
+      document.getElementById('txt-form-prod').innerText = "Registrar Nuevo Producto";
+      document.getElementById('btn-save-prod').innerHTML = '<i data-lucide="save" class="w-4 h-4"></i> Guardar Producto';
+      document.getElementById('btn-cancel-prod').classList.add('hidden');
+      lucide.createIcons();
+    }
+
+    async function eliminarProducto(id, nombre) {
+      if (!confirm(`¿Eliminar definitivamente "${nombre}" del catálogo?`)) return;
+      await db.from('productos').delete().eq('id', id);
+      cargarProductos();
+    }
+
+    // ==================== VENTAS / POS ====================
     async function cargarProductos() {
       const { data } = await db.from('productos').select('*').order('id', { ascending: false });
       productos = data || [];
@@ -931,15 +1038,24 @@
 
       lista.forEach(p => {
         const sinStock = p.stock_actual <= 0;
+        let atributosMini = '';
+        if (p.atributos && typeof p.atributos === 'object') {
+          const claves = Object.keys(p.atributos).slice(0, 2);
+          claves.forEach(k => {
+            atributosMini += `<span class="text-[9px] bg-slate-100 px-1 rounded text-slate-500">${k}: ${p.atributos[k]}</span> `;
+          });
+        }
+
         c.innerHTML += `
           <div onclick="${sinStock ? '' : `agregarCarrito(${p.id})`}" 
                class="border p-3 rounded-lg flex flex-col justify-between transition ${sinStock ? 'opacity-50 cursor-not-allowed bg-slate-50' : 'cursor-pointer hover:border-indigo-500 bg-white shadow-sm hover:shadow'}">
             <div>
               <p class="text-[11px] text-slate-400 font-mono">${p.codigo_barras || 'S/C'}</p>
               <h4 class="font-bold text-xs text-slate-700">${p.nombre}</h4>
+              <div class="mt-1">${atributosMini}</div>
             </div>
             <div class="mt-3 flex justify-between items-center">
-              <span class="text-sm font-bold text-indigo-600">$${parseFloat(p.precio_venta).toFixed(2)}</span>
+              <span class="text-sm font-bold text-indigo-600 font-mono">$${parseFloat(p.precio_venta).toFixed(2)}</span>
               <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${sinStock ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-700'}">
                 ${sinStock ? 'AGOTADO' : `Stock: ${p.stock_actual}`}
               </span>
@@ -947,6 +1063,16 @@
           </div>
         `;
       });
+    }
+
+    function filtrarProductosPOS() {
+      const q = document.getElementById('buscar-pos').value.toLowerCase();
+      renderizarPOS(productos.filter(p => {
+        const porNombre = p.nombre.toLowerCase().includes(q);
+        const porCodigo = p.codigo_barras && p.codigo_barras.toLowerCase().includes(q);
+        const porAtributos = p.atributos && JSON.stringify(p.atributos).toLowerCase().includes(q);
+        return porNombre || porCodigo || porAtributos;
+      }));
     }
 
     function agregarCarrito(id) {
@@ -1008,7 +1134,7 @@
           <div class="flex justify-between items-center text-xs pb-1.5 border-b">
             <div>
               <p class="font-bold text-slate-800">${item.nombre}</p>
-              <p class="text-slate-400">$${item.precio_venta.toFixed(2)} c/u</p>
+              <p class="text-slate-400 font-mono">$${item.precio_venta.toFixed(2)} c/u</p>
             </div>
             <div class="flex items-center gap-1.5">
               <button onclick="cambiarCantidadCarrito(${idx}, -1)" class="w-5 h-5 bg-slate-200 rounded font-bold hover:bg-slate-300">-</button>
@@ -1036,6 +1162,29 @@
       renderCarrito();
     }
 
+    async function obtenerSiguienteNumeroSecuencia() {
+      const { data, error } = await db.from('ventas').select('numero_comprobante');
+      if (error || !data || data.length === 0) return "TKT-00000001";
+
+      let maxNumero = 0;
+      data.forEach(v => {
+        if (v.numero_comprobante) {
+          const match = v.numero_comprobante.match(/\d+/g);
+          if (match) {
+            const num = parseInt(match[match.length - 1], 10);
+            if (!isNaN(num) && num > maxNumero) maxNumero = num;
+          }
+        }
+      });
+      return "TKT-" + String(maxNumero + 1).padStart(8, '0');
+    }
+
+    async function actualizarProximoNumeroTicketVisual() {
+      const proximo = await obtenerSiguienteNumeroSecuencia();
+      const elem = document.getElementById('pos-proximo-ticket');
+      if (elem) elem.innerText = `Próximo: ${proximo}`;
+    }
+
     async function cobrarTicket() {
       if (carrito.length === 0) return alert("Ticket vacío.");
 
@@ -1049,8 +1198,6 @@
       const totalUSD = carrito.reduce((sum, i) => sum + (i.cantidad * i.precio_venta), 0);
       const moneda = document.getElementById('pos-moneda').value;
       const metodo = document.getElementById('pos-metodo').value;
-
-      // Obtener el siguiente número correlativo en secuencia 00000001
       const numComp = await obtenerSiguienteNumeroSecuencia();
 
       const doc = document.getElementById('pos-doc-cliente').value.trim() || '9999999999';
@@ -1117,12 +1264,7 @@
       await actualizarProximoNumeroTicketVisual();
     }
 
-    function filtrarProductosPOS() {
-      const q = document.getElementById('buscar-pos').value.toLowerCase();
-      renderizarPOS(productos.filter(p => p.nombre.toLowerCase().includes(q) || (p.codigo_barras && p.codigo_barras.toLowerCase().includes(q))));
-    }
-
-    // ==================== COTIZACIONES ====================
+    // ==================== RESTO DE MÓDULOS (COTIZACIÓN, PLAN, ENVÍOS, HISTORIAL) ====================
     function renderizarCotizarGrid(lista) {
       const g = document.getElementById('grid-cotizar');
       if (!g) return;
@@ -1184,7 +1326,6 @@
       }, descargarPDF);
     }
 
-    // ==================== PLAN ACUMULATIVO ====================
     function poblarSelectProductosPlan(lista) {
       const sel = document.getElementById('plan-producto-select');
       if (!sel) return;
@@ -1221,13 +1362,8 @@
       if (error) return alert(error.message);
 
       await db.from('abonos_plan').insert([{
-        plan_id: plan.id,
-        monto: abonoIni,
-        metodo_pago: 'EFECTIVO',
-        saldo_anterior: prod.precio_venta,
-        nuevo_saldo: saldo,
-        usuario_nombre: usuarioActual.nombre_completo,
-        usuario_id: usuarioActual.id
+        plan_id: plan.id, monto: abonoIni, metodo_pago: 'EFECTIVO', saldo_anterior: prod.precio_venta,
+        nuevo_saldo: saldo, usuario_nombre: usuarioActual.nombre_completo, usuario_id: usuarioActual.id
       }]);
 
       await db.from('productos').update({ stock_actual: prod.stock_actual - 1 }).eq('id', prod.id);
@@ -1273,19 +1409,12 @@
       const nuevoSaldo = saldoActual - monto;
 
       await db.from('abonos_plan').insert([{
-        plan_id: planId,
-        monto: monto,
-        metodo_pago: 'EFECTIVO',
-        saldo_anterior: saldoActual,
-        nuevo_saldo: nuevoSaldo,
-        usuario_nombre: usuarioActual.nombre_completo,
-        usuario_id: usuarioActual.id
+        plan_id: planId, monto: monto, metodo_pago: 'EFECTIVO', saldo_anterior: saldoActual,
+        nuevo_saldo: nuevoSaldo, usuario_nombre: usuarioActual.nombre_completo, usuario_id: usuarioActual.id
       }]);
 
       await db.from('planes_acumulativos').update({
-        saldo_pendiente: nuevoSaldo,
-        fecha_proximo_abono: proxFecha || null,
-        estado: nuevoSaldo <= 0 ? 'LIQUIDADO' : 'ACTIVO'
+        saldo_pendiente: nuevoSaldo, fecha_proximo_abono: proxFecha || null, estado: nuevoSaldo <= 0 ? 'LIQUIDADO' : 'ACTIVO'
       }).eq('id', planId);
 
       alert(`¡Abono de $${monto.toFixed(2)} registrado!\nSaldo pendiente restante: $${nuevoSaldo.toFixed(2)}`);
@@ -1327,7 +1456,7 @@
       document.getElementById('modal-historial-abonos').classList.add('hidden');
     }
 
-    // ==================== ENVÍOS (COURIER) ====================
+    // ==================== ENVÍOS ====================
     function cambiarRutaEnvio() {
       const ruta = document.getElementById('env-ruta').value;
       const datalist = document.getElementById('lista-ciudades-destino');
@@ -1467,7 +1596,7 @@
         cargarEnvios();
       } catch (err) { alert(err.message); }
       finally {
-        btn.innerText = "Guardar e Imprimir Guía Internacional";
+        btn.innerText = "Guardar e Imprimir Guía";
         btn.disabled = false;
       }
     }
@@ -1499,80 +1628,6 @@
         `;
       });
       lucide.createIcons();
-    }
-
-    // ==================== INVENTARIO (ADMIN) ====================
-    async function guardarProducto(e) {
-      e.preventDefault();
-      const id = document.getElementById('edit-prod-id').value;
-      const nombre = document.getElementById('inv-nombre').value;
-      const codigo = document.getElementById('inv-codigo').value || null;
-      const costo = parseFloat(document.getElementById('inv-costo').value);
-      const venta = parseFloat(document.getElementById('inv-venta').value);
-      const stock = parseInt(document.getElementById('inv-stock').value);
-
-      if (id) {
-        await db.from('productos').update({ nombre, codigo_barras: codigo, precio_costo: costo, precio_venta: venta, stock_actual: stock }).eq('id', id);
-        alert("Producto modificado.");
-      } else {
-        await db.from('productos').insert([{ nombre, codigo_barras: codigo, precio_costo: costo, precio_venta: venta, stock_actual: stock }]);
-        alert("Producto guardado.");
-      }
-      cancelarEdicionProd();
-      cargarProductos();
-    }
-
-    function renderizarInventario(lista) {
-      const t = document.getElementById('tabla-stock');
-      if (!t) return;
-      t.innerHTML = '';
-      lista.forEach(p => {
-        t.innerHTML += `
-          <tr class="hover:bg-slate-50">
-            <td class="p-3 font-mono text-xs">${p.codigo_barras || '-'}</td>
-            <td class="p-3 font-semibold text-slate-700">${p.nombre}</td>
-            <td class="p-3 text-right font-mono text-slate-500">$${parseFloat(p.precio_costo).toFixed(2)}</td>
-            <td class="p-3 text-right font-mono font-bold text-slate-800">$${parseFloat(p.precio_venta).toFixed(2)}</td>
-            <td class="p-3 text-center font-bold ${p.stock_actual <= 0 ? 'text-red-600' : 'text-slate-800'}">${p.stock_actual}</td>
-            <td class="p-3 text-center">
-              <button onclick="prepararEdicionProd(${p.id})" class="px-2 py-1 bg-amber-500 text-white rounded text-xs font-bold mr-1">Editar</button>
-              <button onclick="eliminarProducto(${p.id}, '${p.nombre}')" class="px-2 py-1 bg-red-500 text-white rounded text-xs font-bold">Borrar</button>
-            </td>
-          </tr>
-        `;
-      });
-    }
-
-    function prepararEdicionProd(id) {
-      const p = productos.find(x => x.id === id);
-      if (!p) return;
-      document.getElementById('edit-prod-id').value = p.id;
-      document.getElementById('inv-nombre').value = p.nombre;
-      document.getElementById('inv-codigo').value = p.codigo_barras || '';
-      document.getElementById('inv-costo').value = p.precio_costo;
-      document.getElementById('inv-venta').value = p.precio_venta;
-      document.getElementById('inv-stock').value = p.stock_actual;
-      document.getElementById('txt-form-prod').innerText = "Modificar Producto";
-      document.getElementById('btn-save-prod').innerText = "Actualizar";
-      document.getElementById('btn-cancel-prod').classList.remove('hidden');
-    }
-
-    function cancelarEdicionProd() {
-      document.getElementById('edit-prod-id').value = '';
-      document.getElementById('inv-nombre').value = '';
-      document.getElementById('inv-codigo').value = '';
-      document.getElementById('inv-costo').value = '';
-      document.getElementById('inv-venta').value = '';
-      document.getElementById('inv-stock').value = '1';
-      document.getElementById('txt-form-prod').innerText = "Registrar Nuevo Producto";
-      document.getElementById('btn-save-prod').innerText = "Guardar";
-      document.getElementById('btn-cancel-prod').classList.add('hidden');
-    }
-
-    async function eliminarProducto(id, nombre) {
-      if (!confirm(`¿Eliminar definitivamente "${nombre}"?`)) return;
-      await db.from('productos').delete().eq('id', id);
-      cargarProductos();
     }
 
     // ==================== HISTORIAL DE VENTAS ====================
@@ -1650,7 +1705,7 @@
           <tr class="text-xs">
             <td class="p-2">${it.cantidad}</td>
             <td class="p-2">${it.nombre}</td>
-            <td class="p-2 text-right font-mono">$${parseFloat(it.precio_venta).toFixed(2)}</td>
+            <td class="p-2 text-right">$${parseFloat(it.precio_venta).toFixed(2)}</td>
             <td class="p-2 text-right font-bold font-mono">$${(it.cantidad * it.precio_venta).toFixed(2)}</td>
           </tr>
         `;
