@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Factura de Venta, POS & Courier Internacional</title>
+  <title>Sistema POS, Inventario & Courier Internacional</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -20,24 +20,24 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col">
 
-  <!-- ==================== MODAL DE SELECCIÓN DE USUARIO / TURNO ==================== -->
-  <div id="pantalla-login" class="fixed inset-0 bg-slate-900 bg-opacity-75 flex items-center justify-center p-4 z-50">
+  <!-- ==================== MODAL DE SELECCIÓN DE TURNO / CAJERO ==================== -->
+  <div id="pantalla-login" class="hidden fixed inset-0 bg-slate-900 bg-opacity-75 flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 text-center">
       <div class="inline-flex p-3 bg-indigo-100 text-indigo-600 rounded-full mb-3">
         <i data-lucide="user-check" class="w-8 h-8"></i>
       </div>
       <h2 class="text-lg font-bold text-slate-800">Control de Turno y Caja</h2>
-      <p class="text-xs text-slate-400 mb-4">Selecciona tu usuario para iniciar sesión</p>
+      <p class="text-xs text-slate-400 mb-4">Selecciona el usuario que está atendiendo</p>
 
       <div class="space-y-3 text-left">
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Empleado / Cajero</label>
-          <select id="select-usuario-login" onchange="verificarTipoUsuarioLogin()" class="w-full text-xs font-semibold p-2.5 border rounded-lg bg-white">
-            <option value="3" data-rol="ADMIN">PINA IBARRA (ADMIN)</option>
+          <select id="select-usuario-login" class="w-full text-xs font-semibold p-2.5 border rounded-lg bg-white">
+            <option value="3">PINA IBARRA (ADMIN)</option>
           </select>
         </div>
 
-        <div id="bloque-clave-login">
+        <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Contraseña o PIN</label>
           <input type="password" id="input-clave-login" placeholder="Ingresa contraseña" class="w-full text-xs p-2.5 border rounded-lg outline-none focus:ring-2 focus:ring-indigo-500">
         </div>
@@ -52,293 +52,144 @@
   <!-- ==================== APLICACIÓN PRINCIPAL ==================== -->
   <div id="app-contenido" class="flex-1 flex flex-col">
     <!-- BARRA SUPERIOR -->
-    <header class="bg-slate-900 text-white px-6 py-2.5 flex justify-between items-center border-b border-slate-700 shadow-sm">
+    <header class="bg-indigo-700 text-white px-6 py-3 flex justify-between items-center shadow-md">
       <div class="flex items-center space-x-3">
-        <i data-lucide="receipt" class="w-6 h-6 text-indigo-400"></i>
+        <i data-lucide="package-check" class="w-7 h-7"></i>
         <div>
-          <h1 class="text-base font-bold tracking-wide">Facturación & Sistema POS</h1>
-          <p id="badge-sucursal" class="text-[11px] text-slate-400">Cargando...</p>
+          <h1 class="text-lg font-bold">POS & Courier Internacional</h1>
+          <p id="badge-sucursal" class="text-xs text-indigo-200">Cargando...</p>
         </div>
       </div>
-      <div class="flex items-center space-x-1.5 text-xs font-semibold">
-        <button onclick="cambiarVista('pos')" id="tab-pos" class="px-3 py-1.5 bg-blue-600 rounded text-white flex items-center gap-1.5">
-          <i data-lucide="file-text" class="w-3.5 h-3.5"></i> Factura de Venta
+      <div class="flex items-center space-x-2">
+        <button onclick="cambiarVista('pos')" id="tab-pos" class="px-3 py-1.5 bg-indigo-800 rounded-md text-xs font-semibold flex items-center gap-1.5">
+          <i data-lucide="shopping-cart" class="w-4 h-4"></i> Ventas
         </button>
-        <button onclick="cambiarVista('cotizacion')" id="tab-cotizacion" class="px-3 py-1.5 hover:bg-slate-800 rounded text-slate-300 flex items-center gap-1.5">
-          <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i> Cotización
+        <button onclick="cambiarVista('cotizacion')" id="tab-cotizacion" class="px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
+          <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Cotización
         </button>
-        <button onclick="cambiarVista('plan')" id="tab-plan" class="px-3 py-1.5 hover:bg-slate-800 rounded text-slate-300 flex items-center gap-1.5">
-          <i data-lucide="calendar-clock" class="w-3.5 h-3.5"></i> Plan Acumulativo
+        <button onclick="cambiarVista('plan')" id="tab-plan" class="px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
+          <i data-lucide="calendar-clock" class="w-4 h-4"></i> Plan Acumulativo
         </button>
-        <button onclick="cambiarVista('envios')" id="tab-envios" class="px-3 py-1.5 hover:bg-slate-800 rounded text-slate-300 flex items-center gap-1.5">
-          <i data-lucide="send" class="w-3.5 h-3.5"></i> Envíos
+        <button onclick="cambiarVista('envios')" id="tab-envios" class="px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
+          <i data-lucide="send" class="w-4 h-4"></i> Envíos
         </button>
-        <button onclick="cambiarVista('inventario')" id="tab-inv" class="hidden px-3 py-1.5 hover:bg-slate-800 rounded text-slate-300 flex items-center gap-1.5">
-          <i data-lucide="package" class="w-3.5 h-3.5"></i> Inventario
+        <button onclick="cambiarVista('inventario')" id="tab-inv" class="hidden px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
+          <i data-lucide="package" class="w-4 h-4"></i> Inventario
         </button>
-        <button onclick="cambiarVista('ventas')" id="tab-ventas" class="px-3 py-1.5 hover:bg-slate-800 rounded text-slate-300 flex items-center gap-1.5">
-          <i data-lucide="history" class="w-3.5 h-3.5"></i> Historial
+        <button onclick="cambiarVista('ventas')" id="tab-ventas" class="px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
+          <i data-lucide="receipt" class="w-4 h-4"></i> Historial
         </button>
-        <button onclick="cambiarVista('admin')" id="tab-admin" class="hidden px-3 py-1.5 hover:bg-slate-800 rounded text-slate-300 flex items-center gap-1.5">
-          <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Personal / Sucursales
+        <button onclick="cambiarVista('admin')" id="tab-admin" class="hidden px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
+          <i data-lucide="shield-check" class="w-4 h-4"></i> Personal / Sedes
         </button>
-        <button onclick="mostrarModalLogin()" class="ml-3 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-white flex items-center gap-1" title="Cambiar de cajero/turno">
-          <i data-lucide="users" class="w-3 h-3"></i> Cambiar Cajero
+        <button onclick="mostrarModalLogin()" class="ml-3 px-3 py-1.5 bg-indigo-900 hover:bg-indigo-800 rounded-md text-xs font-semibold flex items-center gap-1" title="Cambiar de cajero">
+          <i data-lucide="users" class="w-3.5 h-3.5"></i> Cambiar Cajero
         </button>
       </div>
     </header>
 
-    <main class="flex-1 p-4 max-w-[1450px] mx-auto w-full">
+    <main class="flex-1 p-6 max-w-7xl mx-auto w-full">
 
-      <!-- ==================== PESTAÑA 1: FACTURA DE VENTA ==================== -->
-      <div id="vista-pos" class="bg-white rounded-lg shadow-sm border border-slate-200 p-5 space-y-4">
-        <!-- Barra de Botones de Acción -->
-        <div class="flex justify-between items-center pb-2 border-b border-slate-100">
-          <h2 class="text-xl font-bold text-slate-800">Factura de venta</h2>
-          <div class="flex items-center gap-1.5">
-            <button onclick="limpiarFacturaCompleta()" class="w-8 h-8 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center shadow-sm" title="Nuevo documento">
-              <i data-lucide="file-plus" class="w-4 h-4"></i>
-            </button>
-            <button onclick="limpiarFacturaCompleta()" class="w-8 h-8 rounded-full bg-amber-500 hover:bg-amber-600 text-white flex items-center justify-center shadow-sm" title="Limpiar formulario">
-              <i data-lucide="x-circle" class="w-4 h-4"></i>
-            </button>
-            <button onclick="reimprimirUltimaFactura()" class="w-8 h-8 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center shadow-sm" title="Reimprimir última">
-              <i data-lucide="printer" class="w-4 h-4"></i>
-            </button>
-            <button onclick="enviarFacturaCorreo()" class="w-8 h-8 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center shadow-sm" title="Enviar por Email">
-              <i data-lucide="mail" class="w-4 h-4"></i>
-            </button>
-            <button onclick="cambiarVista('ventas')" class="w-8 h-8 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center shadow-sm" title="Buscar en Historial">
-              <i data-lucide="search" class="w-4 h-4"></i>
-            </button>
-            <button class="w-8 h-8 rounded-full bg-amber-500 hover:bg-amber-600 text-white flex items-center justify-center shadow-sm" title="Minimizar">
-              <i data-lucide="minus" class="w-4 h-4"></i>
-            </button>
-            <button onclick="procesarFacturaVenta()" class="w-8 h-8 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center shadow-sm" title="Guardar Factura">
-              <i data-lucide="save" class="w-4 h-4"></i>
-            </button>
+      <!-- ==================== SECCIÓN 1: VENTAS (TPV / POS ANTERIOR) ==================== -->
+      <div id="vista-pos" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Catálogo de Productos con Buscador -->
+        <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="font-bold text-slate-800 flex items-center gap-2">
+              <i data-lucide="grid" class="w-5 h-5 text-indigo-600"></i> Catálogo de Productos
+            </h2>
+            <input type="text" id="buscar-pos" oninput="filtrarProductosPOS()" placeholder="Buscar producto o código..." class="text-sm p-2 border rounded-lg w-64 focus:ring-2 focus:ring-indigo-500 outline-none">
           </div>
+          <div id="grid-pos" class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[550px] overflow-y-auto"></div>
         </div>
 
-        <!-- Encabezado de Datos -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 text-xs">
-          <div class="lg:col-span-6 space-y-2">
-            <div class="grid grid-cols-3 gap-2">
+        <!-- Panel de Ticket de Venta -->
+        <div class="bg-white rounded-xl border border-slate-200 p-5 flex flex-col justify-between shadow-sm">
+          <div>
+            <div class="flex justify-between items-center pb-2 border-b mb-3">
               <div>
-                <label class="block text-slate-500 font-semibold mb-0.5">Cédula/Ruc</label>
-                <input type="text" id="fac-doc" value="9999999999999" class="w-full p-2 border border-slate-300 rounded focus:border-blue-500 outline-none font-mono">
+                <h2 class="font-bold text-slate-800 flex items-center gap-2">
+                  <i data-lucide="file-text" class="w-5 h-5 text-indigo-600"></i> Ticket de Venta
+                </h2>
+                <span class="text-[11px] font-mono font-bold text-indigo-600" id="pos-proximo-ticket">Próximo: TKT-00000001</span>
               </div>
-              <div>
-                <label class="block text-slate-500 font-semibold mb-0.5">Apellidos</label>
-                <input type="text" id="fac-ape" value="CONSUMIDOR" class="w-full p-2 border border-slate-300 rounded focus:border-blue-500 outline-none uppercase font-semibold">
-              </div>
-              <div>
-                <label class="block text-slate-500 font-semibold mb-0.5">Nombres</label>
-                <input type="text" id="fac-nom" value="FINAL" class="w-full p-2 border border-slate-300 rounded focus:border-blue-500 outline-none uppercase font-semibold">
-              </div>
+              <button onclick="limpiarCarrito()" class="text-xs text-red-500 hover:underline">Vaciar</button>
             </div>
-            <div class="grid grid-cols-3 gap-2">
-              <div>
-                <label class="block text-slate-500 font-semibold mb-0.5">Dirección</label>
-                <input type="text" id="fac-dir" class="w-full p-2 border border-slate-300 rounded focus:border-blue-500 outline-none">
+            
+            <!-- Datos del Cliente -->
+            <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 mb-3 space-y-2">
+              <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Datos del Cliente</span>
+              <div class="grid grid-cols-2 gap-2">
+                <input type="text" id="pos-doc-cliente" value="9999999999" placeholder="Cédula / RUC" class="text-xs p-1.5 border rounded bg-white font-mono">
+                <input type="text" id="pos-tel-cliente" placeholder="Teléfono" class="text-xs p-1.5 border rounded bg-white">
               </div>
-              <div>
-                <label class="block text-slate-500 font-semibold mb-0.5">Teléfono</label>
-                <input type="text" id="fac-tel" class="w-full p-2 border border-slate-300 rounded focus:border-blue-500 outline-none">
+              <div class="grid grid-cols-2 gap-2">
+                <input type="text" id="pos-nom-cliente" placeholder="Nombres" class="text-xs p-1.5 border rounded bg-white">
+                <input type="text" id="pos-ape-cliente" placeholder="Apellidos" class="text-xs p-1.5 border rounded bg-white">
               </div>
-              <div>
-                <label class="block text-slate-500 font-semibold mb-0.5">Email</label>
-                <input type="email" id="fac-mail" class="w-full p-2 border border-slate-300 rounded focus:border-blue-500 outline-none">
-              </div>
+              <input type="email" id="pos-mail-cliente" placeholder="Correo electrónico" class="w-full text-xs p-1.5 border rounded bg-white">
             </div>
-            <div class="pt-2"><div class="h-1 bg-slate-100 rounded-full w-full"></div></div>
-          </div>
 
-          <div class="lg:col-span-3 space-y-2 border-l border-slate-100 pl-4">
-            <div>
-              <label class="block text-slate-500 font-semibold mb-0.5">Sucursal</label>
-              <select id="fac-sucursal" class="w-full p-2 border border-slate-300 rounded font-semibold bg-white"></select>
-            </div>
-            <div>
-              <label class="block text-slate-500 font-semibold mb-0.5">Talonario</label>
-              <select id="fac-talonario" class="w-full p-2 border border-slate-300 rounded font-semibold bg-white">
-                <option value="F.ELECTRONICA">F.ELECTRONICA</option>
-                <option value="NOTA_VENTA">NOTA DE VENTA</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-slate-500 font-semibold mb-0.5">Aplicar Precio</label>
-              <select id="fac-tipo-precio" class="w-full p-2 border border-slate-300 rounded font-semibold bg-white">
-                <option value="PVP">PVP</option>
-                <option value="MAYORISTA">MAYORISTA</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="lg:col-span-3 space-y-2 border-l border-slate-100 pl-4">
-            <div class="flex items-center justify-between pb-1">
-              <div class="flex items-center gap-1.5">
-                <span class="font-black text-blue-900 tracking-tighter text-sm">SRI</span>
-                <span class="text-[10px] text-slate-400 font-mono">002</span>
-              </div>
-              <div class="text-right">
-                <p class="text-[9px] text-slate-400">Aut. 9999999999</p>
-                <p class="text-[10px] font-mono text-slate-600">001</p>
-              </div>
-              <div class="text-right">
-                <span class="text-[9px] text-slate-400 uppercase block">FACTURA</span>
-                <span id="fac-numero-correlativo" class="text-base font-black text-slate-800">14850</span>
-              </div>
-            </div>
-            <div class="flex gap-1">
-              <input type="text" id="fac-fecha-emision" value="19/10/2026" class="w-full p-2 border border-slate-300 rounded text-xs font-semibold bg-white">
-              <button class="px-2.5 bg-blue-400 text-white rounded hover:bg-blue-500"><i data-lucide="calendar" class="w-4 h-4"></i></button>
-            </div>
-            <div class="flex justify-between items-center text-xs pt-1 text-slate-600 font-semibold">
-              <span>TRIBUTABLE</span>
-              <span class="text-blue-600 font-bold">SI</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Tabla Azul de Facturación -->
-        <div class="overflow-x-auto border border-slate-200 rounded">
-          <table class="w-full text-xs text-left">
-            <thead class="bg-[#1e3a8a] text-white font-semibold">
-              <tr>
-                <th class="p-2 w-28">Código</th>
-                <th class="p-2 w-20">Cantidad</th>
-                <th class="p-2 w-24">UMED</th>
-                <th class="p-2">Detalle</th>
-                <th class="p-2 w-24 text-right">V.UNIT</th>
-                <th class="p-2 w-20 text-center">%D</th>
-                <th class="p-2 w-20 text-center">DES</th>
-                <th class="p-2 w-16 text-center">% IVA</th>
-                <th class="p-2 w-28 text-right">TOTAL</th>
-                <th class="p-2 w-10 text-center"></th>
-              </tr>
-            </thead>
-            <tbody id="tabla-factura-items" class="divide-y divide-slate-200 bg-white">
-              <tr class="bg-blue-50/20">
-                <td class="p-1.5">
-                  <input type="text" id="in-item-codigo" onchange="buscarProductoPorCodigo(this.value)" placeholder="Código" class="w-full p-1.5 border border-emerald-400 rounded bg-white outline-none font-mono">
-                </td>
-                <td class="p-1.5">
-                  <input type="number" id="in-item-cant" value="1" min="1" oninput="calcularFilaActiva()" class="w-full p-1.5 border border-slate-300 rounded bg-white text-center font-bold">
-                </td>
-                <td class="p-1.5">
-                  <select id="in-item-umed" class="w-full p-1.5 border border-slate-300 rounded bg-white">
-                    <option value="UND">UND</option>
-                    <option value="PQTE">PQTE</option>
-                  </select>
-                </td>
-                <td class="p-1.5">
-                  <input type="text" list="lista-sugerencias-prod" id="in-item-detalle" onchange="seleccionarProductoPorNombre(this.value)" placeholder="Escriba el nombre..." class="w-full p-1.5 border border-slate-300 rounded bg-white outline-none">
-                  <datalist id="lista-sugerencias-prod"></datalist>
-                </td>
-                <td class="p-1.5 text-right font-mono font-bold">
-                  <input type="number" step="0.01" id="in-item-vunit" value="0.00" oninput="calcularFilaActiva()" class="w-full p-1.5 border border-slate-300 rounded bg-white text-right font-bold">
-                </td>
-                <td class="p-1.5 text-center">
-                  <input type="number" id="in-item-porc-desc" value="0" oninput="calcularFilaActiva()" class="w-full p-1.5 border border-slate-300 rounded bg-white text-center">
-                </td>
-                <td class="p-1.5 text-center font-mono">
-                  <input type="number" id="in-item-val-desc" value="0" readonly class="w-full p-1.5 bg-slate-100 border border-slate-200 rounded text-center">
-                </td>
-                <td class="p-1.5 text-center font-bold">
-                  <select id="in-item-iva" onchange="calcularFilaActiva()" class="w-full p-1.5 border border-slate-300 rounded bg-white text-center">
-                    <option value="15">15%</option>
-                    <option value="0">0%</option>
-                  </select>
-                </td>
-                <td class="p-1.5 text-right font-bold text-slate-800" id="in-item-total">0.00</td>
-                <td class="p-1.5 text-center">
-                  <button onclick="agregarFilaAFactura()" class="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded font-bold text-xs">+</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Totales -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-2 text-xs">
-          <div class="lg:col-span-3 space-y-3">
-            <div class="flex items-center gap-4">
-              <label class="flex items-center gap-1.5 cursor-pointer font-bold text-slate-700">
-                <input type="radio" name="tipo_pago" value="CONTADO" checked class="text-blue-600"> Contado
-              </label>
-              <label class="flex items-center gap-1.5 cursor-pointer font-bold text-slate-700">
-                <input type="radio" name="tipo_pago" value="CREDITO" class="text-blue-600"> Crédito
-              </label>
-            </div>
-            <div>
-              <span class="font-bold text-slate-700 block mb-0.5">Dcto a total:</span>
-              <p class="text-[11px] text-slate-400 mb-1">Porcentaje</p>
-              <input type="number" id="fac-dcto-porc" value="0" oninput="calcularTotalesFactura()" class="w-24 p-1.5 border border-slate-300 rounded">
-              <p class="text-[11px] text-slate-400 mt-1">Valor</p>
-              <input type="number" id="fac-dcto-val" value="0" readonly class="w-24 p-1.5 bg-slate-50 border border-slate-200 rounded font-mono">
-            </div>
-          </div>
-
-          <div class="lg:col-span-3 space-y-1">
-            <label class="block text-slate-500 font-semibold">Observación</label>
-            <textarea id="fac-observacion" rows="3" class="w-full p-2 border border-slate-300 rounded text-xs outline-none">Observación defecto venta</textarea>
-          </div>
-
-          <div class="lg:col-span-3 flex gap-3 items-start border-l border-slate-100 pl-3">
-            <div class="w-20 h-20 bg-slate-100 border border-slate-200 rounded flex flex-col items-center justify-center text-center p-1">
-              <i data-lucide="box" class="w-6 h-6 text-slate-400"></i>
-              <span class="text-[9px] text-slate-400 mt-1">Producto sin foto</span>
-            </div>
-            <div class="space-y-1.5 flex-1">
+            <!-- Moneda de Cobro -->
+            <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200 mb-3 space-y-2">
               <div class="flex items-center justify-between">
-                <span class="text-[11px] font-semibold text-slate-700">Rimpe popular</span>
-                <input type="checkbox" id="fac-rimpe" class="rounded text-blue-600">
+                <span class="text-xs font-bold text-slate-700">Moneda de Cobro:</span>
+                <select id="pos-moneda" onchange="actualizarMonedaPOS()" class="text-xs font-bold p-1 border rounded bg-white text-indigo-700">
+                  <option value="USD">Dólares (USD $)</option>
+                  <option value="NIO">Córdobas (NIO C$)</option>
+                </select>
               </div>
-              <div class="flex items-center justify-between">
-                <span class="text-[11px] font-semibold text-slate-700">Recargo servicios</span>
-                <input type="checkbox" id="fac-recargo" class="rounded text-blue-600">
+              <div id="bloque-tasa-cambio" class="hidden flex items-center justify-between text-xs pt-1 border-t border-slate-200">
+                <span class="text-slate-500 font-semibold">Tasa (1 USD =):</span>
+                <div class="flex items-center gap-1">
+                  <input type="number" step="0.01" id="pos-tasa-cambio" value="36.80" oninput="renderCarrito()" class="w-16 p-1 text-right font-bold border rounded bg-white">
+                  <span class="text-slate-600 font-bold">C$</span>
+                </div>
               </div>
-              <p class="text-[11px] text-slate-600 pt-1">
-                Vendedor: <b id="fac-vendedor-nombre" class="text-slate-800">Cargando...</b>
-              </p>
             </div>
+
+            <div id="carrito-items" class="space-y-1.5 max-h-[160px] overflow-y-auto"></div>
           </div>
 
-          <div class="lg:col-span-3 border-l border-slate-100 pl-4 space-y-1">
-            <div class="space-y-0.5 text-[11px]">
-              <div class="flex justify-between text-slate-600"><span>SUB TOTAL C/IVA</span><span id="txt-subtotal-c-iva">0.00</span></div>
-              <div class="flex justify-between text-slate-600"><span>SUB TOTAL S/IVA</span><span id="txt-subtotal-s-iva">0.00</span></div>
-              <div class="flex justify-between text-slate-600"><span>DESCUENTO</span><span id="txt-descuento">0.00</span></div>
-              <div class="flex justify-between text-slate-600 font-bold"><span>SUB TOTAL</span><span id="txt-subtotal">0.00</span></div>
-              <div class="flex justify-between text-slate-600"><span>IVA</span><span id="txt-iva">0.00</span></div>
-              <div class="flex justify-between text-slate-600"><span>ICE</span><span>0.00</span></div>
+          <div class="border-t pt-3">
+            <div class="flex justify-between text-base font-bold mb-1">
+              <span>Total USD:</span>
+              <span id="pos-total-usd" class="text-slate-700">$0.00</span>
             </div>
-            <div class="pt-2 border-t border-slate-200 text-right">
-              <span id="txt-total-factura-grande" class="text-4xl font-black text-slate-900 tracking-tight">0.00</span>
+            <div id="fila-total-moneda" class="hidden flex justify-between text-lg font-black mb-2 text-indigo-600">
+              <span>Total a Pagar:</span>
+              <span id="pos-total-moneda">C$ 0.00</span>
             </div>
+            <select id="pos-metodo" class="w-full text-xs p-2 border rounded mb-2 font-semibold">
+              <option value="EFECTIVO">Efectivo</option>
+              <option value="TRANSFERENCIA">Transferencia</option>
+              <option value="CREDITO">Crédito</option>
+            </select>
+            <button onclick="cobrarTicket()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition text-sm shadow">
+              <i data-lucide="check-circle" class="w-4 h-4"></i> Procesar Venta
+            </button>
           </div>
         </div>
       </div>
 
-      <!-- ==================== PESTAÑA 2: COTIZACIÓN ==================== -->
+      <!-- ==================== SECCIÓN 2: COTIZACIÓN (NO TOCA STOCK) ==================== -->
       <div id="vista-cotizacion" class="hidden space-y-6">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-5">
+          <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
             <h2 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
               <i data-lucide="file-spreadsheet" class="w-5 h-5 text-indigo-600"></i> Catálogo para Cotizar (Sin tocar inventario)
             </h2>
             <div id="grid-cotizar" class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[500px] overflow-y-auto"></div>
           </div>
 
-          <div class="bg-white rounded-xl border border-slate-200 p-5 flex flex-col justify-between">
+          <div class="bg-white rounded-xl border border-slate-200 p-5 flex flex-col justify-between shadow-sm">
             <div>
               <div class="flex justify-between items-center pb-2 border-b mb-3">
                 <h3 class="font-bold text-slate-800 text-sm">Detalle de Cotización</h3>
                 <button onclick="carritoCotizacion = []; renderCotizacion();" class="text-xs text-red-500 hover:underline">Vaciar</button>
               </div>
               <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 mb-3 space-y-2">
-                <input type="text" id="cot-doc" placeholder="Cédula / RUC" class="w-full text-xs p-1.5 border rounded bg-white">
+                <input type="text" id="cot-doc" placeholder="Cédula / RUC" class="w-full text-xs p-1.5 border rounded bg-white font-mono">
                 <input type="text" id="cot-nom" placeholder="Nombres y Apellidos" class="w-full text-xs p-1.5 border rounded bg-white">
                 <div class="grid grid-cols-2 gap-2">
                   <input type="text" id="cot-tel" placeholder="Teléfono" class="text-xs p-1.5 border rounded bg-white">
@@ -366,23 +217,23 @@
         </div>
       </div>
 
-      <!-- ==================== PESTAÑA 3: PLAN ACUMULATIVO ==================== -->
+      <!-- ==================== SECCIÓN 3: PLAN ACUMULATIVO ==================== -->
       <div id="vista-plan" class="hidden space-y-6">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div class="lg:col-span-1 bg-white p-5 rounded-xl border border-slate-200 space-y-4">
+          <div class="lg:col-span-1 bg-white p-5 rounded-xl border border-slate-200 space-y-4 shadow-sm">
             <h2 class="font-bold text-slate-800 flex items-center gap-2">
               <i data-lucide="calendar-clock" class="w-5 h-5 text-indigo-600"></i> Apertura de Plan Acumulativo
             </h2>
             <form onsubmit="crearPlanAcumulativo(event)" class="space-y-3">
-              <input type="text" id="plan-doc" required placeholder="Cédula / Identificación" class="w-full text-xs p-2 border rounded">
-              <input type="text" id="plan-nom" required placeholder="Nombre completo" class="w-full text-xs p-2 border rounded">
+              <input type="text" id="plan-doc" required placeholder="Cédula / Identificación" class="w-full text-xs p-2 border rounded font-mono">
+              <input type="text" id="plan-nom" required placeholder="Nombre completo del cliente" class="w-full text-xs p-2 border rounded">
               <div class="grid grid-cols-2 gap-2">
                 <input type="text" id="plan-tel" required placeholder="Teléfono" class="text-xs p-2 border rounded">
                 <input type="email" id="plan-mail" placeholder="Email" class="text-xs p-2 border rounded">
               </div>
               <div>
                 <label class="block text-[11px] font-bold text-slate-600 mb-1">Producto a Reservar</label>
-                <select id="plan-producto-select" class="w-full text-xs p-2 border rounded"></select>
+                <select id="plan-producto-select" class="w-full text-xs p-2 border rounded font-semibold"></select>
               </div>
               <div class="grid grid-cols-2 gap-2">
                 <div>
@@ -429,7 +280,7 @@
         </div>
       </div>
 
-      <!-- ==================== PESTAÑA 4: ENVÍOS (COURIER) ==================== -->
+      <!-- ==================== SECCIÓN 4: ENVÍOS (COURIER) ==================== -->
       <div id="vista-envios" class="hidden space-y-6">
         <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
           <div class="border-b pb-4 mb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -437,7 +288,7 @@
               <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
                 <i data-lucide="plane-takeoff" class="w-6 h-6 text-indigo-600"></i> Guía de Envío Internacional
               </h2>
-              <p class="text-xs text-slate-400">Rutas de transporte hacia EE.UU. o desde EE.UU. hacia Nicaragua</p>
+              <p class="text-xs text-slate-400">Rutas hacia EE.UU. o desde EE.UU. hacia Nicaragua</p>
             </div>
             <div class="flex items-center gap-2">
               <label class="text-xs font-bold text-slate-600">Ruta de Envío:</label>
@@ -490,7 +341,7 @@
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <input type="text" id="rem-telefono" required placeholder="Teléfono" class="text-xs p-2 border rounded-lg">
-                  <input type="text" id="rem-direccion" required placeholder="Dirección de Origen" class="w-full text-xs p-2 border rounded-lg">
+                  <input type="text" id="rem-direccion" required placeholder="Dirección de Origen" class="text-xs p-2 border rounded-lg">
                 </div>
               </div>
 
@@ -501,7 +352,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   <input type="text" id="dest-nombre" required placeholder="Nombre completo" class="w-full text-xs p-2 border rounded-lg">
                   <input type="text" id="dest-doc" required placeholder="Nº Documento / ID" class="w-full text-xs p-2 border rounded-lg font-mono">
-                  <input type="text" id="dest-telefono" required placeholder="Teléfono" class="w-full text-xs p-2 border rounded-lg">
+                  <input type="text" id="dest-telefono" required placeholder="Teléfono" class="text-xs p-2 border rounded-lg">
                 </div>
                 <div id="bloque-direccion-destino" class="hidden space-y-2 bg-indigo-50/40 p-2.5 rounded-lg border border-indigo-100">
                   <input type="text" id="dest-direccion" placeholder="Dirección exacta en destino..." class="w-full text-xs p-2 border rounded-lg bg-white">
@@ -514,19 +365,14 @@
 
             <div class="p-4 border rounded-xl bg-white grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
               <div class="md:col-span-2">
-                <label class="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
-                  <i data-lucide="file-text" class="w-3.5 h-3.5 text-indigo-600"></i> Contenido del Paquete (Declaración de Aduana)
-                </label>
-                <textarea id="env-contenido" rows="2" required placeholder="Detalla los artículos: ropa, cosméticos, zapatos, etc." class="w-full text-xs p-2.5 border rounded-lg"></textarea>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Contenido del Paquete</label>
+                <textarea id="env-contenido" rows="2" required placeholder="Detalla los artículos contenidos..." class="w-full text-xs p-2.5 border rounded-lg"></textarea>
               </div>
               <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
-                  <i data-lucide="camera" class="w-3.5 h-3.5 text-indigo-600"></i> Foto del Paquete
-                </label>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Foto del Paquete</label>
                 <input type="file" id="env-foto-input" accept="image/*" onchange="previsualizarFoto(event)" class="text-xs w-full">
                 <div id="preview-contenedor" class="hidden flex items-center gap-2 mt-2 p-1.5 bg-slate-50 border rounded-lg">
                   <img id="preview-img" src="" class="w-10 h-10 object-cover rounded border">
-                  <span class="text-[11px] font-bold text-emerald-700">Foto cargada</span>
                   <button type="button" onclick="quitarFoto()" class="text-[11px] text-red-500 hover:underline ml-auto">Quitar</button>
                 </div>
               </div>
@@ -604,7 +450,7 @@
         </div>
       </div>
 
-      <!-- ==================== PESTAÑA 5: INVENTARIO ==================== -->
+      <!-- ==================== SECCIÓN 5: INVENTARIO ==================== -->
       <div id="vista-inventario" class="hidden space-y-6">
         <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
           <h2 id="titulo-form-prod" class="font-bold mb-4 flex items-center gap-2">
@@ -641,7 +487,7 @@
         </div>
       </div>
 
-      <!-- ==================== PESTAÑA 6: HISTORIAL DE VENTAS ==================== -->
+      <!-- ==================== SECCIÓN 6: HISTORIAL DE VENTAS ==================== -->
       <div id="vista-ventas" class="hidden space-y-4">
         <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b">
@@ -682,13 +528,13 @@
         </div>
       </div>
 
-      <!-- ==================== PESTAÑA 7: SUCURSALES Y USUARIOS ==================== -->
+      <!-- ==================== SECCIÓN 7: PERSONAL Y SUCURSALES ==================== -->
       <div id="vista-admin" class="hidden space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
             <h2 class="font-bold mb-3 flex items-center gap-2"><i data-lucide="map-pin" class="w-5 h-5 text-indigo-600"></i> Gestión de Sucursales</h2>
             <form onsubmit="crearSucursal(event)" class="space-y-3">
-              <input type="text" id="suc-nombre" required placeholder="Nombre de la sucursal (ej: SUPERCELL 29 DE M)" class="w-full text-sm p-2 border rounded">
+              <input type="text" id="suc-nombre" required placeholder="Nombre de la sucursal" class="w-full text-sm p-2 border rounded">
               <input type="text" id="suc-dir" placeholder="Dirección del local" class="w-full text-sm p-2 border rounded">
               <button type="submit" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded text-sm">Registrar Sucursal</button>
             </form>
@@ -704,9 +550,9 @@
             </h2>
             <form onsubmit="guardarUsuario(event)" class="space-y-3">
               <input type="hidden" id="edit-user-id">
-              <input type="text" id="user-nombre" required placeholder="Nombre completo del empleado" class="w-full text-sm p-2 border rounded">
+              <input type="text" id="user-nombre" required placeholder="Nombre completo" class="w-full text-sm p-2 border rounded">
               <div class="grid grid-cols-2 gap-2">
-                <input type="text" id="user-alias" required placeholder="Usuario (ej: juan)" class="text-sm p-2 border rounded">
+                <input type="text" id="user-alias" required placeholder="Usuario" class="text-sm p-2 border rounded">
                 <input type="password" id="user-clave" placeholder="Contraseña o PIN" class="text-sm p-2 border rounded">
               </div>
               <div class="grid grid-cols-2 gap-2">
@@ -777,7 +623,7 @@
   <!-- PLANTILLA DE TICKET TÉRMICO -->
   <div id="ticket-impresion" class="hidden text-black font-mono text-xs max-w-[280px] mx-auto p-2">
     <div class="text-center pb-2 border-b border-dashed border-black">
-      <h2 class="font-bold text-sm tracking-wider uppercase">SUPERCELL 29 DE M</h2>
+      <h2 class="font-bold text-sm tracking-wider uppercase">SISTEMA POS & COURIER</h2>
       <p class="text-[10px]">RUC: 9999999999001</p>
     </div>
     <div class="py-2 border-b border-dashed border-black text-[11px]">
@@ -803,7 +649,7 @@
         <p class="text-[10px] text-slate-500 font-mono" id="pdf-folio">Nº: -</p>
       </div>
       <div class="text-right text-[10px]">
-        <p class="font-bold text-sm text-slate-800">SUPERCELL & SISTEMA POS</p>
+        <p class="font-bold text-sm text-slate-800">SISTEMA POS & LOGÍSTICA</p>
         <p>RUC: 9999999999001</p>
       </div>
     </div>
@@ -845,12 +691,11 @@
 
     let productos = [];
     let sucursales = [];
-    let itemsFactura = [];
+    let carrito = [];
     let carritoCotizacion = [];
     let planesLista = [];
     let enviosLista = [];
     let usuariosLista = [];
-    let productoActivo = null;
     let fotoBase64 = null;
 
     const CIUDADES_USA = [
@@ -873,21 +718,15 @@
       await cargarVentas();
       await cargarPlanesAcumulativos();
       await cargarEnvios();
-      
-      // Aplicar permisos iniciales
+      await actualizarProximoNumeroTicketVisual();
       aplicarPermisosRol();
       lucide.createIcons();
     });
 
-    // ==================== GESTIÓN DE TURNOS Y ROLES ====================
+    // ==================== GESTIÓN DE TURNOS ====================
     function mostrarModalLogin() {
       document.getElementById('input-clave-login').value = '';
       document.getElementById('pantalla-login').classList.remove('hidden');
-    }
-
-    function verificarTipoUsuarioLogin() {
-      // Si seleccionas al Admin pide clave, si seleccionas vendedor también valida
-      document.getElementById('input-clave-login').focus();
     }
 
     async function confirmarAccesoCajero() {
@@ -898,13 +737,11 @@
       const user = usuariosLista.find(u => u.id === userId);
       if (!user) return alert("Usuario no encontrado.");
 
-      // Si es admin verifica clave admin123
       if (user.rol === 'ADMIN') {
         if (clave !== 'admin123' && clave !== user.clave) {
           return alert("Contraseña de Administrador incorrecta.");
         }
       } else {
-        // Si es vendedor verifica su clave registrada
         if (user.clave && user.clave !== clave) {
           return alert("Contraseña incorrecta para " + user.nombre_completo);
         }
@@ -913,13 +750,11 @@
       usuarioActual = user;
       document.getElementById('pantalla-login').classList.add('hidden');
       aplicarPermisosRol();
-      alert(`Turno iniciado como: ${usuarioActual.nombre_completo} [Rol: ${usuarioActual.rol}]`);
+      alert(`Turno activo: ${usuarioActual.nombre_completo} [${usuarioActual.rol}]`);
     }
 
     function aplicarPermisosRol() {
       document.getElementById('badge-sucursal').innerText = `${usuarioActual.nombre_completo} [${usuarioActual.rol}]`;
-      document.getElementById('fac-vendedor-nombre').innerText = usuarioActual.nombre_completo.toUpperCase();
-
       const tabInv = document.getElementById('tab-inv');
       const tabAdmin = document.getElementById('tab-admin');
 
@@ -927,7 +762,6 @@
         tabInv.classList.remove('hidden');
         tabAdmin.classList.remove('hidden');
       } else {
-        // Bloquear y ocultar inventario y administración al empleado
         tabInv.classList.add('hidden');
         tabAdmin.classList.add('hidden');
         cambiarVista('pos');
@@ -937,13 +771,10 @@
     async function cargarUsuariosLista() {
       const { data } = await db.from('usuarios_sistema').select('*');
       usuariosLista = data || [];
-      
-      // Asegurar que el admin esté en la lista
       if (!usuariosLista.some(u => u.usuario === 'admin')) {
         usuariosLista.unshift(usuarioActual);
       }
 
-      // Llenar selector del Login
       const selectLogin = document.getElementById('select-usuario-login');
       if (selectLogin) {
         selectLogin.innerHTML = '';
@@ -952,7 +783,6 @@
         });
       }
 
-      // Llenar tabla de administración
       const l = document.getElementById('lista-personal');
       if (!l) return;
       l.innerHTML = '';
@@ -989,7 +819,7 @@
       } else {
         if (!clave) return alert("Asigne una contraseña.");
         await db.from('usuarios_sistema').insert([{ nombre_completo: nombre, usuario: alias, clave: clave, rol: rol, sucursal_id: sucursal_id }]);
-        alert("Trabajador registrado con éxito.");
+        alert("Trabajador registrado.");
       }
       cancelarEdicionUser();
       await cargarUsuariosLista();
@@ -1028,22 +858,15 @@
     async function cargarSucursales() {
       const { data } = await db.from('sucursales').select('*');
       sucursales = data || [];
-      const selectFac = document.getElementById('fac-sucursal');
       const selectUser = document.getElementById('user-sucursal');
       const lista = document.getElementById('lista-sucursales');
-      if (selectFac) selectFac.innerHTML = '';
       if (selectUser) selectUser.innerHTML = '<option value="">Sin sede fija (Global)</option>';
       if (lista) lista.innerHTML = '';
 
-      if (sucursales.length === 0) {
-        if (selectFac) selectFac.innerHTML = '<option value="SUPERCELL">SUPERCELL 29 DE M</option>';
-      } else {
-        sucursales.forEach(s => {
-          if (selectFac) selectFac.innerHTML += `<option value="${s.nombre}">${s.nombre}</option>`;
-          if (selectUser) selectUser.innerHTML += `<option value="${s.id}">${s.nombre}</option>`;
-          if (lista) lista.innerHTML += `<li class="p-2 bg-slate-50 border rounded flex justify-between"><b>${s.nombre}</b> <span class="text-xs text-slate-400">${s.direccion || ''}</span></li>`;
-        });
-      }
+      sucursales.forEach(s => {
+        if (selectUser) selectUser.innerHTML += `<option value="${s.id}">${s.nombre}</option>`;
+        if (lista) lista.innerHTML += `<li class="p-2 bg-slate-50 border rounded flex justify-between"><b>${s.nombre}</b> <span class="text-xs text-slate-400">${s.direccion || ''}</span></li>`;
+      });
     }
 
     async function crearSucursal(e) {
@@ -1057,215 +880,246 @@
       cargarSucursales();
     }
 
-    // ==================== FACTURA DE VENTA ====================
+    // ==================== GENERADOR DE SECUENCIA CORRELATIVA 00000001 ====================
+    async function obtenerSiguienteNumeroSecuencia() {
+      const { data, error } = await db.from('ventas').select('numero_comprobante');
+      if (error || !data || data.length === 0) {
+        return "TKT-00000001";
+      }
+
+      let maxNumero = 0;
+      data.forEach(v => {
+        if (v.numero_comprobante) {
+          // Extrae los dígitos numéricos del comprobante
+          const match = v.numero_comprobante.match(/\d+/g);
+          if (match) {
+            const num = parseInt(match[match.length - 1], 10);
+            if (!isNaN(num) && num > maxNumero) {
+              maxNumero = num;
+            }
+          }
+        }
+      });
+
+      const siguiente = maxNumero + 1;
+      return "TKT-" + String(siguiente).padStart(8, '0');
+    }
+
+    async function actualizarProximoNumeroTicketVisual() {
+      const proximo = await obtenerSiguienteNumeroSecuencia();
+      const elem = document.getElementById('pos-proximo-ticket');
+      if (elem) elem.innerText = `Próximo: ${proximo}`;
+    }
+
+    // ==================== VENTAS / POS (INTERFAZ ORIGINAL) ====================
     async function cargarProductos() {
       const { data } = await db.from('productos').select('*').order('id', { ascending: false });
       productos = data || [];
-      const datalist = document.getElementById('lista-sugerencias-prod');
-      if (datalist) {
-        datalist.innerHTML = '';
-        productos.forEach(p => { datalist.innerHTML += `<option value="${p.nombre}">`; });
-      }
+      renderizarPOS(productos);
       renderizarCotizarGrid(productos);
       poblarSelectProductosPlan(productos);
       renderizarInventario(productos);
     }
 
-    function buscarProductoPorCodigo(cod) {
-      if (!cod) return;
-      const prod = productos.find(p => (p.codigo_barras && p.codigo_barras.toLowerCase() === cod.toLowerCase()));
-      if (prod) cargarProductoAFilaActiva(prod);
-      else alert("Producto no encontrado con el código: " + cod);
-    }
+    function renderizarPOS(lista) {
+      const c = document.getElementById('grid-pos');
+      c.innerHTML = '';
+      if (lista.length === 0) {
+        c.innerHTML = `<p class="col-span-3 text-center py-10 text-slate-400 text-sm">No hay productos disponibles.</p>`;
+        return;
+      }
 
-    function seleccionarProductoPorNombre(nombre) {
-      if (!nombre) return;
-      const prod = productos.find(p => p.nombre.toLowerCase() === nombre.toLowerCase());
-      if (prod) cargarProductoAFilaActiva(prod);
-    }
-
-    function cargarProductoAFilaActiva(prod) {
-      productoActivo = prod;
-      document.getElementById('in-item-codigo').value = prod.codigo_barras || 'S/C';
-      document.getElementById('in-item-detalle').value = prod.nombre;
-      document.getElementById('in-item-vunit').value = parseFloat(prod.precio_venta).toFixed(2);
-      calcularFilaActiva();
-    }
-
-    function calcularFilaActiva() {
-      const cant = parseFloat(document.getElementById('in-item-cant').value) || 0;
-      const vunit = parseFloat(document.getElementById('in-item-vunit').value) || 0;
-      const porcDesc = parseFloat(document.getElementById('in-item-porc-desc').value) || 0;
-      const subtotalBruto = cant * vunit;
-      const valDesc = subtotalBruto * (porcDesc / 100);
-      const totalFila = subtotalBruto - valDesc;
-      document.getElementById('in-item-val-desc').value = valDesc.toFixed(2);
-      document.getElementById('in-item-total').innerText = totalFila.toFixed(2);
-    }
-
-    function agregarFilaAFactura() {
-      const detalle = document.getElementById('in-item-detalle').value.trim();
-      const cant = parseFloat(document.getElementById('in-item-cant').value) || 0;
-      const vunit = parseFloat(document.getElementById('in-item-vunit').value) || 0;
-      const porcDesc = parseFloat(document.getElementById('in-item-porc-desc').value) || 0;
-      const ivaPorc = parseFloat(document.getElementById('in-item-iva').value) || 0;
-      const codigo = document.getElementById('in-item-codigo').value.trim() || 'S/C';
-      const umed = document.getElementById('in-item-umed').value;
-
-      if (!detalle || cant <= 0 || vunit <= 0) return alert("Complete los datos del producto.");
-      if (productoActivo && cant > productoActivo.stock_actual) return alert(`Stock insuficiente. Quedan ${productoActivo.stock_actual} unidades.`);
-
-      const subtotalBruto = cant * vunit;
-      const valDesc = subtotalBruto * (porcDesc / 100);
-      const totalFila = subtotalBruto - valDesc;
-
-      itemsFactura.push({
-        id: productoActivo ? productoActivo.id : null,
-        codigo: codigo,
-        cantidad: cant,
-        umed: umed,
-        nombre: detalle,
-        precio_venta: vunit,
-        porcDesc: porcDesc,
-        valDesc: valDesc,
-        ivaPorc: ivaPorc,
-        total: totalFila,
-        stock_actual: productoActivo ? productoActivo.stock_actual : 999
-      });
-
-      document.getElementById('in-item-codigo').value = '';
-      document.getElementById('in-item-cant').value = '1';
-      document.getElementById('in-item-detalle').value = '';
-      document.getElementById('in-item-vunit').value = '0.00';
-      document.getElementById('in-item-porc-desc').value = '0';
-      document.getElementById('in-item-val-desc').value = '0';
-      document.getElementById('in-item-total').innerText = '0.00';
-      productoActivo = null;
-
-      renderizarTablaFactura();
-    }
-
-    function renderizarTablaFactura() {
-      const tbody = document.getElementById('tabla-factura-items');
-      const filasAgregadas = tbody.querySelectorAll('.fila-producto-agregado');
-      filasAgregadas.forEach(f => f.remove());
-
-      itemsFactura.forEach((it, idx) => {
-        const tr = document.createElement('tr');
-        tr.className = 'fila-producto-agregado hover:bg-slate-50';
-        tr.innerHTML = `
-          <td class="p-2 font-mono text-slate-500">${it.codigo}</td>
-          <td class="p-2 font-bold">${it.cantidad}</td>
-          <td class="p-2 text-slate-500">${it.umed}</td>
-          <td class="p-2 font-semibold text-slate-700">${it.nombre}</td>
-          <td class="p-2 text-right font-mono">$${it.precio_venta.toFixed(2)}</td>
-          <td class="p-2 text-center">${it.porcDesc}%</td>
-          <td class="p-2 text-center font-mono">$${it.valDesc.toFixed(2)}</td>
-          <td class="p-2 text-center font-bold">${it.ivaPorc}%</td>
-          <td class="p-2 text-right font-bold text-slate-900 font-mono">$${it.total.toFixed(2)}</td>
-          <td class="p-2 text-center"><button onclick="itemsFactura.splice(${idx},1); renderizarTablaFactura();" class="text-red-500 hover:text-red-700 font-bold text-sm">×</button></td>
+      lista.forEach(p => {
+        const sinStock = p.stock_actual <= 0;
+        c.innerHTML += `
+          <div onclick="${sinStock ? '' : `agregarCarrito(${p.id})`}" 
+               class="border p-3 rounded-lg flex flex-col justify-between transition ${sinStock ? 'opacity-50 cursor-not-allowed bg-slate-50' : 'cursor-pointer hover:border-indigo-500 bg-white shadow-sm hover:shadow'}">
+            <div>
+              <p class="text-[11px] text-slate-400 font-mono">${p.codigo_barras || 'S/C'}</p>
+              <h4 class="font-bold text-xs text-slate-700">${p.nombre}</h4>
+            </div>
+            <div class="mt-3 flex justify-between items-center">
+              <span class="text-sm font-bold text-indigo-600">$${parseFloat(p.precio_venta).toFixed(2)}</span>
+              <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${sinStock ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-700'}">
+                ${sinStock ? 'AGOTADO' : `Stock: ${p.stock_actual}`}
+              </span>
+            </div>
+          </div>
         `;
-        tbody.prepend(tr);
       });
-
-      calcularTotalesFactura();
     }
 
-    function calcularTotalesFactura() {
-      let subTotalCIva = 0;
-      let subTotalSIva = 0;
-      let totalDescuento = 0;
-      let totalIva = 0;
+    function agregarCarrito(id) {
+      const prod = productos.find(p => p.id === id);
+      if (!prod || prod.stock_actual <= 0) return alert("Producto agotado.");
 
-      itemsFactura.forEach(it => {
-        totalDescuento += it.valDesc;
-        if (it.ivaPorc > 0) {
-          subTotalCIva += it.total;
-          totalIva += (it.total * (it.ivaPorc / 100));
-        } else {
-          subTotalSIva += it.total;
+      const itemEnCarrito = carrito.find(c => c.id === id);
+      if (itemEnCarrito) {
+        if (itemEnCarrito.cantidad >= prod.stock_actual) {
+          return alert(`Stock insuficiente. Solo quedan ${prod.stock_actual} unidades.`);
         }
+        itemEnCarrito.cantidad++;
+      } else {
+        carrito.push({ ...prod, cantidad: 1 });
+      }
+      renderCarrito();
+    }
+
+    function cambiarCantidadCarrito(idx, delta) {
+      const item = carrito[idx];
+      const prod = productos.find(p => p.id === item.id);
+      const nuevaCantidad = item.cantidad + delta;
+
+      if (nuevaCantidad <= 0) {
+        carrito.splice(idx, 1);
+      } else if (nuevaCantidad > prod.stock_actual) {
+        alert(`Stock máximo alcanzado (${prod.stock_actual} unidades disponibles).`);
+        return;
+      } else {
+        item.cantidad = nuevaCantidad;
+      }
+      renderCarrito();
+    }
+
+    function actualizarMonedaPOS() {
+      const moneda = document.getElementById('pos-moneda').value;
+      const bloqueTasa = document.getElementById('bloque-tasa-cambio');
+      const filaMoneda = document.getElementById('fila-total-moneda');
+
+      if (moneda === 'NIO') {
+        bloqueTasa.classList.remove('hidden');
+        filaMoneda.classList.remove('hidden');
+      } else {
+        bloqueTasa.classList.add('hidden');
+        filaMoneda.classList.add('hidden');
+      }
+      renderCarrito();
+    }
+
+    function renderCarrito() {
+      const c = document.getElementById('carrito-items');
+      c.innerHTML = '';
+      let totalUSD = 0;
+
+      carrito.forEach((item, idx) => {
+        const sub = item.cantidad * item.precio_venta;
+        totalUSD += sub;
+        c.innerHTML += `
+          <div class="flex justify-between items-center text-xs pb-1.5 border-b">
+            <div>
+              <p class="font-bold text-slate-800">${item.nombre}</p>
+              <p class="text-slate-400">$${item.precio_venta.toFixed(2)} c/u</p>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button onclick="cambiarCantidadCarrito(${idx}, -1)" class="w-5 h-5 bg-slate-200 rounded font-bold hover:bg-slate-300">-</button>
+              <span class="font-bold w-4 text-center">${item.cantidad}</span>
+              <button onclick="cambiarCantidadCarrito(${idx}, 1)" class="w-5 h-5 bg-slate-200 rounded font-bold hover:bg-slate-300">+</button>
+              <span class="font-bold w-12 text-right font-mono">$${sub.toFixed(2)}</span>
+              <button onclick="carrito.splice(${idx},1); renderCarrito();" class="text-red-500 font-bold ml-1">×</button>
+            </div>
+          </div>
+        `;
       });
 
-      const subTotalNeto = subTotalCIva + subTotalSIva;
-      const totalGeneral = subTotalNeto + totalIva;
+      document.getElementById('pos-total-usd').innerText = `$${totalUSD.toFixed(2)}`;
 
-      document.getElementById('txt-subtotal-c-iva').innerText = subTotalCIva.toFixed(2);
-      document.getElementById('txt-subtotal-s-iva').innerText = subTotalSIva.toFixed(2);
-      document.getElementById('txt-descuento').innerText = totalDescuento.toFixed(2);
-      document.getElementById('txt-subtotal').innerText = subTotalNeto.toFixed(2);
-      document.getElementById('txt-iva').innerText = totalIva.toFixed(2);
-      document.getElementById('txt-total-factura-grande').innerText = totalGeneral.toFixed(2);
+      const moneda = document.getElementById('pos-moneda').value;
+      if (moneda === 'NIO') {
+        const tasa = parseFloat(document.getElementById('pos-tasa-cambio').value) || 36.80;
+        const totalNIO = totalUSD * tasa;
+        document.getElementById('pos-total-moneda').innerText = `C$ ${totalNIO.toFixed(2)}`;
+      }
     }
 
-    function limpiarFacturaCompleta() {
-      itemsFactura = [];
-      productoActivo = null;
-      document.getElementById('fac-doc').value = '9999999999999';
-      document.getElementById('fac-ape').value = 'CONSUMIDOR';
-      document.getElementById('fac-nom').value = 'FINAL';
-      document.getElementById('fac-dir').value = '';
-      document.getElementById('fac-tel').value = '';
-      document.getElementById('fac-mail').value = '';
-      renderizarTablaFactura();
+    function limpiarCarrito() {
+      carrito = [];
+      renderCarrito();
     }
 
-    async function procesarFacturaVenta() {
-      if (itemsFactura.length === 0) return alert("Agregue al menos un producto a la factura.");
+    async function cobrarTicket() {
+      if (carrito.length === 0) return alert("Ticket vacío.");
 
-      const totalFactura = parseFloat(document.getElementById('txt-total-factura-grande').innerText);
-      const doc = document.getElementById('fac-doc').value.trim() || '9999999999999';
-      const ape = document.getElementById('fac-ape').value.trim();
-      const nom = document.getElementById('fac-nom').value.trim();
-      const dir = document.getElementById('fac-dir').value.trim();
-      const tel = document.getElementById('fac-tel').value.trim();
-      const mail = document.getElementById('fac-mail').value.trim();
-      const nombreCompleto = `${ape} ${nom}`.trim() || 'CONSUMIDOR FINAL';
+      for (const item of carrito) {
+        const prod = productos.find(p => p.id === item.id);
+        if (!prod || prod.stock_actual < item.cantidad) {
+          return alert(`Stock insuficiente para "${item.nombre}". Disponible: ${prod ? prod.stock_actual : 0}`);
+        }
+      }
 
-      const numCorrelativo = document.getElementById('fac-numero-correlativo').innerText;
-      const numComp = `002-001-${numCorrelativo}`;
-      const metodoPago = document.querySelector('input[name="tipo_pago"]:checked').value;
+      const totalUSD = carrito.reduce((sum, i) => sum + (i.cantidad * i.precio_venta), 0);
+      const moneda = document.getElementById('pos-moneda').value;
+      const metodo = document.getElementById('pos-metodo').value;
+
+      // Obtener el siguiente número correlativo en secuencia 00000001
+      const numComp = await obtenerSiguienteNumeroSecuencia();
+
+      const doc = document.getElementById('pos-doc-cliente').value.trim() || '9999999999';
+      const nom = document.getElementById('pos-nom-cliente').value.trim();
+      const ape = document.getElementById('pos-ape-cliente').value.trim();
+      const tel = document.getElementById('pos-tel-cliente').value.trim();
+      const mail = document.getElementById('pos-mail-cliente').value.trim();
+      const nombreCompleto = (nom || ape) ? `${nom} ${ape}`.trim() : 'CONSUMIDOR FINAL';
+
+      let totalFinalTexto = `$${totalUSD.toFixed(2)} USD`;
+      if (moneda === 'NIO') {
+        const tasa = parseFloat(document.getElementById('pos-tasa-cambio').value) || 36.80;
+        totalFinalTexto += ` (C$ ${(totalUSD * tasa).toFixed(2)} NIO)`;
+      }
 
       let { data: cliente } = await db.from('clientes').select('id').eq('identificacion', doc).maybeSingle();
       if (!cliente) {
         const { data: nc } = await db.from('clientes').insert([{
-          identificacion: doc, nombre_completo: nombreCompleto, nombres: nom, apellidos: ape, direccion: dir, telefono: tel, email: mail
+          identificacion: doc, nombre_completo: nombreCompleto, nombres: nom, apellidos: ape, telefono: tel, email: mail
         }]).select().single();
         cliente = nc;
       }
 
+      const metodoDetalle = `${metodo} [${moneda}]`;
       const { data: venta, error } = await db.from('ventas').insert([{
         numero_comprobante: numComp,
         cliente_id: cliente ? cliente.id : null,
-        total: totalFactura,
-        metodo_pago: metodoPago,
+        total: totalUSD,
+        metodo_pago: metodoDetalle,
         usuario_sistema_id: usuarioActual.id
       }]).select().single();
 
-      if (error) return alert("Error al guardar venta: " + error.message);
+      if (error) return alert("Error al registrar venta: " + error.message);
 
-      for (const it of itemsFactura) {
-        if (it.id) {
-          await db.from('detalle_ventas').insert([{
-            venta_id: venta.id, producto_id: it.id, cantidad: it.cantidad, precio_unitario: it.precio_venta, subtotal: it.total
-          }]);
-          await db.from('productos').update({ stock_actual: it.stock_actual - it.cantidad }).eq('id', it.id);
-        }
+      for (const item of carrito) {
+        await db.from('detalle_ventas').insert([{
+          venta_id: venta.id,
+          producto_id: item.id,
+          cantidad: item.cantidad,
+          precio_unitario: item.precio_venta,
+          subtotal: item.cantidad * item.precio_venta
+        }]);
+
+        const nuevoStock = item.stock_actual - item.cantidad;
+        await db.from('productos').update({ stock_actual: nuevoStock }).eq('id', item.id);
       }
 
-      const imprimir = confirm(`¡Factura ${numComp} guardada!\nTotal: $${totalFactura.toFixed(2)}\n\n¿Deseas imprimir el comprobante térmico?`);
-      if (imprimir) {
+      const deseaImprimir = confirm(`¡Venta realizada con éxito!\nComprobante: ${numComp}\nTotal: ${totalFinalTexto}\n\n¿Deseas imprimir el recibo ahora?`);
+      if (deseaImprimir) {
         imprimirTicketTermicoRaw({
-          numero: numComp, fecha: new Date().toLocaleString(), cliente: nombreCompleto,
-          cajero: usuarioActual.nombre_completo, items: itemsFactura, total: `$${totalFactura.toFixed(2)}`,
-          metodo: metodoPago
+          numero: numComp,
+          fecha: new Date().toLocaleString(),
+          cliente: `${nombreCompleto} (${doc})`,
+          cajero: usuarioActual.nombre_completo,
+          items: carrito.map(c => ({ cantidad: c.cantidad, nombre: c.nombre, precio_venta: c.precio_venta })),
+          total: totalFinalTexto,
+          metodo: metodoDetalle
         });
       }
 
-      document.getElementById('fac-numero-correlativo').innerText = parseInt(numCorrelativo) + 1;
-      limpiarFacturaCompleta();
+      limpiarCarrito();
       await cargarProductos();
       await cargarVentas();
+      await actualizarProximoNumeroTicketVisual();
+    }
+
+    function filtrarProductosPOS() {
+      const q = document.getElementById('buscar-pos').value.toLowerCase();
+      renderizarPOS(productos.filter(p => p.nombre.toLowerCase().includes(q) || (p.codigo_barras && p.codigo_barras.toLowerCase().includes(q))));
     }
 
     // ==================== COTIZACIONES ====================
@@ -1275,9 +1129,9 @@
       g.innerHTML = '';
       lista.forEach(p => {
         g.innerHTML += `
-          <div onclick="agregarCotizacion(${p.id})" class="border p-3 rounded-lg bg-white cursor-pointer hover:border-indigo-500">
+          <div onclick="agregarCotizacion(${p.id})" class="border p-3 rounded-lg bg-white cursor-pointer hover:border-indigo-500 shadow-sm">
             <h4 class="font-bold text-xs text-slate-700">${p.nombre}</h4>
-            <span class="text-sm font-bold text-indigo-600">$${parseFloat(p.precio_venta).toFixed(2)}</span>
+            <span class="text-sm font-bold text-indigo-600 font-mono">$${parseFloat(p.precio_venta).toFixed(2)}</span>
           </div>
         `;
       });
@@ -1302,7 +1156,7 @@
           <div class="flex justify-between items-center text-xs pb-1 border-b">
             <span>${it.nombre} x${it.cantidad}</span>
             <div class="flex items-center gap-1">
-              <span class="font-bold">$${sub.toFixed(2)}</span>
+              <span class="font-bold font-mono">$${sub.toFixed(2)}</span>
               <button onclick="carritoCotizacion.splice(${idx},1); renderCotizacion();" class="text-red-500 font-bold ml-1">×</button>
             </div>
           </div>
@@ -1395,8 +1249,8 @@
           <tr class="hover:bg-slate-50">
             <td class="p-3 font-mono font-bold text-indigo-700">${pl.codigo_plan}</td>
             <td class="p-3"><b>${pl.cliente_nombre}</b><br><span class="text-[10px] text-slate-400">${pl.cliente_telefono}</span></td>
-            <td class="p-3 font-bold">$${parseFloat(pl.total).toFixed(2)}</td>
-            <td class="p-3 font-bold text-red-600">$${parseFloat(pl.saldo_pendiente).toFixed(2)}</td>
+            <td class="p-3 font-bold font-mono">$${parseFloat(pl.total).toFixed(2)}</td>
+            <td class="p-3 font-bold text-red-600 font-mono">$${parseFloat(pl.saldo_pendiente).toFixed(2)}</td>
             <td class="p-3 font-semibold">${pl.fecha_proximo_abono || '-'}</td>
             <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${pl.saldo_pendiente <= 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${pl.saldo_pendiente <= 0 ? 'LIQUIDADO' : 'ACTIVO'}</span></td>
             <td class="p-3 text-center space-x-1">
@@ -1458,8 +1312,8 @@
           <tr class="hover:bg-slate-50">
             <td class="p-2 font-bold text-slate-500">${i + 1}</td>
             <td class="p-2 text-slate-600">${new Date(ab.fecha).toLocaleString()}</td>
-            <td class="p-2 text-right font-bold text-emerald-600">+$${parseFloat(ab.monto).toFixed(2)}</td>
-            <td class="p-2 text-right font-bold text-slate-700">$${parseFloat(ab.nuevo_saldo).toFixed(2)}</td>
+            <td class="p-2 text-right font-bold text-emerald-600 font-mono">+$${parseFloat(ab.monto).toFixed(2)}</td>
+            <td class="p-2 text-right font-bold text-slate-700 font-mono">$${parseFloat(ab.nuevo_saldo).toFixed(2)}</td>
             <td class="p-2 text-slate-500">${ab.usuario_nombre || 'Cajero'}</td>
           </tr>
         `;
@@ -1473,7 +1327,7 @@
       document.getElementById('modal-historial-abonos').classList.add('hidden');
     }
 
-    // ==================== ENVÍOS ====================
+    // ==================== ENVÍOS (COURIER) ====================
     function cambiarRutaEnvio() {
       const ruta = document.getElementById('env-ruta').value;
       const datalist = document.getElementById('lista-ciudades-destino');
@@ -1637,7 +1491,7 @@
             <td class="p-3"><b>${env.cliente_nombre}</b> (${env.ciudad_destino})</td>
             <td class="p-3 text-slate-500 truncate max-w-xs">${env.contenido_paquete || '-'}</td>
             <td class="p-3 font-bold">${env.peso} ${env.unidad_peso}</td>
-            <td class="p-3 text-right font-bold text-slate-800">$${parseFloat(env.valor_envio).toFixed(2)}</td>
+            <td class="p-3 text-right font-bold text-slate-800 font-mono">$${parseFloat(env.valor_envio).toFixed(2)}</td>
             <td class="p-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${env.estado_pago === 'PAGADO' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${env.estado_pago || 'PAGADO'}</span></td>
             <td class="p-3 text-center">${env.foto_paquete_url ? `<img src="${env.foto_paquete_url}" onclick="window.open(this.src)" class="w-8 h-8 object-cover rounded cursor-pointer mx-auto border">` : '<span class="text-slate-400 text-[10px]">Sin foto</span>'}</td>
             <td class="p-3 text-center"><span class="px-2 py-1 rounded text-[10px] bg-slate-100">${env.estado}</span></td>
@@ -1647,7 +1501,7 @@
       lucide.createIcons();
     }
 
-    // ==================== INVENTARIO ====================
+    // ==================== INVENTARIO (ADMIN) ====================
     async function guardarProducto(e) {
       e.preventDefault();
       const id = document.getElementById('edit-prod-id').value;
@@ -1738,10 +1592,10 @@
         tot += parseFloat(v.total);
         tb.innerHTML += `
           <tr class="hover:bg-slate-50">
-            <td class="p-3 font-mono font-bold text-blue-700">${v.numero_comprobante}</td>
+            <td class="p-3 font-mono font-bold text-indigo-700">${v.numero_comprobante}</td>
             <td class="p-3 text-slate-500">${new Date(v.fecha).toLocaleDateString()}</td>
             <td class="p-3"><span class="px-2 py-0.5 rounded text-xs bg-slate-100 font-bold">${v.metodo_pago}</span></td>
-            <td class="p-3 text-right font-bold text-slate-800">$${parseFloat(v.total).toFixed(2)}</td>
+            <td class="p-3 text-right font-bold text-slate-800 font-mono">$${parseFloat(v.total).toFixed(2)}</td>
             <td class="p-3 text-center space-x-1">
               <button onclick="reimprimirVentaDual(${v.id}, 'TICKET')" class="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-xs font-bold" title="Imprimir Ticket"><i data-lucide="printer" class="w-3.5 h-3.5"></i></button>
               <button onclick="reimprimirVentaDual(${v.id}, 'PDF')" class="p-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded text-xs font-bold" title="Descargar Factura PDF"><i data-lucide="download" class="w-3.5 h-3.5"></i></button>
@@ -1762,7 +1616,7 @@
       }));
 
       const nombreCli = venta.clientes ? (venta.clientes.nombre_completo || venta.clientes.identificacion) : 'CONSUMIDOR FINAL';
-      const docCli = venta.clientes ? venta.clientes.identificacion : '9999999999999';
+      const docCli = venta.clientes ? venta.clientes.identificacion : '9999999999';
 
       if (modo === 'TICKET') {
         imprimirTicketTermicoRaw({
@@ -1796,8 +1650,8 @@
           <tr class="text-xs">
             <td class="p-2">${it.cantidad}</td>
             <td class="p-2">${it.nombre}</td>
-            <td class="p-2 text-right">$${parseFloat(it.precio_venta).toFixed(2)}</td>
-            <td class="p-2 text-right font-bold">$${(it.cantidad * it.precio_venta).toFixed(2)}</td>
+            <td class="p-2 text-right font-mono">$${parseFloat(it.precio_venta).toFixed(2)}</td>
+            <td class="p-2 text-right font-bold font-mono">$${(it.cantidad * it.precio_venta).toFixed(2)}</td>
           </tr>
         `;
       });
@@ -1835,22 +1689,11 @@
         tb.innerHTML += `
           <tr>
             <td>${it.cantidad}x ${it.nombre}</td>
-            <td class="text-right font-bold">$${(it.cantidad * it.precio_venta).toFixed(2)}</td>
+            <td class="text-right font-bold font-mono">$${(it.cantidad * it.precio_venta).toFixed(2)}</td>
           </tr>
         `;
       });
       window.print();
-    }
-
-    function reimprimirUltimaFactura() {
-      const numCorrelativo = parseInt(document.getElementById('fac-numero-correlativo').innerText) - 1;
-      alert(`Listo para reimprimir comprobante 002-001-${numCorrelativo}`);
-    }
-
-    function enviarFacturaCorreo() {
-      const mail = document.getElementById('fac-mail').value;
-      if (!mail) return alert("Ingrese un correo electrónico.");
-      alert(`Factura enviada a: ${mail}`);
     }
 
     // ==================== NAVEGACIÓN ====================
@@ -1860,10 +1703,8 @@
         const tb = document.getElementById('tab-' + x);
         if (el) el.classList.toggle('hidden', x !== v);
         if (tb) {
-          tb.classList.toggle('bg-blue-600', x === v);
-          tb.classList.toggle('text-white', x === v);
-          tb.classList.toggle('hover:bg-slate-800', x !== v);
-          tb.classList.toggle('text-slate-300', x !== v);
+          tb.classList.toggle('bg-indigo-800', x === v);
+          tb.classList.toggle('hover:bg-indigo-600', x !== v);
         }
       });
 
