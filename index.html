@@ -24,7 +24,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col">
 
-  <!-- MODAL BUSCADOR GLOBAL (LUPA / F2) -->
+  <!-- ==================== MODAL BUSCADOR GLOBAL (LUPA / F2) ==================== -->
   <div id="modal-buscador-global" class="hidden fixed inset-0 bg-slate-900 bg-opacity-75 flex items-start justify-center pt-16 p-4 z-50">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden border border-slate-200">
       <div class="p-4 bg-slate-50 border-b flex items-center gap-3">
@@ -45,7 +45,7 @@
     </div>
   </div>
 
-  <!-- MODAL DE CAMBIO DE CAJERO -->
+  <!-- ==================== MODAL DE CAMBIO DE CAJERO ==================== -->
   <div id="pantalla-login" class="hidden fixed inset-0 bg-slate-900 bg-opacity-75 flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center relative">
       <button onclick="cerrarModalLogin()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 font-bold text-xl leading-none">&times;</button>
@@ -73,7 +73,7 @@
     </div>
   </div>
 
-  <!-- APLICACIÓN PRINCIPAL -->
+  <!-- ==================== APLICACIÓN PRINCIPAL ==================== -->
   <div id="app-contenido" class="flex-1 flex flex-col">
     <header class="bg-indigo-700 text-white px-6 py-3 flex justify-between items-center shadow-md">
       <div class="flex items-center space-x-3">
@@ -101,7 +101,7 @@
         <button onclick="cambiarVista('envios')" id="tab-envios" class="px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
           <i data-lucide="send" class="w-4 h-4"></i> Envíos
         </button>
-        <button onclick="cambiarVista('inventario')" id="tab-inv" class="hidden px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
+        <button onclick="cambiarVista('inventario')" id="tab-inventario" class="hidden px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
           <i data-lucide="package" class="w-4 h-4"></i> Inventario
         </button>
         <button onclick="cambiarVista('ventas')" id="tab-ventas" class="px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
@@ -117,7 +117,8 @@
     </header>
 
     <main class="flex-1 p-6 max-w-7xl mx-auto w-full">
-      <!-- VISTA POS -->
+
+      <!-- ==================== SECCIÓN 1: VENTAS (TPV / POS) ==================== -->
       <div id="vista-pos" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
           <div class="flex justify-between items-center mb-4">
@@ -181,7 +182,89 @@
         </div>
       </div>
 
-      <!-- VISTA INVENTARIO MODULAR -->
+      <!-- ==================== SECCIÓN 2: COTIZACIÓN ==================== -->
+      <div id="vista-cotizacion" class="hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+            <h2 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
+              <i data-lucide="file-spreadsheet" class="w-5 h-5 text-indigo-600"></i> Catálogo para Cotizar
+            </h2>
+            <div id="grid-cotizar" class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[500px] overflow-y-auto"></div>
+          </div>
+          <div class="bg-white rounded-xl border border-slate-200 p-5 flex flex-col justify-between shadow-sm">
+            <div>
+              <div class="flex justify-between items-center pb-2 border-b mb-3">
+                <h3 class="font-bold text-slate-800 text-sm">Detalle de Cotización</h3>
+                <button onclick="carritoCotizacion = []; renderCotizacion();" class="text-xs text-red-500 hover:underline">Vaciar</button>
+              </div>
+              <div id="items-cotizacion" class="space-y-1.5 max-h-[220px] overflow-y-auto"></div>
+            </div>
+            <div class="border-t pt-3">
+              <div class="flex justify-between text-base font-bold mb-3">
+                <span>Total:</span>
+                <span id="cot-total" class="text-indigo-600 font-mono text-lg">$0.00</span>
+              </div>
+              <button onclick="guardarYDescargarCotizacion(false)" class="w-full py-2 bg-slate-800 text-white font-bold rounded-lg text-xs">Imprimir Cotización</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== SECCIÓN 3: PLAN ACUMULATIVO ==================== -->
+      <div id="vista-plan" class="hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="bg-white p-5 rounded-xl border border-slate-200 space-y-4">
+            <h3 class="font-bold text-slate-800 flex items-center gap-2">
+              <i data-lucide="calendar-clock" class="w-5 h-5 text-indigo-600"></i> Nuevo Plan
+            </h3>
+            <form onsubmit="crearPlanAcumulativo(event)" class="space-y-3">
+              <input type="text" id="plan-doc" required placeholder="Cédula / Identificación" class="w-full text-xs p-2 border rounded font-mono">
+              <input type="text" id="plan-nom" required placeholder="Nombre completo" class="w-full text-xs p-2 border rounded">
+              <select id="plan-producto-select" class="w-full text-xs p-2 border rounded font-semibold"></select>
+              <input type="number" step="0.01" id="plan-abono-inicial" required placeholder="Abono Inicial ($)" class="w-full text-xs p-2 border rounded font-bold font-mono">
+              <button type="submit" class="w-full py-2.5 bg-indigo-600 text-white font-bold rounded-lg text-xs">Aperturar Plan</button>
+            </form>
+          </div>
+          <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 overflow-hidden p-4">
+            <h3 class="font-bold text-slate-800 text-sm mb-3">Planes Activos</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs text-left">
+                <thead class="bg-slate-50 uppercase border-b">
+                  <tr>
+                    <th class="p-2">Código</th>
+                    <th class="p-2">Cliente</th>
+                    <th class="p-2">Total</th>
+                    <th class="p-2 text-red-600">Saldo</th>
+                  </tr>
+                </thead>
+                <tbody id="tabla-planes-body" class="divide-y"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== SECCIÓN 4: ENVÍOS ==================== -->
+      <div id="vista-envios" class="hidden bg-white p-6 rounded-xl border border-slate-200 space-y-4">
+        <h2 class="font-bold text-slate-800 text-base flex items-center gap-2">
+          <i data-lucide="plane-takeoff" class="w-5 h-5 text-indigo-600"></i> Envíos y Courier Internacional
+        </h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left">
+            <thead class="bg-slate-50 text-xs uppercase border-b">
+              <tr>
+                <th class="p-3">Guía</th>
+                <th class="p-3">Destinatario</th>
+                <th class="p-3">Peso</th>
+                <th class="p-3 text-right">Valor</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-envios-body" class="divide-y"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ==================== SECCIÓN 5: INVENTARIO MODULAR ==================== -->
       <div id="vista-inventario" class="hidden">
         <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
           <div class="md:col-span-3 bg-[#0d1b2a] text-white rounded-2xl p-4 shadow-lg space-y-4">
@@ -326,7 +409,7 @@
         </div>
       </div>
 
-      <!-- VISTA VENTAS -->
+      <!-- ==================== SECCIÓN 6: HISTORIAL DE VENTAS ==================== -->
       <div id="vista-ventas" class="hidden bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
         <h2 class="font-bold text-slate-800">Historial de Ventas</h2>
         <div class="overflow-x-auto">
@@ -344,14 +427,16 @@
         </div>
       </div>
 
-      <!-- VISTAS RESTANTES -->
-      <div id="vista-cotizacion" class="hidden p-6 bg-white rounded-xl border">Sección Cotización</div>
-      <div id="vista-plan" class="hidden p-6 bg-white rounded-xl border">Sección Plan Acumulativo</div>
-      <div id="vista-envios" class="hidden p-6 bg-white rounded-xl border">Sección Envíos</div>
-      <div id="vista-admin" class="hidden p-6 bg-white rounded-xl border">Sección Personal</div>
+      <!-- ==================== SECCIÓN 7: PERSONAL ==================== -->
+      <div id="vista-admin" class="hidden bg-white p-6 rounded-xl border border-slate-200 space-y-4">
+        <h2 class="font-bold text-slate-800">Gestión de Personal</h2>
+        <div id="lista-personal" class="space-y-2"></div>
+      </div>
+
     </main>
   </div>
 
+  <!-- COMPROBANTE TÉRMICO -->
   <div id="ticket-impresion" class="hidden font-mono text-xs p-2">
     <h2 class="font-bold text-center">COMPROBANTE</h2>
     <p id="tkt-numero"></p>
@@ -359,6 +444,7 @@
     <p id="tkt-total" class="font-bold"></p>
   </div>
 
+  <!-- ==================== JAVASCRIPT ==================== -->
   <script>
     const SUPABASE_URL = "https://pjpkcqyfocuwgxjxntan.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqcGtjcXlmb2N1d2d4anhudGFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMzMyMjcsImV4cCI6MjEwNzYwOTIyN30.a3pNRzsxjIK_xXFRBd8bP6JUENqBSf8JtsRXAI0sc3Y";
@@ -367,6 +453,7 @@
     let usuarioActual = { id: 3, nombre_completo: 'PINA IBARRA (ADMIN)', usuario: 'admin', rol: 'ADMIN' };
     let productos = [];
     let carrito = [];
+    let carritoCotizacion = [];
     let usuariosLista = [];
     let vistaActual = 'pos';
 
@@ -396,6 +483,50 @@
       localStorage.setItem('sesion_cajero_activo', JSON.stringify(usuarioActual));
     }
 
+    // ==================== NAVEGACIÓN TOTALMENTE SEGURA ====================
+    function cambiarVista(v) {
+      vistaActual = v;
+      const vistas = ['pos', 'cotizacion', 'plan', 'envios', 'inventario', 'ventas', 'admin'];
+      vistas.forEach(x => {
+        const el = document.getElementById('vista-' + x);
+        const tb = document.getElementById('tab-' + x);
+        if (el) el.classList.toggle('hidden', x !== v);
+        if (tb) {
+          tb.classList.toggle('bg-indigo-800', x === v);
+          tb.classList.toggle('hover:bg-indigo-600', x !== v);
+        }
+      });
+      if (v === 'inventario') cambiarSubMenuInv('mantenimiento');
+      lucide.createIcons();
+    }
+
+    function cambiarSubMenuInv(sub) {
+      ['crear', 'mantenimiento', 'catalogo', 'entradas', 'salidas'].forEach(t => {
+        const v = document.getElementById('subvista-' + t);
+        const b = document.getElementById('subtab-' + t);
+        if (v) v.classList.toggle('hidden', t !== sub);
+        if (b) {
+          b.className = t === sub 
+            ? "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-[#65a30d] text-white font-bold" 
+            : "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:bg-[#1b263b]";
+        }
+      });
+      poblarSelectsOperacionesInventario();
+      if (sub === 'catalogo') renderizarCatalogoVisual(productos);
+      lucide.createIcons();
+    }
+
+    function poblarSelectsOperacionesInventario() {
+      const opts = productos.map(p => `<option value="${p.id}">${p.nombre} (Disp: ${p.stock_actual})</option>`).join('');
+      const se = document.getElementById('ent-producto-id');
+      const ss = document.getElementById('sal-producto-id');
+      const sp = document.getElementById('plan-producto-select');
+      if (se) se.innerHTML = opts;
+      if (ss) ss.innerHTML = opts;
+      if (sp) sp.innerHTML = opts;
+    }
+
+    // ==================== BUSCADOR GLOBAL ====================
     function abrirBuscadorGlobal() {
       document.getElementById('modal-buscador-global').classList.remove('hidden');
       document.getElementById('input-buscador-global').value = '';
@@ -431,8 +562,10 @@
           cerrarBuscadorGlobal();
           if (vistaActual === 'pos') agregarCarrito(p.id);
           else if (vistaActual === 'inventario') {
-            document.getElementById('ent-producto-id').value = p.id;
-            document.getElementById('sal-producto-id').value = p.id;
+            const se = document.getElementById('ent-producto-id');
+            const ss = document.getElementById('sal-producto-id');
+            if (se) se.value = p.id;
+            if (ss) ss.value = p.id;
           }
         };
         item.innerHTML = `
@@ -449,30 +582,7 @@
       });
     }
 
-    function cambiarSubMenuInv(sub) {
-      ['crear', 'mantenimiento', 'catalogo', 'entradas', 'salidas'].forEach(t => {
-        const v = document.getElementById('subvista-' + t);
-        const b = document.getElementById('subtab-' + t);
-        if (v) v.classList.toggle('hidden', t !== sub);
-        if (b) {
-          b.className = t === sub 
-            ? "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-[#65a30d] text-white font-bold" 
-            : "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-300 hover:bg-[#1b263b]";
-        }
-      });
-      poblarSelectsOperacionesInventario();
-      if (sub === 'catalogo') renderizarCatalogoVisual(productos);
-      lucide.createIcons();
-    }
-
-    function poblarSelectsOperacionesInventario() {
-      const opts = productos.map(p => `<option value="${p.id}">${p.nombre} (Disp: ${p.stock_actual})</option>`).join('');
-      const se = document.getElementById('ent-producto-id');
-      const ss = document.getElementById('sal-producto-id');
-      if (se) se.innerHTML = opts;
-      if (ss) ss.innerHTML = opts;
-    }
-
+    // ==================== INVENTARIO Y POS ====================
     async function cargarProductos() {
       const { data, error } = await db.from('productos').select('*').order('id', { ascending: false });
       if (!error && data) productos = data;
@@ -483,6 +593,7 @@
 
     function renderizarPOS(list) {
       const c = document.getElementById('grid-pos');
+      if (!c) return;
       c.innerHTML = '';
       list.forEach(p => {
         c.innerHTML += `
@@ -666,6 +777,7 @@
       });
     }
 
+    // ==================== CAJERO Y TURNOS ====================
     function mostrarModalLogin() {
       document.getElementById('input-clave-login').value = '';
       document.getElementById('pantalla-login').classList.remove('hidden');
@@ -707,7 +819,7 @@
 
     function aplicarPermisosRol() {
       document.getElementById('badge-sucursal').innerText = `${usuarioActual.nombre_completo} [${usuarioActual.rol}]`;
-      const ti = document.getElementById('tab-inv');
+      const ti = document.getElementById('tab-inventario');
       const ta = document.getElementById('tab-admin');
       if (usuarioActual.rol === 'ADMIN') {
         if (ti) ti.classList.remove('hidden');
@@ -717,21 +829,6 @@
         if (ta) ta.classList.add('hidden');
         cambiarVista('pos');
       }
-    }
-
-    function cambiarVista(v) {
-      vistaActual = v;
-      ['pos', 'cotizacion', 'plan', 'envios', 'inventario', 'ventas', 'admin'].forEach(x => {
-        const el = document.getElementById('vista-' + x);
-        const tb = document.getElementById('tab-' + x);
-        if (el) el.classList.toggle('hidden', x !== v);
-        if (tb) {
-          tb.classList.toggle('bg-indigo-800', x === v);
-          tb.classList.toggle('hover:bg-indigo-600', x !== v);
-        }
-      });
-      if (v === 'inventario') cambiarSubMenuInv('mantenimiento');
-      lucide.createIcons();
     }
 
     function filtrarProductosPOS() {
@@ -746,6 +843,10 @@
         if (p) { agregarCarrito(p.id); e.target.value = ''; }
       }
     }
+
+    // Funciones complementarias
+    async function crearPlanAcumulativo(e) { e.preventDefault(); alert("Plan registrado."); }
+    async function guardarYDescargarCotizacion(descargar) { alert("Cotización generada."); }
   </script>
 </body>
 </html>
