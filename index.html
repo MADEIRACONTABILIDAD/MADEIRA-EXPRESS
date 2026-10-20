@@ -45,44 +45,44 @@
     </div>
   </div>
 
-  <!-- ==================== MODAL DE CAMBIO DE CAJERO ==================== -->
-  <div id="pantalla-login" class="hidden fixed inset-0 bg-slate-900 bg-opacity-75 flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center relative">
-      <button onclick="cerrarModalLogin()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 font-bold text-xl leading-none">&times;</button>
-      <div class="inline-flex p-3 bg-indigo-100 text-indigo-600 rounded-full mb-3">
-        <i data-lucide="user-check" class="w-8 h-8"></i>
+  <!-- ==================== PANTALLA DE INICIO DE SESIÓN OBLIGATORIA ==================== -->
+  <div id="pantalla-login" class="fixed inset-0 bg-slate-900 bg-opacity-95 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center relative border border-slate-200">
+      <button id="btn-cerrar-modal-login" onclick="cerrarModalLogin()" class="hidden absolute top-4 right-4 text-slate-400 hover:text-slate-700 font-bold text-xl leading-none">&times;</button>
+      <div class="inline-flex p-3.5 bg-indigo-100 text-indigo-600 rounded-full mb-3 shadow-inner">
+        <i data-lucide="lock" class="w-8 h-8"></i>
       </div>
-      <h2 class="text-lg font-bold text-slate-800">Cambio de Turno y Cajero</h2>
-      <p class="text-xs text-slate-400 mb-4">Selecciona el usuario que atenderá el punto de venta</p>
+      <h2 id="titulo-modal-login" class="text-lg font-bold text-slate-800">Iniciar Sesión en el Sistema</h2>
+      <p class="text-xs text-slate-400 mb-5">Identifícate para acceder al Punto de Venta y Courier</p>
 
-      <div class="space-y-3 text-left">
+      <div class="space-y-3.5 text-left">
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Cajero / Trabajador</label>
-          <select id="select-usuario-login" class="w-full text-xs font-semibold p-2.5 border rounded-lg bg-white outline-none focus:ring-2 focus:ring-indigo-500"></select>
+          <select id="select-usuario-login" class="w-full text-xs font-semibold p-2.5 border rounded-lg bg-slate-50 outline-none focus:ring-2 focus:ring-indigo-500"></select>
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-600 mb-1">Contraseña o PIN</label>
-          <input type="password" id="input-clave-login" placeholder="••••••••" class="w-full text-xs p-2.5 border rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
+          <label class="block text-xs font-bold text-slate-600 mb-1">Contraseña o PIN de Acceso</label>
+          <input type="password" id="input-clave-login" onkeydown="if(event.key==='Enter') confirmarAccesoCajero()" placeholder="••••••••" class="w-full text-xs p-2.5 border rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
         </div>
         <div class="pt-2 flex gap-2">
-          <button type="button" onclick="cerrarModalLogin()" class="flex-1 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-lg text-xs transition">Cancelar</button>
-          <button type="button" onclick="confirmarAccesoCajero()" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs transition flex items-center justify-center gap-1 shadow-sm">
-            <i data-lucide="check" class="w-4 h-4"></i> Activar Turno
+          <button type="button" id="btn-cancelar-login" onclick="cerrarModalLogin()" class="hidden flex-1 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-lg text-xs transition">Cancelar</button>
+          <button type="button" onclick="confirmarAccesoCajero()" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs transition flex items-center justify-center gap-1.5 shadow-md">
+            <i data-lucide="log-in" class="w-4 h-4"></i> Ingresar al Sistema
           </button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ==================== APLICACIÓN PRINCIPAL ==================== -->
-  <div id="app-contenido" class="flex-1 flex flex-col">
+  <!-- ==================== APLICACIÓN PRINCIPAL (OCULTA HASTA INICIAR SESIÓN) ==================== -->
+  <div id="app-contenido" class="hidden flex-1 flex flex-col">
     <!-- BARRA SUPERIOR -->
     <header class="bg-indigo-700 text-white px-6 py-3 flex flex-wrap justify-between items-center gap-2 shadow-md">
       <div class="flex items-center space-x-3">
         <i data-lucide="package-check" class="w-7 h-7"></i>
         <div>
           <h1 class="text-lg font-bold">POS & Courier Internacional</h1>
-          <p id="badge-sucursal" class="text-xs text-indigo-200">Cargando...</p>
+          <p id="badge-sucursal" class="text-xs text-indigo-200">Sin sesión activa</p>
         </div>
       </div>
 
@@ -115,8 +115,11 @@
         <button onclick="cambiarVista('admin')" id="tab-admin" class="hidden px-3 py-1.5 hover:bg-indigo-600 rounded-md text-xs font-semibold flex items-center gap-1.5">
           <i data-lucide="shield-check" class="w-4 h-4"></i> Personal / Sedes
         </button>
-        <button onclick="mostrarModalLogin()" class="ml-2 px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-900 rounded-md text-xs font-bold flex items-center gap-1.5 shadow">
-          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Cambiar Cajero
+        <button onclick="mostrarModalLogin(true)" class="ml-2 px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-900 rounded-md text-xs font-bold flex items-center gap-1.5 shadow" title="Cambiar de cajero">
+          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Turno
+        </button>
+        <button onclick="cerrarSesionCompleta()" class="px-2.5 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-md text-xs font-bold flex items-center gap-1 shadow" title="Cerrar sesión y bloquear">
+          <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Salir
         </button>
       </div>
     </header>
@@ -1062,13 +1065,7 @@
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqcGtjcXlmb2N1d2d4anhudGFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMzMyMjcsImV4cCI6MjEwNzYwOTIyN30.a3pNRzsxjIK_xXFRBd8bP6JUENqBSf8JtsRXAI0sc3Y";
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    let usuarioActual = {
-      id: 3,
-      nombre_completo: 'PINA IBARRA (ADMIN)',
-      usuario: 'admin',
-      rol: 'ADMIN'
-    };
-
+    let usuarioActual = null;
     let productos = [];
     let sucursales = [];
     let plantillas = [];
@@ -1093,7 +1090,6 @@
 
     window.addEventListener('DOMContentLoaded', async () => {
       lucide.createIcons();
-      recuperarSesionCajero();
       cambiarRutaEnvio();
       await cargarUsuariosLista();
       await cargarSucursales();
@@ -1103,10 +1099,13 @@
       await cargarPlanesAcumulativos();
       await cargarEnvios();
       await actualizarProximoNumeroTicketVisual();
-      aplicarPermisosRol();
+
+      // Verificar si ya inició sesión en esta pestaña
+      verificarAccesoInicial();
       lucide.createIcons();
 
       window.addEventListener('keydown', (e) => {
+        if (!usuarioActual) return;
         if (e.key === 'F2') {
           e.preventDefault();
           abrirBuscadorGlobal();
@@ -1117,20 +1116,98 @@
       });
     });
 
-    // ==================== PERSISTENCIA DE SESIÓN ====================
-    function recuperarSesionCajero() {
-      const sesionGuardada = localStorage.getItem('sesion_cajero_activo');
+    // ==================== CONTROL DE INICIO DE SESIÓN OBLIGATORIO ====================
+    function verificarAccesoInicial() {
+      const sesionGuardada = sessionStorage.getItem('sesion_activa_pos');
       if (sesionGuardada) {
         try {
           usuarioActual = JSON.parse(sesionGuardada);
+          document.getElementById('pantalla-login').classList.add('hidden');
+          document.getElementById('app-contenido').classList.remove('hidden');
+          aplicarPermisosRol();
+          return;
         } catch (e) {
-          localStorage.removeItem('sesion_cajero_activo');
+          sessionStorage.removeItem('sesion_activa_pos');
         }
       }
+      // Si no hay sesión activa en la pestaña actual, obliga a iniciar sesión
+      mostrarModalLogin(false);
     }
 
-    function guardarSesionCajero() {
-      localStorage.setItem('sesion_cajero_activo', JSON.stringify(usuarioActual));
+    async function mostrarModalLogin(permitirCancelar = false) {
+      await cargarUsuariosLista();
+      const selectLogin = document.getElementById('select-usuario-login');
+      if (selectLogin && usuariosLista.length > 0) {
+        selectLogin.innerHTML = '';
+        usuariosLista.forEach(u => {
+          selectLogin.innerHTML += `<option value="${u.id}">${u.nombre_completo} (${u.rol})</option>`;
+        });
+      }
+
+      document.getElementById('titulo-modal-login').innerText = permitirCancelar ? "Cambio de Turno y Cajero" : "Iniciar Sesión en el Sistema";
+      document.getElementById('btn-cerrar-modal-login').classList.toggle('hidden', !permitirCancelar);
+      document.getElementById('btn-cancelar-login').classList.toggle('hidden', !permitirCancelar);
+
+      document.getElementById('input-clave-login').value = '';
+      document.getElementById('pantalla-login').classList.remove('hidden');
+      setTimeout(() => {
+        const input = document.getElementById('input-clave-login');
+        if (input) input.focus();
+      }, 100);
+    }
+
+    function cerrarModalLogin() {
+      if (!usuarioActual) return; // No permite cerrar si nadie ha iniciado sesión
+      document.getElementById('pantalla-login').classList.add('hidden');
+    }
+
+    async function confirmarAccesoCajero() {
+      const select = document.getElementById('select-usuario-login');
+      const userId = select.value;
+      const clave = document.getElementById('input-clave-login').value.trim();
+
+      const user = usuariosLista.find(u => String(u.id) === String(userId));
+      if (!user) return alert("Por favor selecciona un usuario válido.");
+
+      if (!clave) return alert("Por favor ingresa la contraseña o PIN.");
+
+      const esAdminMaster = (clave === 'admin123');
+      const claveCorrecta = (user.clave && user.clave.trim() !== '') ? (user.clave.trim() === clave) : false;
+
+      if (!esAdminMaster && !claveCorrecta) {
+        return alert("Contraseña incorrecta para " + user.nombre_completo);
+      }
+
+      usuarioActual = user;
+      sessionStorage.setItem('sesion_activa_pos', JSON.stringify(usuarioActual));
+      document.getElementById('pantalla-login').classList.add('hidden');
+      document.getElementById('app-contenido').classList.remove('hidden');
+      aplicarPermisosRol();
+      lucide.createIcons();
+    }
+
+    function cerrarSesionCompleta() {
+      if (!confirm("¿Deseas cerrar la sesión actual y bloquear el sistema?")) return;
+      usuarioActual = null;
+      sessionStorage.removeItem('sesion_activa_pos');
+      document.getElementById('app-contenido').classList.add('hidden');
+      mostrarModalLogin(false);
+    }
+
+    function aplicarPermisosRol() {
+      if (!usuarioActual) return;
+      document.getElementById('badge-sucursal').innerText = `${usuarioActual.nombre_completo} [${usuarioActual.rol}]`;
+      const tabInv = document.getElementById('tab-inventario');
+      const tabAdmin = document.getElementById('tab-admin');
+
+      if (usuarioActual.rol === 'ADMIN') {
+        if (tabInv) tabInv.classList.remove('hidden');
+        if (tabAdmin) tabAdmin.classList.remove('hidden');
+      } else {
+        if (tabInv) tabInv.classList.add('hidden');
+        if (tabAdmin) tabAdmin.classList.add('hidden');
+        cambiarVista('pos');
+      }
     }
 
     // ==================== NAVEGACIÓN ENTRE PESTAÑAS ====================
@@ -1506,65 +1583,7 @@
       }
     }
 
-    // ==================== GESTIÓN DE TURNOS ====================
-    async function mostrarModalLogin() {
-      await cargarUsuariosLista();
-      const selectLogin = document.getElementById('select-usuario-login');
-      if (selectLogin && usuariosLista.length > 0) {
-        selectLogin.innerHTML = '';
-        usuariosLista.forEach(u => {
-          selectLogin.innerHTML += `<option value="${u.id}">${u.nombre_completo} (${u.rol})</option>`;
-        });
-      }
-      document.getElementById('input-clave-login').value = '';
-      document.getElementById('pantalla-login').classList.remove('hidden');
-      setTimeout(() => {
-        const input = document.getElementById('input-clave-login');
-        if (input) input.focus();
-      }, 100);
-    }
-
-    function cerrarModalLogin() {
-      document.getElementById('pantalla-login').classList.add('hidden');
-    }
-
-    async function confirmarAccesoCajero() {
-      const select = document.getElementById('select-usuario-login');
-      const userId = select.value;
-      const clave = document.getElementById('input-clave-login').value.trim();
-
-      const user = usuariosLista.find(u => String(u.id) === String(userId));
-      if (!user) return alert("Por favor selecciona un usuario válido.");
-
-      const esAdminMaster = (clave === 'admin123');
-      const claveCorrecta = (user.clave && user.clave.trim() !== '') ? (user.clave.trim() === clave) : true;
-
-      if (!esAdminMaster && !claveCorrecta) {
-        return alert("Contraseña incorrecta para " + user.nombre_completo);
-      }
-
-      usuarioActual = user;
-      guardarSesionCajero();
-      cerrarModalLogin();
-      aplicarPermisosRol();
-      alert(`¡Turno activado con éxito!\nCajero actual: ${usuarioActual.nombre_completo}\nRol: ${usuarioActual.rol}`);
-    }
-
-    function aplicarPermisosRol() {
-      document.getElementById('badge-sucursal').innerText = `${usuarioActual.nombre_completo} [${usuarioActual.rol}]`;
-      const tabInv = document.getElementById('tab-inventario');
-      const tabAdmin = document.getElementById('tab-admin');
-
-      if (usuarioActual.rol === 'ADMIN') {
-        if (tabInv) tabInv.classList.remove('hidden');
-        if (tabAdmin) tabAdmin.classList.remove('hidden');
-      } else {
-        if (tabInv) tabInv.classList.add('hidden');
-        if (tabAdmin) tabAdmin.classList.add('hidden');
-        cambiarVista('pos');
-      }
-    }
-
+    // ==================== GESTIÓN DE PERSONAL ====================
     async function cargarUsuariosLista() {
       const { data } = await db.from('usuarios_sistema').select('*');
       usuariosLista = data || [];
