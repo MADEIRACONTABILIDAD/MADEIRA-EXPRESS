@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Factura de Venta & Sistema POS</title>
+  <title>Factura de Venta, POS & Courier Internacional</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -20,7 +20,7 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col">
 
-  <!-- PANTALLA DE LOGIN -->
+  <!-- ==================== PANTALLA DE LOGIN ==================== -->
   <div id="pantalla-login" class="fixed inset-0 bg-slate-900 bg-opacity-70 flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
       <div class="text-center mb-6">
@@ -46,9 +46,9 @@
     </div>
   </div>
 
-  <!-- APLICACIÓN PRINCIPAL -->
+  <!-- ==================== APLICACIÓN PRINCIPAL ==================== -->
   <div id="app-contenido" class="hidden flex-1 flex flex-col">
-    <!-- ENCABEZADO DE NAVEGACIÓN -->
+    <!-- BARRA SUPERIOR -->
     <header class="bg-slate-900 text-white px-6 py-2.5 flex justify-between items-center border-b border-slate-700 shadow-sm">
       <div class="flex items-center space-x-3">
         <i data-lucide="receipt" class="w-6 h-6 text-indigo-400"></i>
@@ -77,7 +77,7 @@
           <i data-lucide="history" class="w-3.5 h-3.5"></i> Historial
         </button>
         <button onclick="cambiarVista('admin')" id="tab-admin" class="hidden px-3 py-1.5 hover:bg-slate-800 rounded text-slate-300 flex items-center gap-1.5">
-          <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Personal
+          <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Personal / Sucursales
         </button>
         <button onclick="cerrarSesion()" class="ml-3 px-3 py-1.5 bg-red-600 hover:bg-red-700 rounded text-white flex items-center gap-1">
           <i data-lucide="log-out" class="w-3 h-3"></i> Salir
@@ -87,26 +87,27 @@
 
     <main class="flex-1 p-4 max-w-[1450px] mx-auto w-full">
 
-      <!-- ==================== SECCIÓN: FACTURA DE VENTA (INTERFAZ DE LA IMAGEN) ==================== -->
+      <!-- ========================================================================= -->
+      <!-- PESTAÑA 1: FACTURA DE VENTA (DISEÑO EXACTO)                              -->
+      <!-- ========================================================================= -->
       <div id="vista-pos" class="bg-white rounded-lg shadow-sm border border-slate-200 p-5 space-y-4">
-        
-        <!-- ENCABEZADO SUPERIOR: TITULO Y BOTONES CIRCULARES -->
+        <!-- Barra de Botones de Acción -->
         <div class="flex justify-between items-center pb-2 border-b border-slate-100">
           <h2 class="text-xl font-bold text-slate-800">Factura de venta</h2>
           <div class="flex items-center gap-1.5">
             <button onclick="limpiarFacturaCompleta()" class="w-8 h-8 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center shadow-sm" title="Nuevo documento">
               <i data-lucide="file-plus" class="w-4 h-4"></i>
             </button>
-            <button onclick="limpiarFacturaCompleta()" class="w-8 h-8 rounded-full bg-amber-500 hover:bg-amber-600 text-white flex items-center justify-center shadow-sm" title="Limpiar / Anular">
+            <button onclick="limpiarFacturaCompleta()" class="w-8 h-8 rounded-full bg-amber-500 hover:bg-amber-600 text-white flex items-center justify-center shadow-sm" title="Limpiar formulario">
               <i data-lucide="x-circle" class="w-4 h-4"></i>
             </button>
-            <button onclick="reimprimirUltimaFactura()" class="w-8 h-8 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center shadow-sm" title="Reimprimir">
+            <button onclick="reimprimirUltimaFactura()" class="w-8 h-8 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center shadow-sm" title="Reimprimir última">
               <i data-lucide="printer" class="w-4 h-4"></i>
             </button>
             <button onclick="enviarFacturaCorreo()" class="w-8 h-8 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center shadow-sm" title="Enviar por Email">
               <i data-lucide="mail" class="w-4 h-4"></i>
             </button>
-            <button onclick="cambiarVista('ventas')" class="w-8 h-8 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center shadow-sm" title="Buscar Facturas">
+            <button onclick="cambiarVista('ventas')" class="w-8 h-8 rounded-full bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center shadow-sm" title="Buscar en Historial">
               <i data-lucide="search" class="w-4 h-4"></i>
             </button>
             <button class="w-8 h-8 rounded-full bg-amber-500 hover:bg-amber-600 text-white flex items-center justify-center shadow-sm" title="Minimizar">
@@ -118,10 +119,9 @@
           </div>
         </div>
 
-        <!-- BLOQUE CENTRAL: DATOS DEL CLIENTE, SUCURSAL Y TIMBRADO SRI -->
+        <!-- Encabezado de Datos -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 text-xs">
-          
-          <!-- COLUMNA 1: DATOS CLIENTE (6 COLUMNAS) -->
+          <!-- Datos Cliente -->
           <div class="lg:col-span-6 space-y-2">
             <div class="grid grid-cols-3 gap-2">
               <div>
@@ -137,7 +137,6 @@
                 <input type="text" id="fac-nom" value="FINAL" class="w-full p-2 border border-slate-300 rounded focus:border-blue-500 outline-none uppercase font-semibold">
               </div>
             </div>
-
             <div class="grid grid-cols-3 gap-2">
               <div>
                 <label class="block text-slate-500 font-semibold mb-0.5">Dirección</label>
@@ -152,20 +151,14 @@
                 <input type="email" id="fac-mail" class="w-full p-2 border border-slate-300 rounded focus:border-blue-500 outline-none">
               </div>
             </div>
-
-            <!-- BARRA DE SEPARACIÓN -->
-            <div class="pt-2">
-              <div class="h-1 bg-slate-100 rounded-full w-full"></div>
-            </div>
+            <div class="pt-2"><div class="h-1 bg-slate-100 rounded-full w-full"></div></div>
           </div>
 
-          <!-- COLUMNA 2: SUCURSAL Y TALONARIO (3 COLUMNAS) -->
+          <!-- Sucursal & Talonario -->
           <div class="lg:col-span-3 space-y-2 border-l border-slate-100 pl-4">
             <div>
               <label class="block text-slate-500 font-semibold mb-0.5">Sucursal</label>
-              <select id="fac-sucursal" class="w-full p-2 border border-slate-300 rounded font-semibold bg-white">
-                <option value="SUPERCELL">SUPERCELL 29 DE M</option>
-              </select>
+              <select id="fac-sucursal" class="w-full p-2 border border-slate-300 rounded font-semibold bg-white"></select>
             </div>
             <div>
               <label class="block text-slate-500 font-semibold mb-0.5">Talonario</label>
@@ -183,7 +176,7 @@
             </div>
           </div>
 
-          <!-- COLUMNA 3: SRI & DATOS DE EMISIÓN (3 COLUMNAS) -->
+          <!-- Bloque SRI -->
           <div class="lg:col-span-3 space-y-2 border-l border-slate-100 pl-4">
             <div class="flex items-center justify-between pb-1">
               <div class="flex items-center gap-1.5">
@@ -199,23 +192,18 @@
                 <span id="fac-numero-correlativo" class="text-base font-black text-slate-800">14850</span>
               </div>
             </div>
-
             <div class="flex gap-1">
               <input type="text" id="fac-fecha-emision" value="19/10/2026" class="w-full p-2 border border-slate-300 rounded text-xs font-semibold bg-white">
-              <button class="px-2.5 bg-blue-400 text-white rounded hover:bg-blue-500">
-                <i data-lucide="calendar" class="w-4 h-4"></i>
-              </button>
+              <button class="px-2.5 bg-blue-400 text-white rounded hover:bg-blue-500"><i data-lucide="calendar" class="w-4 h-4"></i></button>
             </div>
-
             <div class="flex justify-between items-center text-xs pt-1 text-slate-600 font-semibold">
               <span>TRIBUTABLE</span>
               <span class="text-blue-600 font-bold">SI</span>
             </div>
           </div>
-
         </div>
 
-        <!-- ==================== TABLA DE DETALLE ESTILO CUADRÍCULA ==================== -->
+        <!-- Tabla de Facturación Azul -->
         <div class="overflow-x-auto border border-slate-200 rounded">
           <table class="w-full text-xs text-left">
             <thead class="bg-[#1e3a8a] text-white font-semibold">
@@ -233,7 +221,7 @@
               </tr>
             </thead>
             <tbody id="tabla-factura-items" class="divide-y divide-slate-200 bg-white">
-              <!-- FILA DE ENTRADA ACTIVA DIRECTA -->
+              <!-- Fila Interactiva para Ingresar Producto -->
               <tr class="bg-blue-50/20">
                 <td class="p-1.5">
                   <input type="text" id="in-item-codigo" onchange="buscarProductoPorCodigo(this.value)" placeholder="Código" class="w-full p-1.5 border border-emerald-400 rounded bg-white outline-none font-mono">
@@ -266,31 +254,26 @@
                     <option value="0">0%</option>
                   </select>
                 </td>
-                <td class="p-1.5 text-right font-bold text-slate-800" id="in-item-total">
-                  0.00
-                </td>
+                <td class="p-1.5 text-right font-bold text-slate-800" id="in-item-total">0.00</td>
                 <td class="p-1.5 text-center">
-                  <button onclick="agregarFilaAFactura()" class="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded font-bold text-xs" title="Agregar producto">+</button>
+                  <button onclick="agregarFilaAFactura()" class="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded font-bold text-xs" title="Añadir a la lista">+</button>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <!-- ==================== PIE DE FACTURA: TOTALES, OBSERVACIÓN Y VENDEDOR ==================== -->
+        <!-- Pie de Factura: Totales y Opciones -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-2 text-xs">
-          
-          <!-- COLUMNA 1: CONTADO/CRÉDITO Y DESCUENTO A TOTAL (3 COLUMNAS) -->
           <div class="lg:col-span-3 space-y-3">
             <div class="flex items-center gap-4">
               <label class="flex items-center gap-1.5 cursor-pointer font-bold text-slate-700">
-                <input type="radio" name="tipo_pago" value="CONTADO" checked onchange="cambiarTipoPago(this.value)" class="text-blue-600"> Contado
+                <input type="radio" name="tipo_pago" value="CONTADO" checked class="text-blue-600"> Contado
               </label>
               <label class="flex items-center gap-1.5 cursor-pointer font-bold text-slate-700">
-                <input type="radio" name="tipo_pago" value="CREDITO" onchange="cambiarTipoPago(this.value)" class="text-blue-600"> Crédito
+                <input type="radio" name="tipo_pago" value="CREDITO" class="text-blue-600"> Crédito
               </label>
             </div>
-
             <div>
               <span class="font-bold text-slate-700 block mb-0.5">Dcto a total:</span>
               <p class="text-[11px] text-slate-400 mb-1">Porcentaje</p>
@@ -300,19 +283,16 @@
             </div>
           </div>
 
-          <!-- COLUMNA 2: OBSERVACIÓN (3 COLUMNAS) -->
           <div class="lg:col-span-3 space-y-1">
             <label class="block text-slate-500 font-semibold">Observación</label>
             <textarea id="fac-observacion" rows="3" class="w-full p-2 border border-slate-300 rounded text-xs outline-none">Observación defecto venta</textarea>
           </div>
 
-          <!-- COLUMNA 3: FOTO, INTERRUPTORES Y VENDEDOR (3 COLUMNAS) -->
           <div class="lg:col-span-3 flex gap-3 items-start border-l border-slate-100 pl-3">
             <div class="w-20 h-20 bg-slate-100 border border-slate-200 rounded flex flex-col items-center justify-center text-center p-1">
               <i data-lucide="box" class="w-6 h-6 text-slate-400"></i>
               <span class="text-[9px] text-slate-400 mt-1">Producto sin foto</span>
             </div>
-            
             <div class="space-y-1.5 flex-1">
               <div class="flex items-center justify-between">
                 <span class="text-[11px] font-semibold text-slate-700">Rimpe popular</span>
@@ -323,12 +303,11 @@
                 <input type="checkbox" id="fac-recargo" class="rounded text-blue-600">
               </div>
               <p class="text-[11px] text-slate-600 pt-1">
-                Vendedor: <b id="fac-vendedor-nombre" class="text-slate-800">PINA IBARRA...</b>
+                Vendedor: <b id="fac-vendedor-nombre" class="text-slate-800">Cargando...</b>
               </p>
             </div>
           </div>
 
-          <!-- COLUMNA 4: DESGLOSE DE TOTALES Y VALOR GIGANTE (3 COLUMNAS) -->
           <div class="lg:col-span-3 border-l border-slate-100 pl-4 space-y-1">
             <div class="space-y-0.5 text-[11px]">
               <div class="flex justify-between text-slate-600"><span>SUB TOTAL C/IVA</span><span id="txt-subtotal-c-iva">0.00</span></div>
@@ -338,53 +317,380 @@
               <div class="flex justify-between text-slate-600"><span>IVA</span><span id="txt-iva">0.00</span></div>
               <div class="flex justify-between text-slate-600"><span>ICE</span><span>0.00</span></div>
             </div>
-
             <div class="pt-2 border-t border-slate-200 text-right">
               <span id="txt-total-factura-grande" class="text-4xl font-black text-slate-900 tracking-tight">0.00</span>
             </div>
           </div>
-
         </div>
-
       </div>
 
-      <!-- ==================== SECCIÓN 2: COTIZACIÓN ==================== -->
+      <!-- ========================================================================= -->
+      <!-- PESTAÑA 2: COTIZACIÓN (NO TOCA STOCK / DESCARGA PDF)                     -->
+      <!-- ========================================================================= -->
       <div id="vista-cotizacion" class="hidden space-y-6">
-        <div class="bg-white p-5 rounded-lg border border-slate-200">
-          <h2 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
-            <i data-lucide="file-spreadsheet" class="w-5 h-5 text-indigo-600"></i> Cotizaciones Formales
-          </h2>
-          <p class="text-xs text-slate-400">Genera presupuestos que no afectan inventario y descárgalos en PDF.</p>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-5">
+            <h2 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
+              <i data-lucide="file-spreadsheet" class="w-5 h-5 text-indigo-600"></i> Catálogo para Cotizar (Sin tocar stock)
+            </h2>
+            <div id="grid-cotizar" class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[500px] overflow-y-auto"></div>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-200 p-5 flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-center pb-2 border-b mb-3">
+                <h3 class="font-bold text-slate-800 text-sm">Detalle de Cotización</h3>
+                <button onclick="carritoCotizacion = []; renderCotizacion();" class="text-xs text-red-500 hover:underline">Vaciar</button>
+              </div>
+              <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 mb-3 space-y-2">
+                <input type="text" id="cot-doc" placeholder="Cédula / RUC" class="w-full text-xs p-1.5 border rounded bg-white">
+                <input type="text" id="cot-nom" placeholder="Nombres y Apellidos" class="w-full text-xs p-1.5 border rounded bg-white">
+                <div class="grid grid-cols-2 gap-2">
+                  <input type="text" id="cot-tel" placeholder="Teléfono" class="text-xs p-1.5 border rounded bg-white">
+                  <input type="email" id="cot-mail" placeholder="Correo" class="text-xs p-1.5 border rounded bg-white">
+                </div>
+              </div>
+              <div id="items-cotizacion" class="space-y-1.5 max-h-[180px] overflow-y-auto"></div>
+            </div>
+
+            <div class="border-t pt-3">
+              <div class="flex justify-between text-lg font-bold mb-3">
+                <span>Total Cotizado:</span>
+                <span id="cot-total" class="text-indigo-600">$0.00</span>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <button onclick="guardarYDescargarCotizacion(false)" class="py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1.5">
+                  <i data-lucide="printer" class="w-4 h-4"></i> Imprimir
+                </button>
+                <button onclick="guardarYDescargarCotizacion(true)" class="py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1.5">
+                  <i data-lucide="download" class="w-4 h-4"></i> Descargar PDF
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- ==================== SECCIÓN 3: PLAN ACUMULATIVO ==================== -->
+      <!-- ========================================================================= -->
+      <!-- PESTAÑA 3: PLAN ACUMULATIVO (HISTORIAL NO DESTRUCTIVO)                   -->
+      <!-- ========================================================================= -->
       <div id="vista-plan" class="hidden space-y-6">
-        <div class="bg-white p-5 rounded-lg border border-slate-200">
-          <h2 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
-            <i data-lucide="calendar-clock" class="w-5 h-5 text-indigo-600"></i> Plan Acumulativo
-          </h2>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-1 bg-white p-5 rounded-xl border border-slate-200 space-y-4">
+            <h2 class="font-bold text-slate-800 flex items-center gap-2">
+              <i data-lucide="calendar-clock" class="w-5 h-5 text-indigo-600"></i> Apertura de Plan Acumulativo
+            </h2>
+            <form onsubmit="crearPlanAcumulativo(event)" class="space-y-3">
+              <input type="text" id="plan-doc" required placeholder="Cédula / Identificación" class="w-full text-xs p-2 border rounded">
+              <input type="text" id="plan-nom" required placeholder="Nombre completo" class="w-full text-xs p-2 border rounded">
+              <div class="grid grid-cols-2 gap-2">
+                <input type="text" id="plan-tel" required placeholder="Teléfono" class="text-xs p-2 border rounded">
+                <input type="email" id="plan-mail" placeholder="Email" class="text-xs p-2 border rounded">
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Producto a Reservar</label>
+                <select id="plan-producto-select" class="w-full text-xs p-2 border rounded"></select>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 mb-1">Abono Inicial ($)</label>
+                  <input type="number" step="0.01" id="plan-abono-inicial" required placeholder="0.00" class="w-full text-xs p-2 border rounded font-bold text-emerald-600">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 mb-1">Próximo Abono</label>
+                  <input type="date" id="plan-proxima-fecha" required class="w-full text-xs p-2 border rounded">
+                </div>
+              </div>
+              <button type="submit" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs">
+                Aperturar Plan Acumulativo
+              </button>
+            </form>
+          </div>
+
+          <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+            <div class="p-4 border-b flex justify-between items-center">
+              <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+                <i data-lucide="list" class="w-4 h-4 text-indigo-600"></i> Planes Activos y Control de Abonos
+              </h3>
+              <button onclick="cargarPlanesAcumulativos()" class="text-xs text-indigo-600 font-bold flex items-center gap-1 hover:underline">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Actualizar
+              </button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs text-left">
+                <thead class="bg-slate-50 text-slate-500 uppercase border-b">
+                  <tr>
+                    <th class="p-3">Código</th>
+                    <th class="p-3">Cliente</th>
+                    <th class="p-3">Total</th>
+                    <th class="p-3 text-red-600 font-bold">Saldo</th>
+                    <th class="p-3">Próx. Abono</th>
+                    <th class="p-3">Estado</th>
+                    <th class="p-3 text-center">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="tabla-planes-body" class="divide-y"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================================================= -->
+      <!-- PESTAÑA 4: ENVÍOS (COURIER INTERNACIONAL BIDIRECCIONAL)                  -->
+      <!-- ========================================================================= -->
+      <div id="vista-envios" class="hidden space-y-6">
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+          <div class="border-b pb-4 mb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                <i data-lucide="plane-takeoff" class="w-6 h-6 text-indigo-600"></i> Guía de Envío Internacional
+              </h2>
+              <p class="text-xs text-slate-400">Rutas de paquetería hacia EE.UU. o desde EE.UU. hacia Nicaragua</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <label class="text-xs font-bold text-slate-600">Ruta de Envío:</label>
+              <select id="env-ruta" onchange="cambiarRutaEnvio()" class="text-xs font-bold py-2 px-3 border-2 border-indigo-500 rounded-lg bg-indigo-50 text-indigo-800">
+                <option value="USA">✈️ Hacia Estados Unidos (USA)</option>
+                <option value="USA_NICARAGUA">🇳🇮 Estados Unidos ➔ Nicaragua</option>
+              </select>
+            </div>
+            <div class="flex items-center gap-2 bg-indigo-50 border border-indigo-200 px-3 py-1.5 rounded-lg">
+              <i data-lucide="scan-barcode" class="w-5 h-5 text-indigo-600"></i>
+              <div>
+                <span class="block text-[10px] uppercase font-bold text-indigo-700">Guía / Tracking</span>
+                <input type="text" id="env-tracking" placeholder="Escanear..." class="text-xs font-mono font-bold bg-transparent outline-none w-32 text-indigo-900">
+              </div>
+              <button type="button" onclick="generarTracking()" class="px-2 py-1 bg-white hover:bg-indigo-100 border border-indigo-300 text-[11px] font-bold rounded text-indigo-700">Auto</button>
+            </div>
+          </div>
+          
+          <form onsubmit="registrarEnvio(event)" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Modalidad de Transporte</label>
+                <select id="env-tipo" onchange="actualizarTarifaSugerida()" class="w-full text-sm p-2 border rounded-lg bg-white font-bold text-indigo-800">
+                  <option value="AEREO">✈️ Aéreo (Express)</option>
+                  <option value="MARITIMO">🚢 Marítimo (Cajas / Carga)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Forma de Entrega en Destino</label>
+                <select id="env-entrega" onchange="toggleDireccionDestino()" class="w-full text-sm p-2 border rounded-lg bg-white font-semibold">
+                  <option value="OFICINA">🏢 Retiro en Sucursal / Oficina</option>
+                  <option value="DOMICILIO">🏠 Entrega a Domicilio (Delivery)</option>
+                </select>
+              </div>
+              <div>
+                <label id="lbl-ciudad-destino" class="block text-xs font-bold text-slate-700 mb-1">Ciudad Destino en EE.UU.</label>
+                <input list="lista-ciudades-destino" id="env-ciudad" required placeholder="Escribe o selecciona ciudad..." class="w-full text-sm p-2 border rounded-lg bg-white">
+                <datalist id="lista-ciudades-destino"></datalist>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <!-- Remitente -->
+              <div class="p-4 border rounded-xl bg-white space-y-3">
+                <h3 id="titulo-remitente" class="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1.5 pb-2 border-b">
+                  <i data-lucide="user" class="w-4 h-4"></i> Datos de Quien Envía (Remitente)
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <input type="text" id="rem-nombre" required placeholder="Nombres y Apellidos" class="w-full text-xs p-2 border rounded-lg">
+                  <input type="text" id="rem-cedula" required placeholder="Cédula / Identificación" class="w-full text-xs p-2 border rounded-lg font-mono">
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <input type="text" id="rem-telefono" required placeholder="Teléfono" class="w-full text-xs p-2 border rounded-lg">
+                  <input type="text" id="rem-direccion" required placeholder="Dirección de Origen" class="w-full text-xs p-2 border rounded-lg">
+                </div>
+              </div>
+
+              <!-- Destinatario -->
+              <div class="p-4 border rounded-xl bg-white space-y-3">
+                <h3 id="titulo-destinatario" class="text-xs font-bold text-indigo-600 uppercase tracking-wider flex items-center gap-1.5 pb-2 border-b">
+                  <i data-lucide="map-pin" class="w-4 h-4"></i> Datos de Quien Recibe (Destinatario)
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <input type="text" id="dest-nombre" required placeholder="Nombre completo" class="w-full text-xs p-2 border rounded-lg">
+                  <input type="text" id="dest-doc" required placeholder="Nº Documento / ID" class="w-full text-xs p-2 border rounded-lg font-mono">
+                  <input type="text" id="dest-telefono" required placeholder="Teléfono" class="w-full text-xs p-2 border rounded-lg">
+                </div>
+                <div id="bloque-direccion-destino" class="hidden space-y-2 bg-indigo-50/40 p-2.5 rounded-lg border border-indigo-100">
+                  <input type="text" id="dest-direccion" placeholder="Dirección exacta en destino..." class="w-full text-xs p-2 border rounded-lg bg-white">
+                  <div id="bloque-zip-code">
+                    <input type="text" id="dest-zip" placeholder="ZIP Code (EE.UU.)" class="w-full text-xs p-2 border rounded-lg bg-white font-mono">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-4 border rounded-xl bg-white grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+              <div class="md:col-span-2">
+                <label class="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
+                  <i data-lucide="file-text" class="w-3.5 h-3.5 text-indigo-600"></i> Contenido del Paquete (Declaración de Aduana)
+                </label>
+                <textarea id="env-contenido" rows="2" required placeholder="Detalla los artículos: ropa, cosméticos, zapatos, etc." class="w-full text-xs p-2.5 border rounded-lg"></textarea>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
+                  <i data-lucide="camera" class="w-3.5 h-3.5 text-indigo-600"></i> Foto del Paquete
+                </label>
+                <input type="file" id="env-foto-input" accept="image/*" onchange="previsualizarFoto(event)" class="text-xs w-full">
+                <div id="preview-contenedor" class="hidden flex items-center gap-2 mt-2 p-1.5 bg-slate-50 border rounded-lg">
+                  <img id="preview-img" src="" class="w-10 h-10 object-cover rounded border">
+                  <span class="text-[11px] font-bold text-emerald-700">Foto cargada</span>
+                  <button type="button" onclick="quitarFoto()" class="text-[11px] text-red-500 hover:underline ml-auto">Quitar</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-indigo-50/70 p-4 rounded-xl border border-indigo-100 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Peso</label>
+                <div class="flex gap-1.5">
+                  <input type="number" step="0.01" id="env-peso" required oninput="calcularTotalEnvio()" placeholder="0.00" class="w-full text-base font-bold p-2 border rounded-lg bg-white">
+                  <select id="env-unidad-peso" onchange="cambiarUnidadPeso()" class="text-xs p-2 border rounded-lg font-bold bg-white">
+                    <option value="LBS">lbs</option>
+                    <option value="KG">kg</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label id="lbl-tarifa" class="block text-xs font-bold text-slate-700 mb-1">Precio x Libra ($)</label>
+                <input type="number" step="0.01" id="env-tarifa-unidad" value="4.50" oninput="calcularTotalEnvio()" class="w-full text-base font-bold p-2 border rounded-lg bg-white">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Seguro / Extras ($)</label>
+                <input type="number" step="0.01" id="env-cargos-extra" value="0.00" oninput="calcularTotalEnvio()" class="w-full text-base font-bold p-2 border rounded-lg bg-white">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Condición de Pago</label>
+                <select id="env-estado-pago" class="w-full text-xs font-bold p-2.5 border rounded-lg bg-white">
+                  <option value="PAGADO">✅ PAGADO</option>
+                  <option value="POR COBRAR">⏳ POR COBRAR</option>
+                </select>
+              </div>
+              <div class="bg-indigo-600 text-white p-2.5 rounded-lg flex flex-col justify-between shadow-sm">
+                <span class="text-[10px] font-bold uppercase text-indigo-200">Total Envíos</span>
+                <span id="txt-total-envio" class="text-xl font-black">$0.00</span>
+                <input type="hidden" id="env-valor-final" value="0.00">
+              </div>
+            </div>
+
+            <div class="pt-2 flex justify-end">
+              <button type="submit" id="btn-guardar-envio" class="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm flex items-center gap-2">
+                <i data-lucide="printer" class="w-5 h-5"></i> Guardar e Imprimir Guía Internacional
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Tabla de Envíos Realizados -->
+        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+          <div class="p-4 border-b flex justify-between items-center">
+            <h3 class="font-bold text-slate-800 flex items-center gap-2">
+              <i data-lucide="archive" class="w-4 h-4 text-indigo-600"></i> Registro General de Envíos
+            </h3>
+            <button onclick="cargarEnvios()" class="text-xs text-indigo-600 font-bold flex items-center gap-1 hover:underline">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Actualizar
+            </button>
+          </div>
           <div class="overflow-x-auto">
-            <table class="w-full text-xs text-left">
-              <thead class="bg-slate-50 text-slate-500 uppercase border-b">
-                <tr><th class="p-3">Código</th><th class="p-3">Cliente</th><th class="p-3">Total</th><th class="p-3 text-red-600">Saldo</th><th class="p-3">Estado</th></tr>
+            <table class="w-full text-sm text-left">
+              <thead class="bg-slate-50 text-slate-500 uppercase text-xs border-b">
+                <tr>
+                  <th class="p-3">Guía</th>
+                  <th class="p-3">Ruta</th>
+                  <th class="p-3">Remitente</th>
+                  <th class="p-3">Destinatario</th>
+                  <th class="p-3">Contenido</th>
+                  <th class="p-3">Peso</th>
+                  <th class="p-3 text-right">Valor</th>
+                  <th class="p-3 text-center">Pago</th>
+                  <th class="p-3 text-center">Foto</th>
+                  <th class="p-3 text-center">Estado</th>
+                </tr>
               </thead>
-              <tbody id="tabla-planes-body" class="divide-y"></tbody>
+              <tbody id="tabla-envios-body" class="divide-y"></tbody>
             </table>
           </div>
         </div>
       </div>
 
-      <!-- ==================== SECCIÓN 4: HISTORIAL DE VENTAS ==================== -->
-      <div id="vista-ventas" class="hidden space-y-4">
-        <div class="bg-white p-5 rounded-lg border border-slate-200">
-          <h2 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
-            <i data-lucide="history" class="w-5 h-5 text-indigo-600"></i> Registro de Facturas Emitidas
+      <!-- ========================================================================= -->
+      <!-- PESTAÑA 5: INVENTARIO (CREAR, EDITAR, ELIMINAR, STOCK)                   -->
+      <!-- ========================================================================= -->
+      <div id="vista-inventario" class="hidden space-y-6">
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <h2 id="titulo-form-prod" class="font-bold mb-4 flex items-center gap-2">
+            <i data-lucide="plus-circle" class="w-5 h-5 text-indigo-600"></i> <span id="txt-form-prod">Registrar Nuevo Producto</span>
           </h2>
-          <div class="overflow-x-auto">
+          <form onsubmit="guardarProducto(event)" class="grid grid-cols-1 sm:grid-cols-6 gap-3">
+            <input type="hidden" id="edit-prod-id">
+            <input type="text" id="inv-nombre" required placeholder="Nombre del producto" class="text-sm p-2 border rounded sm:col-span-2">
+            <input type="text" id="inv-codigo" placeholder="Código / IMEI" class="text-sm p-2 border rounded">
+            <input type="number" step="0.01" id="inv-costo" required placeholder="P. Costo ($)" class="text-sm p-2 border rounded">
+            <input type="number" step="0.01" id="inv-venta" required placeholder="P. Venta ($)" class="text-sm p-2 border rounded">
+            <div class="flex gap-2">
+              <input type="number" id="inv-stock" required placeholder="Stock" value="1" class="w-full text-sm p-2 border rounded">
+              <button type="submit" id="btn-save-prod" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 rounded font-bold text-sm">Guardar</button>
+              <button type="button" id="btn-cancel-prod" onclick="cancelarEdicionProd()" class="hidden bg-slate-400 text-white px-2 rounded text-xs">X</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+          <table class="w-full text-sm text-left">
+            <thead class="bg-slate-50 text-slate-500 uppercase text-xs border-b">
+              <tr>
+                <th class="p-3">Código</th>
+                <th class="p-3">Producto</th>
+                <th class="p-3 text-right">P. Costo</th>
+                <th class="p-3 text-right">P. Venta</th>
+                <th class="p-3 text-center">Stock</th>
+                <th class="p-3 text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tabla-stock" class="divide-y"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ========================================================================= -->
+      <!-- PESTAÑA 6: HISTORIAL DE VENTAS & REIMPRESIÓN                             -->
+      <!-- ========================================================================= -->
+      <div id="vista-ventas" class="hidden space-y-4">
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b">
+            <div>
+              <h2 class="font-bold text-slate-800 flex items-center gap-2">
+                <i data-lucide="history" class="w-5 h-5 text-indigo-600"></i> Historial y Reporte de Ventas
+              </h2>
+              <p class="text-xs text-slate-400">Reimprime comprobantes en ticket térmico o descarga factura formal en PDF</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2 text-xs">
+              <input type="date" id="filtro-fecha-inicio" class="p-1.5 border rounded-lg bg-slate-50 font-semibold">
+              <input type="date" id="filtro-fecha-fin" class="p-1.5 border rounded-lg bg-slate-50 font-semibold">
+              <button onclick="cargarVentas()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg flex items-center gap-1">
+                <i data-lucide="filter" class="w-3.5 h-3.5"></i> Filtrar
+              </button>
+              <button onclick="document.getElementById('filtro-fecha-inicio').value=''; document.getElementById('filtro-fecha-fin').value=''; cargarVentas();" class="px-2 py-1.5 bg-slate-200 hover:bg-slate-300 font-bold rounded-lg text-slate-700">Limpiar</button>
+            </div>
+          </div>
+
+          <div class="py-2 flex justify-between items-center text-xs text-slate-500">
+            <span>Total vendido en el periodo: <b id="txt-total-periodo" class="text-sm font-bold text-indigo-700">$0.00</b></span>
+          </div>
+
+          <div class="overflow-x-auto mt-2">
             <table class="w-full text-sm text-left">
               <thead class="bg-slate-50 text-slate-500 uppercase text-xs border-b">
-                <tr><th class="p-3">Nº Comprobante</th><th class="p-3">Fecha</th><th class="p-3">Método</th><th class="p-3 text-right">Total</th><th class="p-3 text-center">Acciones</th></tr>
+                <tr>
+                  <th class="p-3">Comprobante</th>
+                  <th class="p-3">Fecha y Hora</th>
+                  <th class="p-3">Método</th>
+                  <th class="p-3 text-right">Total ($)</th>
+                  <th class="p-3 text-center">Acciones</th>
+                </tr>
               </thead>
               <tbody id="tabla-ventas-body" class="divide-y"></tbody>
             </table>
@@ -392,55 +698,161 @@
         </div>
       </div>
 
-      <!-- ==================== SECCIÓN 5: ENVÍOS ==================== -->
-      <div id="vista-envios" class="hidden space-y-4">
-        <div class="bg-white p-5 rounded-lg border border-slate-200">
-          <h2 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
-            <i data-lucide="send" class="w-5 h-5 text-indigo-600"></i> Envíos Internacionales
-          </h2>
-        </div>
-      </div>
+      <!-- ========================================================================= -->
+      <!-- PESTAÑA 7: SUCURSALES Y USUARIOS (ADMINISTRACIÓN)                        -->
+      <!-- ========================================================================= -->
+      <div id="vista-admin" class="hidden space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Sucursales -->
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <h2 class="font-bold mb-3 flex items-center gap-2"><i data-lucide="map-pin" class="w-5 h-5 text-indigo-600"></i> Gestión de Sucursales</h2>
+            <form onsubmit="crearSucursal(event)" class="space-y-3">
+              <input type="text" id="suc-nombre" required placeholder="Nombre de la sucursal (ej: SUPERCELL 29 DE M)" class="w-full text-sm p-2 border rounded">
+              <input type="text" id="suc-dir" placeholder="Dirección del local" class="w-full text-sm p-2 border rounded">
+              <button type="submit" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded text-sm">Registrar Sucursal</button>
+            </form>
+            <div class="mt-4">
+              <h3 class="text-xs font-bold text-slate-400 uppercase mb-2">Sucursales Activas:</h3>
+              <ul id="lista-sucursales" class="text-sm space-y-1"></ul>
+            </div>
+          </div>
 
-      <!-- ==================== SECCIÓN 6: INVENTARIO ==================== -->
-      <div id="vista-inventario" class="hidden space-y-4">
-        <div class="bg-white p-5 rounded-lg border border-slate-200">
-          <h2 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
-            <i data-lucide="package" class="w-5 h-5 text-indigo-600"></i> Inventario de Productos
-          </h2>
-        </div>
-      </div>
-
-      <!-- ==================== SECCIÓN 7: ADMINISTRACIÓN ==================== -->
-      <div id="vista-admin" class="hidden space-y-4">
-        <div class="bg-white p-5 rounded-lg border border-slate-200">
-          <h2 class="font-bold text-slate-800 mb-3 flex items-center gap-2">
-            <i data-lucide="users" class="w-5 h-5 text-indigo-600"></i> Personal y Sucursales
-          </h2>
+          <!-- Personal / Usuarios -->
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <h2 class="font-bold mb-3 flex items-center gap-2">
+              <i data-lucide="users" class="w-5 h-5 text-indigo-600"></i> <span id="txt-form-user">Crear Nuevo Trabajador</span>
+            </h2>
+            <form onsubmit="guardarUsuario(event)" class="space-y-3">
+              <input type="hidden" id="edit-user-id">
+              <input type="text" id="user-nombre" required placeholder="Nombre completo" class="w-full text-sm p-2 border rounded">
+              <div class="grid grid-cols-2 gap-2">
+                <input type="text" id="user-alias" required placeholder="Usuario" class="text-sm p-2 border rounded">
+                <input type="password" id="user-clave" placeholder="Contraseña" class="text-sm p-2 border rounded">
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <select id="user-rol" class="text-sm p-2 border rounded">
+                  <option value="VENDEDOR">Vendedor (Solo Ventas y Envíos)</option>
+                  <option value="ADMIN">Administrador (Acceso Total)</option>
+                </select>
+                <select id="user-sucursal" class="text-sm p-2 border rounded"></select>
+              </div>
+              <div class="flex gap-2">
+                <button type="submit" id="btn-save-user" class="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded text-sm">Guardar Usuario</button>
+                <button type="button" id="btn-cancel-user" onclick="cancelarEdicionUser()" class="hidden px-3 py-2 bg-slate-400 text-white font-bold rounded text-sm">Cancelar</button>
+              </div>
+            </form>
+            <div class="mt-4">
+              <h3 class="text-xs font-bold text-slate-400 uppercase mb-2">Personal Registrado:</h3>
+              <div id="lista-personal" class="space-y-2 max-h-60 overflow-y-auto"></div>
+            </div>
+          </div>
         </div>
       </div>
 
     </main>
   </div>
 
-  <!-- TICKET TÉRMICO OCULTO -->
+  <!-- MODAL: KARDEX / HISTORIAL INMUTABLE DE ABONOS DEL PLAN -->
+  <div id="modal-historial-abonos" class="hidden fixed inset-0 bg-slate-900 bg-opacity-60 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4">
+      <div class="flex justify-between items-center border-b pb-3">
+        <div>
+          <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+            <i data-lucide="history" class="w-5 h-5 text-indigo-600"></i> Historial Inmutable de Abonos
+          </h3>
+          <p id="modal-subtitulo-plan" class="text-xs text-slate-400 font-mono"></p>
+        </div>
+        <button onclick="cerrarModalHistorial()" class="text-slate-400 hover:text-slate-700 text-xl font-bold">&times;</button>
+      </div>
+
+      <div class="bg-slate-50 p-3 rounded-lg border grid grid-cols-3 gap-2 text-center text-xs">
+        <div><span class="text-slate-400 block text-[10px]">TOTAL:</span><b id="modal-plan-total" class="text-slate-700 font-bold">$0.00</b></div>
+        <div><span class="text-slate-400 block text-[10px]">ABONADO:</span><b id="modal-plan-abonado" class="text-emerald-600 font-bold">$0.00</b></div>
+        <div><span class="text-slate-400 block text-[10px]">PENDIENTE:</span><b id="modal-plan-saldo" class="text-red-600 font-bold">$0.00</b></div>
+      </div>
+
+      <div class="overflow-y-auto max-h-60 border rounded-lg">
+        <table class="w-full text-xs text-left">
+          <thead class="bg-slate-100 text-slate-500 uppercase text-[10px] border-b">
+            <tr>
+              <th class="p-2">#</th>
+              <th class="p-2">Fecha y Hora</th>
+              <th class="p-2 text-right">Abono ($)</th>
+              <th class="p-2 text-right">Saldo Restante</th>
+              <th class="p-2">Cajero</th>
+            </tr>
+          </thead>
+          <tbody id="modal-tabla-abonos-body" class="divide-y"></tbody>
+        </table>
+      </div>
+
+      <div class="flex justify-end pt-2 border-t">
+        <button onclick="cerrarModalHistorial()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 font-bold text-xs rounded-lg text-slate-700">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLANTILLA DE TICKET TÉRMICO -->
   <div id="ticket-impresion" class="hidden text-black font-mono text-xs max-w-[280px] mx-auto p-2">
     <div class="text-center pb-2 border-b border-dashed border-black">
-      <h2 class="font-bold text-sm uppercase">SUPERCELL 29 DE M</h2>
+      <h2 class="font-bold text-sm tracking-wider uppercase">SUPERCELL 29 DE M</h2>
       <p class="text-[10px]">RUC: 9999999999001</p>
     </div>
     <div class="py-2 border-b border-dashed border-black text-[11px]">
       <p><b>Comp:</b> <span id="tkt-numero"></span></p>
       <p><b>Fecha:</b> <span id="tkt-fecha"></span></p>
       <p><b>Cliente:</b> <span id="tkt-cliente"></span></p>
+      <p><b>Cajero:</b> <span id="tkt-cajero"></span></p>
     </div>
     <table class="w-full text-[11px] my-2">
       <tbody id="tkt-items"></tbody>
     </table>
     <div class="border-t border-dashed border-black pt-1 text-[11px]">
       <div class="flex justify-between font-bold text-xs"><span>TOTAL:</span><span id="tkt-total"></span></div>
+      <p class="text-[10px]"><b>Pago:</b> <span id="tkt-metodo"></span></p>
     </div>
   </div>
 
+  <!-- CONTENEDOR PDF FACTURA / COTIZACIÓN (OCULTO) -->
+  <div id="pdf-plantilla" class="hidden p-8 font-sans bg-white text-slate-800 text-xs max-w-xl mx-auto border">
+    <div class="flex justify-between items-start border-b pb-4 mb-4">
+      <div>
+        <h1 class="text-xl font-bold text-indigo-700" id="pdf-titulo-doc">DOCUMENTO</h1>
+        <p class="text-[10px] text-slate-500 font-mono" id="pdf-folio">Nº: -</p>
+      </div>
+      <div class="text-right text-[10px]">
+        <p class="font-bold text-sm text-slate-800">SUPERCELL & SISTEMA POS</p>
+        <p>RUC: 9999999999001</p>
+      </div>
+    </div>
+    <div class="bg-slate-50 p-3 rounded mb-4 text-[11px] grid grid-cols-2 gap-2">
+      <div>
+        <p><b>Cliente:</b> <span id="pdf-cliente-nom">-</span></p>
+        <p><b>Identificación:</b> <span id="pdf-cliente-doc">-</span></p>
+      </div>
+      <div>
+        <p><b>Teléfono:</b> <span id="pdf-cliente-tel">-</span></p>
+        <p><b>Fecha:</b> <span id="pdf-fecha">-</span></p>
+      </div>
+    </div>
+    <table class="w-full text-left mb-6">
+      <thead class="border-b bg-slate-100 text-[10px] uppercase">
+        <tr><th class="p-2">Cant</th><th class="p-2">Descripción</th><th class="p-2 text-right">Unitario</th><th class="p-2 text-right">Subtotal</th></tr>
+      </thead>
+      <tbody id="pdf-items" class="divide-y"></tbody>
+    </table>
+    <div class="flex justify-end border-t pt-2 mb-6">
+      <div class="w-48 text-right text-xs">
+        <p class="text-sm font-bold text-indigo-700">Total: <span id="pdf-total">$0.00</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- JAVASCRIPT: TODA LA LÓGICA ACTIVA                                         -->
+  <!-- ========================================================================= -->
   <script>
     const SUPABASE_URL = "https://pjpkcqyfocuwgxjxntan.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqcGtjcXlmb2N1d2d4anhudGFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMzMyMjcsImV4cCI6MjEwNzYwOTIyN30.a3pNRzsxjIK_xXFRBd8bP6JUENqBSf8JtsRXAI0sc3Y";
@@ -448,12 +860,30 @@
 
     let usuarioActual = null;
     let productos = [];
+    let sucursales = [];
     let itemsFactura = [];
+    let carritoCotizacion = [];
+    let planesLista = [];
+    let enviosLista = [];
+    let usuariosLista = [];
     let productoActivo = null;
+    let fotoBase64 = null;
+
+    const CIUDADES_USA = [
+      "New York, NY", "Queens, NY", "Brooklyn, NY", "Bronx, NY", "Newark, NJ", 
+      "Jersey City, NJ", "Miami, FL", "Orlando, FL", "Tampa, FL", "Chicago, IL", 
+      "Houston, TX", "Dallas, TX", "Los Angeles, CA", "Atlanta, GA", "New Haven, CT"
+    ];
+
+    const CIUDADES_NICARAGUA = [
+      "Managua (Capital)", "Matagalpa", "Estelí", "León", "Chinandega", 
+      "Masaya", "Granada", "Jinotega", "Juigalpa", "Rivas", "Ocotal", "Bluefields"
+    ];
 
     window.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
       verificarSesionGuardada();
+      cambiarRutaEnvio();
     });
 
     function verificarSesionGuardada() {
@@ -493,8 +923,14 @@
         document.getElementById('tab-inv').classList.remove('hidden');
         document.getElementById('tab-admin').classList.remove('hidden');
       }
+      await cargarSucursales();
       await cargarProductos();
       await cargarVentas();
+      await cargarPlanesAcumulativos();
+      await cargarEnvios();
+      if (usuarioActual.rol === 'ADMIN') {
+        await cargarUsuariosLista();
+      }
       lucide.createIcons();
     }
 
@@ -503,33 +939,63 @@
       location.reload();
     }
 
+    async function cargarSucursales() {
+      const { data } = await db.from('sucursales').select('*');
+      sucursales = data || [];
+      const selectFac = document.getElementById('fac-sucursal');
+      const selectUser = document.getElementById('user-sucursal');
+      const lista = document.getElementById('lista-sucursales');
+      if (selectFac) selectFac.innerHTML = '';
+      if (selectUser) selectUser.innerHTML = '<option value="">Sin sede fija (Global)</option>';
+      if (lista) lista.innerHTML = '';
+
+      if (sucursales.length === 0) {
+        if (selectFac) selectFac.innerHTML = '<option value="SUPERCELL">SUPERCELL 29 DE M</option>';
+      } else {
+        sucursales.forEach(s => {
+          if (selectFac) selectFac.innerHTML += `<option value="${s.nombre}">${s.nombre}</option>`;
+          if (selectUser) selectUser.innerHTML += `<option value="${s.id}">${s.nombre}</option>`;
+          if (lista) lista.innerHTML += `<li class="p-2 bg-slate-50 border rounded flex justify-between"><b>${s.nombre}</b> <span class="text-xs text-slate-400">${s.direccion || ''}</span></li>`;
+        });
+      }
+    }
+
+    async function crearSucursal(e) {
+      e.preventDefault();
+      const nombre = document.getElementById('suc-nombre').value.trim();
+      const direccion = document.getElementById('suc-dir').value.trim();
+      await db.from('sucursales').insert([{ nombre, direccion }]);
+      alert("Sucursal creada.");
+      document.getElementById('suc-nombre').value = '';
+      document.getElementById('suc-dir').value = '';
+      cargarSucursales();
+    }
+
+    // ==================== PRODUCTOS & FACTURA DE VENTA ====================
     async function cargarProductos() {
       const { data } = await db.from('productos').select('*').order('id', { ascending: false });
       productos = data || [];
       const datalist = document.getElementById('lista-sugerencias-prod');
-      datalist.innerHTML = '';
-      productos.forEach(p => {
-        datalist.innerHTML += `<option value="${p.nombre}">`;
-      });
+      if (datalist) {
+        datalist.innerHTML = '';
+        productos.forEach(p => { datalist.innerHTML += `<option value="${p.nombre}">`; });
+      }
+      renderizarCotizarGrid(productos);
+      poblarSelectProductosPlan(productos);
+      renderizarInventario(productos);
     }
 
-    // ==================== LÓGICA DE FACTURA DE VENTA ====================
     function buscarProductoPorCodigo(cod) {
       if (!cod) return;
       const prod = productos.find(p => (p.codigo_barras && p.codigo_barras.toLowerCase() === cod.toLowerCase()));
-      if (prod) {
-        cargarProductoAFilaActiva(prod);
-      } else {
-        alert("Producto no encontrado con el código: " + cod);
-      }
+      if (prod) cargarProductoAFilaActiva(prod);
+      else alert("Producto no encontrado con el código: " + cod);
     }
 
     function seleccionarProductoPorNombre(nombre) {
       if (!nombre) return;
       const prod = productos.find(p => p.nombre.toLowerCase() === nombre.toLowerCase());
-      if (prod) {
-        cargarProductoAFilaActiva(prod);
-      }
+      if (prod) cargarProductoAFilaActiva(prod);
     }
 
     function cargarProductoAFilaActiva(prod) {
@@ -544,11 +1010,9 @@
       const cant = parseFloat(document.getElementById('in-item-cant').value) || 0;
       const vunit = parseFloat(document.getElementById('in-item-vunit').value) || 0;
       const porcDesc = parseFloat(document.getElementById('in-item-porc-desc').value) || 0;
-
       const subtotalBruto = cant * vunit;
       const valDesc = subtotalBruto * (porcDesc / 100);
       const totalFila = subtotalBruto - valDesc;
-
       document.getElementById('in-item-val-desc').value = valDesc.toFixed(2);
       document.getElementById('in-item-total').innerText = totalFila.toFixed(2);
     }
@@ -562,13 +1026,8 @@
       const codigo = document.getElementById('in-item-codigo').value.trim() || 'S/C';
       const umed = document.getElementById('in-item-umed').value;
 
-      if (!detalle || cant <= 0 || vunit <= 0) {
-        return alert("Por favor complete los datos del producto (nombre, cantidad y precio).");
-      }
-
-      if (productoActivo && cant > productoActivo.stock_actual) {
-        return alert(`Stock insuficiente. Solo quedan ${productoActivo.stock_actual} unidades.`);
-      }
+      if (!detalle || cant <= 0 || vunit <= 0) return alert("Complete los datos del producto.");
+      if (productoActivo && cant > productoActivo.stock_actual) return alert(`Stock insuficiente. Quedan ${productoActivo.stock_actual} unidades.`);
 
       const subtotalBruto = cant * vunit;
       const valDesc = subtotalBruto * (porcDesc / 100);
@@ -588,7 +1047,6 @@
         stock_actual: productoActivo ? productoActivo.stock_actual : 999
       });
 
-      // Limpiar fila activa
       document.getElementById('in-item-codigo').value = '';
       document.getElementById('in-item-cant').value = '1';
       document.getElementById('in-item-detalle').value = '';
@@ -603,8 +1061,6 @@
 
     function renderizarTablaFactura() {
       const tbody = document.getElementById('tabla-factura-items');
-      
-      // Remover filas añadidas antes
       const filasAgregadas = tbody.querySelectorAll('.fila-producto-agregado');
       filasAgregadas.forEach(f => f.remove());
 
@@ -621,19 +1077,12 @@
           <td class="p-2 text-center font-mono">$${it.valDesc.toFixed(2)}</td>
           <td class="p-2 text-center font-bold">${it.ivaPorc}%</td>
           <td class="p-2 text-right font-bold text-slate-900 font-mono">$${it.total.toFixed(2)}</td>
-          <td class="p-2 text-center">
-            <button onclick="eliminarFilaFactura(${idx})" class="text-red-500 hover:text-red-700 font-bold text-sm">×</button>
-          </td>
+          <td class="p-2 text-center"><button onclick="itemsFactura.splice(${idx},1); renderizarTablaFactura();" class="text-red-500 hover:text-red-700 font-bold text-sm">×</button></td>
         `;
         tbody.prepend(tr);
       });
 
       calcularTotalesFactura();
-    }
-
-    function eliminarFilaFactura(idx) {
-      itemsFactura.splice(idx, 1);
-      renderizarTablaFactura();
     }
 
     function calcularTotalesFactura() {
@@ -676,7 +1125,7 @@
     }
 
     async function procesarFacturaVenta() {
-      if (itemsFactura.length === 0) return alert("No hay productos agregados en la factura.");
+      if (itemsFactura.length === 0) return alert("Agregue al menos un producto a la factura.");
 
       const totalFactura = parseFloat(document.getElementById('txt-total-factura-grande').innerText);
       const doc = document.getElementById('fac-doc').value.trim() || '9999999999999';
@@ -718,29 +1167,155 @@
         }
       }
 
-      alert(`¡Factura guardada exitosamente!\nNº: ${numComp}\nTotal: $${totalFactura.toFixed(2)}`);
+      const imprimir = confirm(`¡Factura ${numComp} guardada!\nTotal: $${totalFactura.toFixed(2)}\n\n¿Deseas imprimir el comprobante térmico?`);
+      if (imprimir) {
+        imprimirTicketTermicoRaw({
+          numero: numComp, fecha: new Date().toLocaleString(), cliente: nombreCompleto,
+          cajero: usuarioActual.nombre_completo, items: itemsFactura, total: `$${totalFactura.toFixed(2)}`,
+          metodo: metodoPago
+        });
+      }
 
-      // Incrementar número de factura para la próxima
       document.getElementById('fac-numero-correlativo').innerText = parseInt(numCorrelativo) + 1;
       limpiarFacturaCompleta();
       await cargarProductos();
       await cargarVentas();
     }
 
-    async function cargarVentas() {
-      const { data } = await db.from('ventas').select('*').order('id', { ascending: false }).limit(10);
-      const tb = document.getElementById('tabla-ventas-body');
-      if (!tb) return;
-      tb.innerHTML = '';
-      (data || []).forEach(v => {
-        tb.innerHTML += `
+    // ==================== COTIZACIONES ====================
+    function renderizarCotizarGrid(lista) {
+      const g = document.getElementById('grid-cotizar');
+      if (!g) return;
+      g.innerHTML = '';
+      lista.forEach(p => {
+        g.innerHTML += `
+          <div onclick="agregarCotizacion(${p.id})" class="border p-3 rounded-lg bg-white cursor-pointer hover:border-indigo-500">
+            <h4 class="font-bold text-xs text-slate-700">${p.nombre}</h4>
+            <span class="text-sm font-bold text-indigo-600">$${parseFloat(p.precio_venta).toFixed(2)}</span>
+          </div>
+        `;
+      });
+    }
+
+    function agregarCotizacion(id) {
+      const prod = productos.find(p => p.id === id);
+      const existe = carritoCotizacion.find(c => c.id === id);
+      if (existe) existe.cantidad++;
+      else carritoCotizacion.push({ ...prod, cantidad: 1 });
+      renderCotizacion();
+    }
+
+    function renderCotizacion() {
+      const cont = document.getElementById('items-cotizacion');
+      cont.innerHTML = '';
+      let tot = 0;
+      carritoCotizacion.forEach((it, idx) => {
+        const sub = it.cantidad * it.precio_venta;
+        tot += sub;
+        cont.innerHTML += `
+          <div class="flex justify-between items-center text-xs pb-1 border-b">
+            <span>${it.nombre} x${it.cantidad}</span>
+            <div class="flex items-center gap-1">
+              <span class="font-bold">$${sub.toFixed(2)}</span>
+              <button onclick="carritoCotizacion.splice(${idx},1); renderCotizacion();" class="text-red-500 font-bold ml-1">×</button>
+            </div>
+          </div>
+        `;
+      });
+      document.getElementById('cot-total').innerText = `$${tot.toFixed(2)}`;
+    }
+
+    async function guardarYDescargarCotizacion(descargarPDF) {
+      if (carritoCotizacion.length === 0) return alert("Cotización vacía.");
+      const total = carritoCotizacion.reduce((s, i) => s + (i.cantidad * i.precio_venta), 0);
+      const fol = 'COT-' + Math.floor(100000 + Math.random() * 900000);
+      const nom = document.getElementById('cot-nom').value.trim() || 'Cliente Cotización';
+      const doc = document.getElementById('cot-doc').value.trim() || 'S/N';
+      const tel = document.getElementById('cot-tel').value.trim() || '-';
+
+      await db.from('cotizaciones').insert([{
+        numero_cotizacion: fol, cliente_nombre: nom, cliente_identificacion: doc, cliente_telefono: tel,
+        total: total, usuario_id: usuarioActual.id
+      }]);
+
+      generarDocumentoPDF({
+        titulo: "COTIZACIÓN", folio: fol, cliente: nom, doc: doc, tel: tel,
+        fecha: new Date().toLocaleDateString(), items: carritoCotizacion, total: `$${total.toFixed(2)}`
+      }, descargarPDF);
+    }
+
+    // ==================== PLAN ACUMULATIVO ====================
+    function poblarSelectProductosPlan(lista) {
+      const sel = document.getElementById('plan-producto-select');
+      if (!sel) return;
+      sel.innerHTML = '';
+      lista.forEach(p => {
+        sel.innerHTML += `<option value="${p.id}">${p.nombre} - $${p.precio_venta} (Disp: ${p.stock_actual})</option>`;
+      });
+    }
+
+    async function crearPlanAcumulativo(e) {
+      e.preventDefault();
+      const prodId = document.getElementById('plan-producto-select').value;
+      const prod = productos.find(p => p.id == prodId);
+      if (!prod || prod.stock_actual <= 0) return alert("Producto sin existencias.");
+
+      const abonoIni = parseFloat(document.getElementById('plan-abono-inicial').value);
+      if (abonoIni <= 0 || abonoIni > prod.precio_venta) return alert("Monto de abono inválido.");
+
+      const codigo = 'PLAN-' + Math.floor(100000 + Math.random() * 900000);
+      const saldo = prod.precio_venta - abonoIni;
+
+      const { data: plan, error } = await db.from('planes_acumulativos').insert([{
+        codigo_plan: codigo,
+        cliente_identificacion: document.getElementById('plan-doc').value,
+        cliente_nombre: document.getElementById('plan-nom').value,
+        cliente_telefono: document.getElementById('plan-tel').value,
+        cliente_email: document.getElementById('plan-mail').value,
+        total: prod.precio_venta,
+        saldo_pendiente: saldo,
+        fecha_proximo_abono: document.getElementById('plan-proxima-fecha').value,
+        usuario_id: usuarioActual.id
+      }]).select().single();
+
+      if (error) return alert(error.message);
+
+      await db.from('abonos_plan').insert([{
+        plan_id: plan.id,
+        monto: abonoIni,
+        metodo_pago: 'EFECTIVO',
+        saldo_anterior: prod.precio_venta,
+        nuevo_saldo: saldo,
+        usuario_nombre: usuarioActual.nombre_completo,
+        usuario_id: usuarioActual.id
+      }]);
+
+      await db.from('productos').update({ stock_actual: prod.stock_actual - 1 }).eq('id', prod.id);
+
+      alert(`Plan Acumulativo Creado: ${codigo}\nAbono Inicial: $${abonoIni.toFixed(2)}\nSaldo pendiente: $${saldo.toFixed(2)}`);
+      e.target.reset();
+      cargarProductos();
+      cargarPlanesAcumulativos();
+    }
+
+    async function cargarPlanesAcumulativos() {
+      const { data } = await db.from('planes_acumulativos').select('*').order('id', { ascending: false });
+      planesLista = data || [];
+      const tbody = document.getElementById('tabla-planes-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      planesLista.forEach(pl => {
+        tbody.innerHTML += `
           <tr class="hover:bg-slate-50">
-            <td class="p-3 font-mono font-bold text-blue-700">${v.numero_comprobante}</td>
-            <td class="p-3 text-slate-500">${new Date(v.fecha).toLocaleDateString()}</td>
-            <td class="p-3"><span class="px-2 py-0.5 rounded text-xs bg-slate-100 font-bold">${v.metodo_pago}</span></td>
-            <td class="p-3 text-right font-bold text-slate-800">$${parseFloat(v.total).toFixed(2)}</td>
-            <td class="p-3 text-center">
-              <button class="p-1.5 bg-blue-50 text-blue-700 rounded text-xs font-bold">Imprimir</button>
+            <td class="p-3 font-mono font-bold text-indigo-700">${pl.codigo_plan}</td>
+            <td class="p-3"><b>${pl.cliente_nombre}</b><br><span class="text-[10px] text-slate-400">${pl.cliente_telefono}</span></td>
+            <td class="p-3 font-bold">$${parseFloat(pl.total).toFixed(2)}</td>
+            <td class="p-3 font-bold text-red-600">$${parseFloat(pl.saldo_pendiente).toFixed(2)}</td>
+            <td class="p-3 font-semibold">${pl.fecha_proximo_abono || '-'}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${pl.saldo_pendiente <= 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${pl.saldo_pendiente <= 0 ? 'LIQUIDADO' : 'ACTIVO'}</span></td>
+            <td class="p-3 text-center space-x-1">
+              ${pl.saldo_pendiente > 0 ? `<button onclick="registrarNuevoAbono(${pl.id}, ${pl.saldo_pendiente})" class="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded font-bold" title="Ingresar Abono">+ Abono</button>` : ''}
+              <button onclick="verHistorialAbonosModal(${pl.id})" class="px-2 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded font-bold border border-indigo-200">Historial</button>
             </td>
           </tr>
         `;
@@ -748,31 +1323,444 @@
       lucide.createIcons();
     }
 
-    function cambiarVista(v) {
-      ['pos', 'cotizacion', 'plan', 'envios', 'inventario', 'ventas', 'admin'].forEach(x => {
-        const el = document.getElementById('vista-' + x);
-        const tb = document.getElementById('tab-' + x);
-        if (el) el.classList.toggle('hidden', x !== v);
-        if (tb) {
-          tb.classList.toggle('bg-blue-600', x === v);
-          tb.classList.toggle('hover:bg-slate-800', x !== v);
-        }
+    async function registrarNuevoAbono(planId, saldoActual) {
+      const montoStr = prompt(`Saldo pendiente: $${saldoActual.toFixed(2)}\nIngresa el monto del abono ($):`);
+      if (!montoStr) return;
+      const monto = parseFloat(montoStr);
+      if (isNaN(monto) || monto <= 0 || monto > saldoActual) return alert("Monto inválido.");
+
+      const proxFecha = prompt("Fecha coordinada para el siguiente abono (AAAA-MM-DD):", new Date().toISOString().split('T')[0]);
+      const nuevoSaldo = saldoActual - monto;
+
+      await db.from('abonos_plan').insert([{
+        plan_id: planId,
+        monto: monto,
+        metodo_pago: 'EFECTIVO',
+        saldo_anterior: saldoActual,
+        nuevo_saldo: nuevoSaldo,
+        usuario_nombre: usuarioActual.nombre_completo,
+        usuario_id: usuarioActual.id
+      }]);
+
+      await db.from('planes_acumulativos').update({
+        saldo_pendiente: nuevoSaldo,
+        fecha_proximo_abono: proxFecha || null,
+        estado: nuevoSaldo <= 0 ? 'LIQUIDADO' : 'ACTIVO'
+      }).eq('id', planId);
+
+      alert(`¡Abono de $${monto.toFixed(2)} registrado!\nSaldo pendiente restante: $${nuevoSaldo.toFixed(2)}`);
+      cargarPlanesAcumulativos();
+    }
+
+    async function verHistorialAbonosModal(planId) {
+      const plan = planesLista.find(p => p.id === planId);
+      if (!plan) return;
+
+      const { data: abonos } = await db.from('abonos_plan').select('*').eq('plan_id', planId).order('id', { ascending: true });
+      document.getElementById('modal-subtitulo-plan').innerText = `${plan.codigo_plan} - ${plan.cliente_nombre}`;
+      document.getElementById('modal-plan-total').innerText = `$${parseFloat(plan.total).toFixed(2)}`;
+      
+      const totalAbonado = (abonos || []).reduce((acc, a) => acc + parseFloat(a.monto), 0);
+      document.getElementById('modal-plan-abonado').innerText = `$${totalAbonado.toFixed(2)}`;
+      document.getElementById('modal-plan-saldo').innerText = `$${parseFloat(plan.saldo_pendiente).toFixed(2)}`;
+
+      const tbody = document.getElementById('modal-tabla-abonos-body');
+      tbody.innerHTML = '';
+
+      (abonos || []).forEach((ab, i) => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50">
+            <td class="p-2 font-bold text-slate-500">${i + 1}</td>
+            <td class="p-2 text-slate-600">${new Date(ab.fecha).toLocaleString()}</td>
+            <td class="p-2 text-right font-bold text-emerald-600">+$${parseFloat(ab.monto).toFixed(2)}</td>
+            <td class="p-2 text-right font-bold text-slate-700">$${parseFloat(ab.nuevo_saldo).toFixed(2)}</td>
+            <td class="p-2 text-slate-500">${ab.usuario_nombre || 'Cajero'}</td>
+          </tr>
+        `;
       });
-      localStorage.setItem('sesion_pos_vista', v);
+
+      document.getElementById('modal-historial-abonos').classList.remove('hidden');
       lucide.createIcons();
     }
 
-    function reimprimirUltimaFactura() {
-      alert("Listo para imprimir la última factura generada.");
+    function cerrarModalHistorial() {
+      document.getElementById('modal-historial-abonos').classList.add('hidden');
     }
 
-    function enviarFacturaCorreo() {
-      const mail = document.getElementById('fac-mail').value;
-      if (!mail) return alert("Por favor ingrese un correo electrónico en el campo Email.");
-      alert(`Factura enviada electrónicamente a: ${mail}`);
+    // ==================== ENVÍOS (COURIER) ====================
+    function cambiarRutaEnvio() {
+      const ruta = document.getElementById('env-ruta').value;
+      const datalist = document.getElementById('lista-ciudades-destino');
+      const inputCiudad = document.getElementById('env-ciudad');
+      const lblCiudad = document.getElementById('lbl-ciudad-destino');
+      const tituloRem = document.getElementById('titulo-remitente');
+      const tituloDest = document.getElementById('titulo-destinatario');
+      const bloqueZip = document.getElementById('bloque-zip-code');
+
+      datalist.innerHTML = '';
+      inputCiudad.value = '';
+
+      if (ruta === 'USA_NICARAGUA') {
+        lblCiudad.innerText = "Departamento / Ciudad en Nicaragua";
+        tituloRem.innerHTML = '<i data-lucide="user" class="w-4 h-4"></i> Remitente en EE.UU.';
+        tituloDest.innerHTML = '<i data-lucide="map-pin" class="w-4 h-4"></i> Destinatario en Nicaragua';
+        if (bloqueZip) bloqueZip.classList.add('hidden');
+        CIUDADES_NICARAGUA.forEach(c => datalist.innerHTML += `<option value="${c}">`);
+      } else {
+        lblCiudad.innerText = "Ciudad Destino en EE.UU.";
+        tituloRem.innerHTML = '<i data-lucide="user" class="w-4 h-4"></i> Remitente';
+        tituloDest.innerHTML = '<i data-lucide="map-pin" class="w-4 h-4"></i> Destinatario en EE.UU.';
+        if (bloqueZip) bloqueZip.classList.remove('hidden');
+        CIUDADES_USA.forEach(c => datalist.innerHTML += `<option value="${c}">`);
+      }
+      actualizarTarifaSugerida();
+      lucide.createIcons();
     }
 
-    function cambiarTipoPago(val) {}
-  </script>
-</body>
-</html>
+    function cambiarUnidadPeso() {
+      const unidad = document.getElementById('env-unidad-peso').value;
+      document.getElementById('lbl-tarifa').innerText = unidad === 'LBS' ? 'Precio x Libra ($)' : 'Precio x Kilo ($)';
+      calcularTotalEnvio();
+    }
+
+    function actualizarTarifaSugerida() {
+      const tipo = document.getElementById('env-tipo').value;
+      const ruta = document.getElementById('env-ruta').value;
+      const inputTarifa = document.getElementById('env-tarifa-unidad');
+      inputTarifa.value = (ruta === 'USA_NICARAGUA') ? (tipo === 'AEREO' ? "5.50" : "2.25") : (tipo === 'AEREO' ? "4.50" : "2.00");
+      calcularTotalEnvio();
+    }
+
+    function calcularTotalEnvio() {
+      const peso = parseFloat(document.getElementById('env-peso').value) || 0;
+      const tarifa = parseFloat(document.getElementById('env-tarifa-unidad').value) || 0;
+      const extra = parseFloat(document.getElementById('env-cargos-extra').value) || 0;
+      const total = (peso * tarifa) + extra;
+      document.getElementById('txt-total-envio').innerText = `$${total.toFixed(2)}`;
+      document.getElementById('env-valor-final').value = total.toFixed(2);
+    }
+
+    function toggleDireccionDestino() {
+      const tipo = document.getElementById('env-entrega').value;
+      document.getElementById('bloque-direccion-destino').classList.toggle('hidden', tipo === 'OFICINA');
+    }
+
+    function generarTracking() {
+      const ruta = document.getElementById('env-ruta').value;
+      const tipo = document.getElementById('env-tipo').value;
+      const prefijo = tipo === 'AEREO' ? 'AIR' : 'SEA';
+      const sufijo = ruta === 'USA_NICARAGUA' ? 'NI' : 'US';
+      const num = Math.floor(10000000 + Math.random() * 90000000);
+      document.getElementById('env-tracking').value = `${prefijo}-${num}${sufijo}`;
+    }
+
+    function previsualizarFoto(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        fotoBase64 = evt.target.result;
+        document.getElementById('preview-img').src = fotoBase64;
+        document.getElementById('preview-contenedor').classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function quitarFoto() {
+      fotoBase64 = null;
+      document.getElementById('env-foto-input').value = '';
+      document.getElementById('preview-contenedor').classList.add('hidden');
+    }
+
+    async function registrarEnvio(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-guardar-envio');
+      btn.innerText = "Guardando...";
+      btn.disabled = true;
+
+      let tracking = document.getElementById('env-tracking').value.trim();
+      if (!tracking) {
+        generarTracking();
+        tracking = document.getElementById('env-tracking').value;
+      }
+
+      const ruta = document.getElementById('env-ruta').value;
+      const tipo = document.getElementById('env-tipo').value;
+      const entrega = document.getElementById('env-entrega').value;
+      const ciudad = document.getElementById('env-ciudad').value;
+
+      const remNombre = document.getElementById('rem-nombre').value;
+      const remCedula = document.getElementById('rem-cedula').value;
+      const remTelefono = document.getElementById('rem-telefono').value;
+      const remDireccion = document.getElementById('rem-direccion').value;
+
+      const destNombre = document.getElementById('dest-nombre').value;
+      const destDoc = document.getElementById('dest-doc').value;
+      const destTelefono = document.getElementById('dest-telefono').value;
+      const destDireccion = entrega === 'DOMICILIO' ? document.getElementById('dest-direccion').value : 'Retiro en Sucursal/Oficina';
+      const destZip = (entrega === 'DOMICILIO' && ruta === 'USA') ? document.getElementById('dest-zip').value : null;
+
+      const contenido = document.getElementById('env-contenido').value;
+      const peso = parseFloat(document.getElementById('env-peso').value);
+      const unidad = document.getElementById('env-unidad-peso').value;
+      const valor = parseFloat(document.getElementById('env-valor-final').value);
+      const estadoPago = document.getElementById('env-estado-pago').value;
+
+      try {
+        const { error } = await db.from('envios_internacionales').insert([{
+          numero_guia: tracking, ruta_envio: ruta, tipo_transporte: tipo, cliente_nombre: destNombre,
+          cliente_telefono: destTelefono, destinatario_documento: destDoc, ciudad_destino: ciudad,
+          tipo_entrega: entrega, direccion_destino: destDireccion, zip_code: destZip, remitente_cedula: remCedula,
+          remitente_direccion: `${remNombre} (ID: ${remCedula}) - Tel: ${remTelefono} - Origen: ${remDireccion}`,
+          contenido_paquete: contenido, peso: peso, unidad_peso: unidad, valor_envio: valor, estado_pago: estadoPago,
+          foto_paquete_url: fotoBase64, usuario_id: usuarioActual.id, sucursal_id: usuarioActual.sucursal_id
+        }]);
+
+        if (error) throw error;
+        alert(`¡Envío Registrado!\nGuía: ${tracking}\nTotal: $${valor.toFixed(2)} (${estadoPago})`);
+        window.print();
+
+        e.target.reset();
+        quitarFoto();
+        actualizarTarifaSugerida();
+        toggleDireccionDestino();
+        cargarEnvios();
+      } catch (err) { alert(err.message); }
+      finally {
+        btn.innerText = "Guardar e Imprimir Guía Internacional";
+        btn.disabled = false;
+      }
+    }
+
+    async function cargarEnvios() {
+      const { data } = await db.from('envios_internacionales').select('*').order('id', { ascending: false });
+      enviosLista = data || [];
+      const t = document.getElementById('tabla-envios-body');
+      t.innerHTML = '';
+      if (enviosLista.length === 0) {
+        t.innerHTML = `<tr><td colspan="10" class="text-center p-4 text-slate-400">No hay envíos registrados.</td></tr>`;
+        return;
+      }
+      enviosLista.forEach(env => {
+        const esNica = env.ruta_envio === 'USA_NICARAGUA';
+        t.innerHTML += `
+          <tr class="hover:bg-slate-50 text-xs">
+            <td class="p-3 font-mono font-bold text-indigo-700">${env.numero_guia}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${esNica ? 'bg-indigo-100 text-indigo-800' : 'bg-slate-100 text-slate-800'}">${esNica ? '🇺🇸 ➔ 🇳🇮' : '➔ 🇺🇸'}</span></td>
+            <td class="p-3 font-bold text-slate-700">${env.remitente_direccion ? env.remitente_direccion.split('-')[0] : 'S/D'}</td>
+            <td class="p-3"><b>${env.cliente_nombre}</b> (${env.ciudad_destino})</td>
+            <td class="p-3 text-slate-500 truncate max-w-xs">${env.contenido_paquete || '-'}</td>
+            <td class="p-3 font-bold">${env.peso} ${env.unidad_peso}</td>
+            <td class="p-3 text-right font-bold text-slate-800">$${parseFloat(env.valor_envio).toFixed(2)}</td>
+            <td class="p-3 text-center"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${env.estado_pago === 'PAGADO' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${env.estado_pago || 'PAGADO'}</span></td>
+            <td class="p-3 text-center">${env.foto_paquete_url ? `<img src="${env.foto_paquete_url}" onclick="window.open(this.src)" class="w-8 h-8 object-cover rounded cursor-pointer mx-auto border">` : '<span class="text-slate-400 text-[10px]">Sin foto</span>'}</td>
+            <td class="p-3 text-center"><span class="px-2 py-1 rounded text-[10px] bg-slate-100">${env.estado}</span></td>
+          </tr>
+        `;
+      });
+      lucide.createIcons();
+    }
+
+    // ==================== INVENTARIO (ADMIN) ====================
+    async function guardarProducto(e) {
+      e.preventDefault();
+      const id = document.getElementById('edit-prod-id').value;
+      const nombre = document.getElementById('inv-nombre').value;
+      const codigo = document.getElementById('inv-codigo').value || null;
+      const costo = parseFloat(document.getElementById('inv-costo').value);
+      const venta = parseFloat(document.getElementById('inv-venta').value);
+      const stock = parseInt(document.getElementById('inv-stock').value);
+
+      if (id) {
+        await db.from('productos').update({ nombre, codigo_barras: codigo, precio_costo: costo, precio_venta: venta, stock_actual: stock }).eq('id', id);
+        alert("Producto modificado.");
+      } else {
+        await db.from('productos').insert([{ nombre, codigo_barras: codigo, precio_costo: costo, precio_venta: venta, stock_actual: stock }]);
+        alert("Producto guardado.");
+      }
+      cancelarEdicionProd();
+      cargarProductos();
+    }
+
+    function renderizarInventario(lista) {
+      const t = document.getElementById('tabla-stock');
+      if (!t) return;
+      t.innerHTML = '';
+      lista.forEach(p => {
+        t.innerHTML += `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3 font-mono text-xs">${p.codigo_barras || '-'}</td>
+            <td class="p-3 font-semibold text-slate-700">${p.nombre}</td>
+            <td class="p-3 text-right font-mono text-slate-500">$${parseFloat(p.precio_costo).toFixed(2)}</td>
+            <td class="p-3 text-right font-mono font-bold text-slate-800">$${parseFloat(p.precio_venta).toFixed(2)}</td>
+            <td class="p-3 text-center font-bold ${p.stock_actual <= 0 ? 'text-red-600' : 'text-slate-800'}">${p.stock_actual}</td>
+            <td class="p-3 text-center">
+              <button onclick="prepararEdicionProd(${p.id})" class="px-2 py-1 bg-amber-500 text-white rounded text-xs font-bold mr-1">Editar</button>
+              <button onclick="eliminarProducto(${p.id}, '${p.nombre}')" class="px-2 py-1 bg-red-500 text-white rounded text-xs font-bold">Borrar</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function prepararEdicionProd(id) {
+      const p = productos.find(x => x.id === id);
+      if (!p) return;
+      document.getElementById('edit-prod-id').value = p.id;
+      document.getElementById('inv-nombre').value = p.nombre;
+      document.getElementById('inv-codigo').value = p.codigo_barras || '';
+      document.getElementById('inv-costo').value = p.precio_costo;
+      document.getElementById('inv-venta').value = p.precio_venta;
+      document.getElementById('inv-stock').value = p.stock_actual;
+      document.getElementById('txt-form-prod').innerText = "Modificar Producto";
+      document.getElementById('btn-save-prod').innerText = "Actualizar";
+      document.getElementById('btn-cancel-prod').classList.remove('hidden');
+    }
+
+    function cancelarEdicionProd() {
+      document.getElementById('edit-prod-id').value = '';
+      document.getElementById('inv-nombre').value = '';
+      document.getElementById('inv-codigo').value = '';
+      document.getElementById('inv-costo').value = '';
+      document.getElementById('inv-venta').value = '';
+      document.getElementById('inv-stock').value = '1';
+      document.getElementById('txt-form-prod').innerText = "Registrar Nuevo Producto";
+      document.getElementById('btn-save-prod').innerText = "Guardar";
+      document.getElementById('btn-cancel-prod').classList.add('hidden');
+    }
+
+    async function eliminarProducto(id, nombre) {
+      if (!confirm(`¿Eliminar definitivamente "${nombre}"?`)) return;
+      await db.from('productos').delete().eq('id', id);
+      cargarProductos();
+    }
+
+    // ==================== HISTORIAL DE VENTAS ====================
+    async function cargarVentas() {
+      let q = db.from('ventas').select('*').order('id', { ascending: false });
+      const fi = document.getElementById('filtro-fecha-inicio').value;
+      const ff = document.getElementById('filtro-fecha-fin').value;
+      if (fi) q = q.gte('fecha', `${fi}T00:00:00.000Z`);
+      if (ff) q = q.lte('fecha', `${ff}T23:59:59.999Z`);
+
+      const { data } = await q;
+      const tb = document.getElementById('tabla-ventas-body');
+      if (!tb) return;
+      tb.innerHTML = '';
+      let tot = 0;
+      (data || []).forEach(v => {
+        tot += parseFloat(v.total);
+        tb.innerHTML += `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3 font-mono font-bold text-blue-700">${v.numero_comprobante}</td>
+            <td class="p-3 text-slate-500">${new Date(v.fecha).toLocaleDateString()}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded text-xs bg-slate-100 font-bold">${v.metodo_pago}</span></td>
+            <td class="p-3 text-right font-bold text-slate-800">$${parseFloat(v.total).toFixed(2)}</td>
+            <td class="p-3 text-center space-x-1">
+              <button onclick="reimprimirVentaDual(${v.id}, 'TICKET')" class="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-xs font-bold" title="Imprimir Ticket"><i data-lucide="printer" class="w-3.5 h-3.5"></i></button>
+              <button onclick="reimprimirVentaDual(${v.id}, 'PDF')" class="p-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded text-xs font-bold" title="Descargar Factura PDF"><i data-lucide="download" class="w-3.5 h-3.5"></i></button>
+            </td>
+          </tr>
+        `;
+      });
+      document.getElementById('txt-total-periodo').innerText = `$${tot.toFixed(2)}`;
+      lucide.createIcons();
+    }
+
+    async function reimprimirVentaDual(ventaId, modo) {
+      const { data: venta } = await db.from('ventas').select('*, clientes(*)').eq('id', ventaId).single();
+      const { data: det } = await db.from('detalle_ventas').select('*, productos(nombre)').eq('venta_id', ventaId);
+
+      const itemsFormateados = (det || []).map(d => ({
+        cantidad: d.cantidad, nombre: d.productos ? d.productos.nombre : 'Producto', precio_venta: d.precio_unitario
+      }));
+
+      const nombreCli = venta.clientes ? (venta.clientes.nombre_completo || venta.clientes.identificacion) : 'CONSUMIDOR FINAL';
+      const docCli = venta.clientes ? venta.clientes.identificacion : '9999999999999';
+
+      if (modo === 'TICKET') {
+        imprimirTicketTermicoRaw({
+          numero: venta.numero_comprobante, fecha: new Date(venta.fecha).toLocaleString(),
+          cliente: nombreCli, cajero: 'Cajero', items: itemsFormateados, total: `$${parseFloat(venta.total).toFixed(2)}`,
+          metodo: venta.metodo_pago
+        });
+      } else {
+        generarDocumentoPDF({
+          titulo: "FACTURA DE VENTA", folio: venta.numero_comprobante, cliente: nombreCli,
+          doc: docCli, tel: '-', fecha: new Date(venta.fecha).toLocaleDateString(),
+          items: itemsFormateados, total: `$${parseFloat(venta.total).toFixed(2)}`
+        }, true);
+      }
+    }
+
+    // ==================== PERSONAL / USUARIOS (ADMIN) ====================
+    async function cargarUsuariosLista() {
+      const { data } = await db.from('usuarios_sistema').select('*');
+      usuariosLista = data || [];
+      const l = document.getElementById('lista-personal');
+      if (!l) return;
+      l.innerHTML = '';
+      usuariosLista.forEach(u => {
+        l.innerHTML += `
+          <div class="p-2 bg-slate-50 border rounded flex justify-between items-center text-xs">
+            <div>
+              <p class="font-bold text-slate-800">${u.nombre_completo} <span class="text-indigo-600 font-normal">(@${u.usuario})</span></p>
+              <p class="text-slate-400">Rol: <b>${u.rol}</b></p>
+            </div>
+            <div class="flex gap-1">
+              <button onclick="prepararEdicionUser(${u.id})" class="px-2 py-1 bg-amber-500 text-white rounded font-bold">Editar</button>
+              ${u.id !== usuarioActual.id ? `<button onclick="eliminarUsuario(${u.id}, '${u.usuario}')" class="px-2 py-1 bg-red-500 text-white rounded font-bold">Eliminar</button>` : ''}
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    async function guardarUsuario(e) {
+      e.preventDefault();
+      const id = document.getElementById('edit-user-id').value;
+      const nombre = document.getElementById('user-nombre').value;
+      const alias = document.getElementById('user-alias').value;
+      const clave = document.getElementById('user-clave').value;
+      const rol = document.getElementById('user-rol').value;
+      const sucursal_id = document.getElementById('user-sucursal').value || null;
+
+      if (id) {
+        const payload = { nombre_completo: nombre, usuario: alias, rol: rol, sucursal_id: sucursal_id };
+        if (clave.trim() !== '') payload.clave = clave;
+        await db.from('usuarios_sistema').update(payload).eq('id', id);
+        alert("Usuario actualizado.");
+      } else {
+        if (!clave) return alert("Asigne una contraseña.");
+        await db.from('usuarios_sistema').insert([{ nombre_completo: nombre, usuario: alias, clave: clave, rol: rol, sucursal_id: sucursal_id }]);
+        alert("Usuario registrado.");
+      }
+      cancelarEdicionUser();
+      cargarUsuariosLista();
+    }
+
+    function prepararEdicionUser(id) {
+      const u = usuariosLista.find(x => x.id === id);
+      if (!u) return;
+      document.getElementById('edit-user-id').value = u.id;
+      document.getElementById('user-nombre').value = u.nombre_completo;
+      document.getElementById('user-alias').value = u.usuario;
+      document.getElementById('user-clave').value = '';
+      document.getElementById('user-rol').value = u.rol;
+      document.getElementById('user-sucursal').value = u.sucursal_id || '';
+      document.getElementById('txt-form-user').innerText = "Modificar Usuario";
+      document.getElementById('btn-save-user').innerText = "Actualizar";
+      document.getElementById('btn-cancel-user').classList.remove('hidden');
+    }
+
+    function cancelarEdicionUser() {
+      document.getElementById('edit-user-id').value = '';
+      document.getElementById('user-nombre').value = '';
+      document.getElementById('user-alias').value = '';
+      document.getElementById('user-clave').value = '';
+      document.getElementById('txt-form-user').innerText = "Crear Nuevo Trabajador";
+      document.getElementById('btn-save-user').innerText = "Guardar Usuario";
+      document.getElementById('btn-cancel-user').classList.add('hidden');
+    }
+
+    async function eliminarUsuario(
