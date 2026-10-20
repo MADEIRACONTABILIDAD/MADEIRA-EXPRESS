@@ -7,6 +7,25 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #ticket-impresion, #ticket-impresion * {
+        visibility: visible;
+      }
+      #ticket-impresion {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        display: block !important;
+      }
+    }
+  </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col">
 
@@ -71,7 +90,7 @@
 
     <main class="flex-1 p-6 max-w-7xl mx-auto w-full">
 
-      <!-- ==================== SECCIÓN 1: VENTAS (POS CON STOCK Y MULTI-MONEDA) ==================== -->
+      <!-- ==================== SECCIÓN 1: VENTAS (POS) ==================== -->
       <div id="vista-pos" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-5">
           <div class="flex justify-between items-center mb-4">
@@ -93,7 +112,7 @@
               <input type="text" id="pos-doc-cliente" value="9999999999" class="w-full text-xs p-2 border rounded">
             </div>
 
-            <!-- SELECTOR DE MONEDA DE COBRO -->
+            <!-- MONEDA DE COBRO -->
             <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-200 mb-3 space-y-2">
               <div class="flex items-center justify-between">
                 <span class="text-xs font-bold text-slate-700">Moneda de Cobro:</span>
@@ -129,13 +148,62 @@
               <option value="CREDITO">Crédito</option>
             </select>
             <button onclick="cobrarTicket()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition">
-              <i data-lucide="check-circle" class="w-5 h-5"></i> Cobrar e Imprimir
+              <i data-lucide="check-circle" class="w-5 h-5"></i> Procesar Venta
             </button>
           </div>
         </div>
       </div>
 
-      <!-- ==================== SECCIÓN 2: GESTIÓN DE ENVÍOS ==================== -->
+      <!-- ==================== SECCIÓN 2: HISTORIAL DE VENTAS CON FILTRO DE FECHAS ==================== -->
+      <div id="vista-ventas" class="hidden space-y-4">
+        <div class="bg-white p-5 rounded-xl border border-slate-200">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b">
+            <div>
+              <h2 class="font-bold text-slate-800 flex items-center gap-2"><i data-lucide="history" class="w-5 h-5 text-indigo-600"></i> Reporte e Historial de Ventas</h2>
+              <p class="text-xs text-slate-400">Consulta ventas por rango de fechas y reimprime comprobantes térmicos</p>
+            </div>
+            
+            <!-- FILTRO DE FECHAS -->
+            <div class="flex flex-wrap items-center gap-2 text-xs">
+              <div class="flex items-center gap-1">
+                <span class="font-bold text-slate-600">Desde:</span>
+                <input type="date" id="filtro-fecha-inicio" class="p-1.5 border rounded-lg bg-slate-50 font-semibold">
+              </div>
+              <div class="flex items-center gap-1">
+                <span class="font-bold text-slate-600">Hasta:</span>
+                <input type="date" id="filtro-fecha-fin" class="p-1.5 border rounded-lg bg-slate-50 font-semibold">
+              </div>
+              <button onclick="cargarVentas()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg flex items-center gap-1">
+                <i data-lucide="filter" class="w-3.5 h-3.5"></i> Filtrar
+              </button>
+              <button onclick="limpiarFiltroFechas()" class="px-2 py-1.5 bg-slate-200 hover:bg-slate-300 font-bold rounded-lg text-slate-700">
+                Limpiar
+              </button>
+            </div>
+          </div>
+
+          <div class="py-2 flex justify-between items-center text-xs text-slate-500">
+            <span>Total vendido en el periodo: <b id="txt-total-periodo" class="text-sm font-bold text-indigo-700">$0.00</b></span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+              <thead class="bg-slate-50 text-slate-500 uppercase text-xs border-b">
+                <tr>
+                  <th class="p-3">Nº Comprobante</th>
+                  <th class="p-3">Fecha y Hora</th>
+                  <th class="p-3">Método / Moneda</th>
+                  <th class="p-3 text-right">Total USD</th>
+                  <th class="p-3 text-center">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-ventas-body" class="divide-y"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== SECCIÓN 3: GESTIÓN DE ENVÍOS ==================== -->
       <div id="vista-envios" class="hidden space-y-6">
         <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
           <div class="border-b pb-4 mb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -146,7 +214,7 @@
               <p class="text-xs text-slate-400">Selecciona la ruta de transporte y completa los datos aduaneros</p>
             </div>
             <div class="flex items-center gap-2">
-              <label class="text-xs font-bold text-slate-600">Ruta de Envío:</label>
+              <label class="text-xs font-bold text-slate-600">Ruta:</label>
               <select id="env-ruta" onchange="cambiarRutaEnvio()" class="text-xs font-bold py-2 px-3 border-2 border-indigo-500 rounded-lg bg-indigo-50 text-indigo-800">
                 <option value="USA">✈️ Hacia Estados Unidos (USA)</option>
                 <option value="USA_NICARAGUA">🇳🇮 Estados Unidos ➔ Nicaragua</option>
@@ -303,7 +371,7 @@
         </div>
       </div>
 
-      <!-- ==================== SECCIÓN 3: INVENTARIO (ADMIN) ==================== -->
+      <!-- ==================== SECCIÓN 4: INVENTARIO (ADMIN) ==================== -->
       <div id="vista-inventario" class="hidden space-y-6">
         <div class="bg-white p-5 rounded-xl border border-slate-200">
           <h2 id="titulo-form-prod" class="font-bold mb-4 flex items-center gap-2">
@@ -337,31 +405,6 @@
             </thead>
             <tbody id="tabla-stock" class="divide-y"></tbody>
           </table>
-        </div>
-      </div>
-
-      <!-- ==================== SECCIÓN 4: HISTORIAL DE VENTAS ==================== -->
-      <div id="vista-ventas" class="hidden space-y-4">
-        <div class="bg-white p-5 rounded-xl border border-slate-200">
-          <div class="flex justify-between items-center mb-3">
-            <h2 class="font-bold text-slate-800 flex items-center gap-2"><i data-lucide="history" class="w-5 h-5 text-indigo-600"></i> Historial de Ventas</h2>
-            <button onclick="cargarVentas()" class="text-xs text-indigo-600 font-bold flex items-center gap-1 hover:underline">
-              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Actualizar
-            </button>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm text-left">
-              <thead class="bg-slate-50 text-slate-500 uppercase text-xs border-b">
-                <tr>
-                  <th class="p-3">Nº Comprobante</th>
-                  <th class="p-3">Fecha y Hora</th>
-                  <th class="p-3">Método / Moneda</th>
-                  <th class="p-3 text-right">Total</th>
-                </tr>
-              </thead>
-              <tbody id="tabla-ventas-body" class="divide-y"></tbody>
-            </table>
-          </div>
         </div>
       </div>
 
@@ -409,6 +452,42 @@
     </main>
   </div>
 
+  <!-- PLANTILLA DE TICKET TÉRMICO (SOLO VISIBLE AL IMPRIMIR) -->
+  <div id="ticket-impresion" class="hidden text-black font-mono text-xs max-w-[280px] mx-auto p-2">
+    <div class="text-center pb-2 border-b border-dashed border-black">
+      <h2 class="font-bold text-sm tracking-wider uppercase" id="tkt-empresa">SISTEMA POS & COURIER</h2>
+      <p id="tkt-sucursal" class="text-[10px]">Sucursal Principal</p>
+      <p class="text-[10px]">RUC: 9999999999001</p>
+    </div>
+    <div class="py-2 border-b border-dashed border-black text-[11px] space-y-0.5">
+      <p><b>Comp:</b> <span id="tkt-numero"></span></p>
+      <p><b>Fecha:</b> <span id="tkt-fecha"></span></p>
+      <p><b>Cliente:</b> <span id="tkt-cliente"></span></p>
+      <p><b>Atendido por:</b> <span id="tkt-cajero"></span></p>
+    </div>
+    <table class="w-full text-[11px] my-2">
+      <thead>
+        <tr class="border-b border-black text-left">
+          <th>Cant</th>
+          <th>Desc</th>
+          <th class="text-right">Total</th>
+        </tr>
+      </thead>
+      <tbody id="tkt-items"></tbody>
+    </table>
+    <div class="border-t border-dashed border-black pt-1.5 space-y-1 text-[11px]">
+      <div class="flex justify-between font-bold text-xs">
+        <span>TOTAL:</span>
+        <span id="tkt-total"></span>
+      </div>
+      <p class="text-[10px]"><b>Pago:</b> <span id="tkt-metodo"></span></p>
+    </div>
+    <div class="text-center pt-3 text-[10px] space-y-1">
+      <p>¡Gracias por su preferencia!</p>
+      <p>Revise su mercadería antes de salir.</p>
+    </div>
+  </div>
+
   <script>
     const SUPABASE_URL = "https://pjpkcqyfocuwgxjxntan.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBqcGtjcXlmb2N1d2d4anhudGFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMzMyMjcsImV4cCI6MjEwNzYwOTIyN30.a3pNRzsxjIK_xXFRBd8bP6JUENqBSf8JtsRXAI0sc3Y";
@@ -437,6 +516,14 @@
       lucide.createIcons();
       verificarSesionGuardada();
       cambiarRutaEnvio();
+
+      // Fechas por defecto para el filtro (inicio del mes al día de hoy)
+      const hoy = new Date();
+      const anio = hoy.getFullYear();
+      const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+      const dia = String(hoy.getDate()).padStart(2, '0');
+      document.getElementById('filtro-fecha-fin').value = `${anio}-${mes}-${dia}`;
+      document.getElementById('filtro-fecha-inicio').value = `${anio}-${mes}-01`;
     });
 
     function verificarSesionGuardada() {
@@ -519,7 +606,7 @@
       }
     }
 
-    // ==================== LÓGICA DE VENTAS (CONTROL DE STOCK Y MONEDA) ====================
+    // ==================== LÓGICA DE VENTAS & TICKET ====================
     function renderizarPOS(lista) {
       const c = document.getElementById('grid-pos');
       c.innerHTML = '';
@@ -638,7 +725,6 @@
     async function cobrarTicket() {
       if (carrito.length === 0) return alert("Ticket vacío.");
 
-      // Validación preventiva de stock antes de registrar
       for (const item of carrito) {
         const prod = productos.find(p => p.id === item.id);
         if (!prod || prod.stock_actual < item.cantidad) {
@@ -649,6 +735,7 @@
       const totalUSD = carrito.reduce((sum, i) => sum + (i.cantidad * i.precio_venta), 0);
       const moneda = document.getElementById('pos-moneda').value;
       const metodo = document.getElementById('pos-metodo').value;
+      const docCliente = document.getElementById('pos-doc-cliente').value.trim() || '9999999999';
       const numComp = 'TKT-' + Math.floor(100000 + Math.random() * 900000);
 
       let totalFinalTexto = `$${totalUSD.toFixed(2)} USD`;
@@ -657,41 +744,162 @@
         totalFinalTexto += ` (C$ ${(totalUSD * tasa).toFixed(2)} NIO)`;
       }
 
-      let { data: cliente } = await db.from('clientes').select('id').eq('identificacion', '9999999999').single();
+      let { data: cliente } = await db.from('clientes').select('id, nombre_completo').eq('identificacion', docCliente).single();
       if (!cliente) {
-        const { data: nc } = await db.from('clientes').insert([{ identificacion: '9999999999', nombre_completo: 'CONSUMIDOR FINAL' }]).select().single();
+        const { data: nc } = await db.from('clientes').insert([{ identificacion: docCliente, nombre_completo: docCliente === '9999999999' ? 'CONSUMIDOR FINAL' : 'CLIENTE POS' }]).select().single();
         cliente = nc;
       }
 
+      const metodoDetalle = `${metodo} [${moneda}]`;
       const { data: venta, error } = await db.from('ventas').insert([{
         numero_comprobante: numComp,
         cliente_id: cliente.id,
         total: totalUSD,
-        metodo_pago: `${metodo} [${moneda}]`,
+        metodo_pago: metodoDetalle,
         usuario_sistema_id: usuarioActual.id
       }]).select().single();
 
       if (error) return alert("Error al registrar venta: " + error.message);
 
-      // Guardar detalle y descontar stock por cada producto
-      for (const item of carrito) {
-        await db.from('detalle_ventas').insert([{
-          venta_id: venta.id,
-          producto_id: item.id,
-          cantidad: item.cantidad,
-          precio_unitario: item.precio_venta,
-          subtotal: item.cantidad * item.precio_venta
-        }]);
+      const itemsGuardar = carrito.map(i => ({
+        venta_id: venta.id,
+        producto_id: i.id,
+        cantidad: i.cantidad,
+        precio_unitario: i.precio_venta,
+        subtotal: i.cantidad * i.precio_venta
+      }));
+      await db.from('detalle_ventas').insert(itemsGuardar);
 
+      for (const item of carrito) {
         const nuevoStock = item.stock_actual - item.cantidad;
         await db.from('productos').update({ stock_actual: nuevoStock }).eq('id', item.id);
       }
 
-      alert(`¡Venta realizada con éxito!\nTicket: ${numComp}\nTotal: ${totalFinalTexto}`);
-      window.print();
+      // Preguntar si desea imprimir
+      const deseaImprimir = confirm(`¡Venta realizada con éxito!\nTicket: ${numComp}\nTotal: ${totalFinalTexto}\n\n¿Deseas imprimir el recibo ahora?`);
+
+      if (deseaImprimir) {
+        imprimirReciboTermico({
+          numero: numComp,
+          fecha: new Date().toLocaleString(),
+          cliente: `${cliente.nombre_completo} (${docCliente})`,
+          cajero: usuarioActual.nombre_completo,
+          items: carrito.map(c => ({ cantidad: c.cantidad, nombre: c.nombre, subtotal: (c.cantidad * c.precio_venta).toFixed(2) })),
+          total: totalFinalTexto,
+          metodo: metodoDetalle
+        });
+      }
+
       limpiarCarrito();
       await cargarProductos();
       await cargarVentas();
+    }
+
+    function imprimirReciboTermico(datos) {
+      document.getElementById('tkt-numero').innerText = datos.numero;
+      document.getElementById('tkt-fecha').innerText = datos.fecha;
+      document.getElementById('tkt-cliente').innerText = datos.cliente;
+      document.getElementById('tkt-cajero').innerText = datos.cajero;
+      document.getElementById('tkt-total').innerText = datos.total;
+      document.getElementById('tkt-metodo').innerText = datos.metodo;
+
+      const tb = document.getElementById('tkt-items');
+      tb.innerHTML = '';
+      datos.items.forEach(it => {
+        tb.innerHTML += `
+          <tr>
+            <td class="pr-1">${it.cantidad}</td>
+            <td class="pr-1">${it.nombre}</td>
+            <td class="text-right">$${it.subtotal}</td>
+          </tr>
+        `;
+      });
+
+      window.print();
+    }
+
+    async function reimprimirTicket(ventaId) {
+      const { data: venta } = await db.from('ventas').select('*, clientes(nombre_completo, identificacion), usuarios_sistema(nombre_completo)').eq('id', ventaId).single();
+      if (!venta) return alert("No se encontró la venta.");
+
+      const { data: detalles } = await db.from('detalle_ventas').select('*, productos(nombre)').eq('venta_id', ventaId);
+
+      const items = (detalles || []).map(d => ({
+        cantidad: d.cantidad,
+        nombre: d.productos ? d.productos.nombre : 'Producto',
+        subtotal: parseFloat(d.subtotal).toFixed(2)
+      }));
+
+      const nombreCliente = venta.clientes ? `${venta.clientes.nombre_completo} (${venta.clientes.identificacion})` : 'CONSUMIDOR FINAL';
+      const nombreCajero = venta.usuarios_sistema ? venta.usuarios_sistema.nombre_completo : 'Cajero';
+
+      imprimirReciboTermico({
+        numero: venta.numero_comprobante,
+        fecha: new Date(venta.fecha).toLocaleString(),
+        cliente: nombreCliente,
+        cajero: nombreCajero,
+        items: items,
+        total: `$${parseFloat(venta.total).toFixed(2)} USD`,
+        metodo: venta.metodo_pago
+      });
+    }
+
+    // ==================== HISTORIAL Y FILTRO POR FECHAS ====================
+    async function cargarVentas() {
+      let query = db.from('ventas').select('*').order('fecha', { ascending: false });
+
+      if (usuarioActual && usuarioActual.rol !== 'ADMIN') {
+        query = query.eq('usuario_sistema_id', usuarioActual.id);
+      }
+
+      const fechaIni = document.getElementById('filtro-fecha-inicio').value;
+      const fechaFin = document.getElementById('filtro-fecha-fin').value;
+
+      if (fechaIni) {
+        query = query.gte('fecha', `${fechaIni}T00:00:00.000Z`);
+      }
+      if (fechaFin) {
+        query = query.lte('fecha', `${fechaFin}T23:59:59.999Z`);
+      }
+
+      const { data, error } = await query;
+      if (error) return console.error(error);
+
+      const t = document.getElementById('tabla-ventas-body');
+      t.innerHTML = '';
+      let totalPeriodo = 0;
+
+      if (!data || data.length === 0) {
+        t.innerHTML = `<tr><td colspan="5" class="text-center p-4 text-slate-400">No hay ventas registradas en las fechas seleccionadas.</td></tr>`;
+        document.getElementById('txt-total-periodo').innerText = "$0.00";
+        return;
+      }
+
+      data.forEach(v => {
+        totalPeriodo += parseFloat(v.total);
+        t.innerHTML += `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3 font-mono font-bold text-indigo-700">${v.numero_comprobante}</td>
+            <td class="p-3 text-slate-500">${new Date(v.fecha).toLocaleString()}</td>
+            <td class="p-3"><span class="px-2 py-0.5 rounded text-xs bg-slate-100 font-bold">${v.metodo_pago}</span></td>
+            <td class="p-3 text-right font-bold text-slate-800">$${parseFloat(v.total).toFixed(2)}</td>
+            <td class="p-3 text-center">
+              <button onclick="reimprimirTicket(${v.id})" title="Reimprimir Ticket" class="p-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg inline-flex items-center gap-1 text-xs font-bold transition">
+                <i data-lucide="printer" class="w-4 h-4"></i> Reimprimir
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      document.getElementById('txt-total-periodo').innerText = `$${totalPeriodo.toFixed(2)}`;
+      lucide.createIcons();
+    }
+
+    function limpiarFiltroFechas() {
+      document.getElementById('filtro-fecha-inicio').value = '';
+      document.getElementById('filtro-fecha-fin').value = '';
+      cargarVentas();
     }
 
     function filtrarProductosPOS() {
@@ -699,7 +907,7 @@
       renderizarPOS(productos.filter(p => p.nombre.toLowerCase().includes(q) || (p.codigo_barras && p.codigo_barras.toLowerCase().includes(q))));
     }
 
-    // ==================== FUNCIONES DE ENVÍOS ====================
+    // ==================== RESTO DE FUNCIONES (ENVÍOS, INVENTARIO, ADMIN) ====================
     function cambiarRutaEnvio() {
       const ruta = document.getElementById('env-ruta').value;
       const datalist = document.getElementById('lista-ciudades-destino');
@@ -907,7 +1115,6 @@
       lucide.createIcons();
     }
 
-    // ==================== FUNCIONES BASE (INVENTARIO, SUCURSALES, USUARIOS) ====================
     async function cargarSucursales() {
       const { data } = await db.from('sucursales').select('*');
       sucursales = data || [];
@@ -929,26 +1136,6 @@
       if (usuarioActual && usuarioActual.rol === 'ADMIN') {
         renderizarInventario(productos);
       }
-    }
-
-    async function cargarVentas() {
-      let query = db.from('ventas').select('*').order('fecha', { ascending: false });
-      if (usuarioActual && usuarioActual.rol !== 'ADMIN') {
-        query = query.eq('usuario_sistema_id', usuarioActual.id);
-      }
-      const { data } = await query;
-      const t = document.getElementById('tabla-ventas-body');
-      t.innerHTML = '';
-      (data || []).forEach(v => {
-        t.innerHTML += `
-          <tr class="hover:bg-slate-50">
-            <td class="p-3 font-mono font-bold">${v.numero_comprobante}</td>
-            <td class="p-3 text-slate-500">${new Date(v.fecha).toLocaleString()}</td>
-            <td class="p-3"><span class="px-2 py-0.5 rounded text-xs bg-slate-100 font-bold">${v.metodo_pago}</span></td>
-            <td class="p-3 text-right font-bold text-slate-800">$${parseFloat(v.total).toFixed(2)}</td>
-          </tr>
-        `;
-      });
     }
 
     async function cargarUsuariosLista() {
@@ -1133,6 +1320,10 @@
           const input = document.getElementById('env-tracking');
           if (input) input.focus();
         }, 300);
+      }
+
+      if (v === 'ventas') {
+        cargarVentas();
       }
 
       lucide.createIcons();
